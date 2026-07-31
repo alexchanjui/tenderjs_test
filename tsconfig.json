@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "commonjs",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "experimentalDecorators": true, // (如果未來使用 NestJS 或 TypeORM 會需要)
+    "emitDecoratorMetadata": true, // (同上)
+    "resolveJsonModule": true // 允許匯入 JSON 檔案
+  },
+  "include": ["src/**/*"],
+  "exclude": [
+    "node_modules",
+    "**/*.test.ts", // [新增] 排除測試檔
+    "**/*.spec.ts", // [新增] 排除規格檔
+    "src/**/__tests__/*" // [新增] 排除測試目錄
+  ]
+}
