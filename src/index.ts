@@ -2,17 +2,19 @@
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
-import { getLoggerConfig } from "./configs/logger.config";
 import logger from "./utils/logger";
 import prisma from "./utils/prisma";
 import redis from "./utils/redis";
+import { registerRoutes } from "./routes";
+import { loggerConfigService } from "./configs/logger.config";
 
 dotenv.config();
 
 /**
  * 初始化 Logger
  */
-logger.init(getLoggerConfig());
+const loggerConfig = loggerConfigService.getLoggerConfig();
+logger.init(loggerConfig);
 
 const app = express();
 const port = Number(process.env.PORT ?? 3001);
@@ -29,14 +31,7 @@ app.use(
 
 app.use(express.json());
 
-/**
- * 健康檢查
- */
-app.get("/api/health", (_req, res) => {
-  res.status(200).json({
-    status: "UP",
-  });
-});
+registerRoutes(app);
 
 /**
  * 啟動應用程式
@@ -48,7 +43,7 @@ const bootstrap = async (): Promise<void> => {
      */
     await prisma.connect();
 
-    logger.info("資料庫連線成功");
+    logger.info("✅ 資料庫連線成功");
 
     /**
      * 建立 Redis 連線

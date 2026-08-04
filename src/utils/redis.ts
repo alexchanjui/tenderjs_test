@@ -1,74 +1,95 @@
 // src/utils/redis.ts
-import { createClient } from "redis";
+import Redis from "ioredis";
 import logger from "./logger";
 
-/**
- * 建立 Redis Client
- * 全專案共用同一個 Redis 連線實例。
- */
-const client = createClient({
-  url: process.env.REDIS_URL,
-});
+export class RedisService {
+  public readonly client: Redis;
 
-/**
- * Redis 錯誤事件
- */
-client.on("error", (error) => {
-  logger.error("❌ Redis Runtime Error", {
-    error: error.message,
-  });
-});
+  constructor() {
+    const redisUrl = process.env.REDIS_URL;
 
-/**
- * 建立 Redis 連線
- */
-const connect = async (): Promise<void> => {
-  const TIMEOUT_MS = 5000;
-
-  if (client.isOpen) {
-    return;
-  }
-
-  logger.info("⏳ 正在等待 Redis 連線...");
-
-  const timeoutPromise = new Promise<never>((_, reject) => {
-    setTimeout(() => {
-      reject(
-        new Error(`Redis 連線逾時 (${TIMEOUT_MS}ms) - 請檢查 Redis 是否已啟動`),
-      );
-    }, TIMEOUT_MS);
-  });
-
-  try {
-    await Promise.race([client.connect(), timeoutPromise]);
-
-    const response = await client.ping();
-
-    if (response !== "PONG") {
-      throw new Error(`Redis 回應異常：${response}`);
+    if (!redisUrl) {
+      throw new Error("缺少 REDIS_URL 環境變數");
     }
 
-    logger.info("✅ Redis 連線檢查通過 (Ready)");
-  } catch (error) {
-    logger.fatal("❌ Redis 啟動連線失敗，服務將終止", error);
+    /**
+     * 建立 Redis Client
+     *
+     * lazyConnect：
+     * 建立實例時不立即連線，由 connect() 統一控制。
+     */
+    this.client = new Redis(redisUrl, {
+      lazyConnect: true,
+      retryStrategy: (times) => Math.min(times * 50, 2000),
+    });
+
+    /**
+     * Redis 執行期間錯誤事件
+     */
+    this.client.on("error", (error) => {
+      logger.error("❌ Redis Runtime Error", {
+        error: error.message,
+      });
+    });
   }
-};
 
-/**
- * 關閉 Redis 連線
- */
-const disconnect = async (): Promise<void> => {
-  if (!client.isOpen) {
-    return;
+  /**
+   * 建立 Redis 連線
+   */
+  public async connect(): Promise<void> {
+    const TIMEOUT_MS = 5000;
+
+    if (this.client.status === "ready") {
+      return;
+    }
+
+    logger.info("⏳ 正在等待 Redis 連線...");
+
+    let timeoutId: NodeJS.Timeout | undefined;
+
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      timeoutId = setTimeout(() => {
+        reject(
+          new Error(
+            `Redis 連線逾時 (${TIMEOUT_MS}ms) - 請檢查 Redis 是否已啟動`,
+          ),
+        );
+      }, TIMEOUT_MS);
+    });
+
+    try {
+      await Promise.race([this.client.connect(), timeoutPromise]);
+
+      const response = await this.client.ping();
+
+      if (response !== "PONG") {
+        throw new Error(`Redis 回應異常：${response}`);
+      }
+
+      logger.info("✅ Redis 連線檢查通過 (Ready)");
+    } catch (error) {
+      logger.error("❌ Redis 啟動連線失敗", error);
+      throw error;
+    } finally {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    }
   }
 
-  await client.disconnect();
+  /**
+   * 關閉 Redis 連線
+   */
+  public async disconnect(): Promise<void> {
+    if (this.client.status === "end") {
+      return;
+    }
 
-  logger.info("Redis 已斷線");
-};
+    await this.client.quit();
 
-export default {
-  client,
-  connect,
-  disconnect,
-};
+    logger.info("Redis 已斷線");
+  }
+}
+
+const redisInstance = new RedisService();
+export default redisInstance;

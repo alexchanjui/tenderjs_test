@@ -19,7 +19,6 @@
     "express": "^5.2.1",
     "ioredis": "^5.11.1",
     "prisma": "^6.19.3",
-    "redis": "^6.1.0",
     "winston": "^3.19.0",
     "winston-daily-rotate-file": "^5.0.0"
   },

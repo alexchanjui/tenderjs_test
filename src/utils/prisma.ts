@@ -1,28 +1,20 @@
 // src/utils/prisma.ts
 import { PrismaClient } from "@prisma/client";
 
-/**
- * 建立 Prisma Client
- * 全專案共用同一個資料庫連線實例。
- */
-const client = new PrismaClient();
+export class PrismaService {
+  public readonly client: PrismaClient;
 
-/**
- * 建立資料庫連線
- */
-const connect = async (): Promise<void> => {
-  await client.$connect();
-};
+  constructor() {
+    this.client = new PrismaClient();
+  }
 
-/**
- * 關閉資料庫連線
- */
-const disconnect = async (): Promise<void> => {
-  await client.$disconnect();
-};
+  /**
+   * 建立資料庫連線
+   */
+  public async connect(): Promise<void> {
+    await this.client.$connect();
+  }
+}
 
-export default {
-  client,
-  connect,
-  disconnect,
-};
+const prismaInstance = new PrismaService();
+export default prismaInstance;

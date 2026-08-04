@@ -1,13 +1,26 @@
-// src/config/logger.ts
-import type { LoggerConfig } from "../utils/logger";
+// src/configs/logger.config.ts
 
 /**
- * 取得 Logger 設定
+ * Logger 設定
  */
-export const getLoggerConfig = (): LoggerConfig => ({
-  stdout: process.env.LOG_STDOUT === "true",
-  level: process.env.LOG_LEVEL?.toLowerCase() || "info",
-  file: process.env.LOG_FILE || "./logs/app.log",
-  rotation: process.env.LOG_ROTATION === "true",
-  max_size: Number.parseInt(process.env.LOG_MAX_SIZE || "10", 10),
-});
+export interface LoggerConfig {
+  stdout: boolean;
+  level: string;
+  file: string;
+  rotation: boolean;
+  max_size: number;
+}
+
+class LoggerConfigService {
+  public getLoggerConfig(): LoggerConfig {
+    return {
+      stdout: process.env.LOG_STDOUT === "true",
+      level: process.env.LOG_LEVEL?.toLowerCase() || "info",
+      file: process.env.LOG_FILE || "./logs/app.log",
+      rotation: process.env.LOG_ROTATION === "true",
+      max_size: Number.parseInt(process.env.LOG_MAX_SIZE || "10", 10),
+    };
+  }
+}
+
+export const loggerConfigService = new LoggerConfigService();
