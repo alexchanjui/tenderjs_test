@@ -6,3 +6,31 @@ datasource db {
   provider = "sqlserver"
   url      = env("DATABASE_URL")
 }
+
+// ==========================================
+// 核心系統模組 (Core System Models)
+// ==========================================
+
+/// 系統使用者帳號
+/// 包含登入憑證與帳號狀態
+model User {
+  /// 使用者 ID（UUID）
+  id String @id @default(dbgenerated("newid()")) @db.UniqueIdentifier
+
+  /// 使用者名稱
+  username String @unique
+
+  /// 登入信箱
+  email String @unique
+
+  /// 密碼 Hash (Bcrypt)
+  password String
+
+  /// 帳號是否啟用
+  isActive Boolean @default(true) @map("is_active")
+
+  createdAt DateTime @default(now()) @map("create_time")
+  updatedAt DateTime @updatedAt @map("update_time")
+
+  @@map("user")
+}
