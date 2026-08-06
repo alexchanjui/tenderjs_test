@@ -1,35 +1,60 @@
 // src/controllers/user.controller.ts
-import type { Request, Response } from "express";
+import { Router } from "express";
+import type { Request, Response, NextFunction } from "express";
+import type { UserService } from "../services/user.service";
+import type { IController } from "./interface/controller.interface";
+import * as R from "../utils/response";
 
-const getUsers = (_req: Request, res: Response): void => {
-  res.json({
-    message: "取得使用者列表",
-  });
-};
+/**
+ * User Controller
+ */
+export class UserController implements IController {
+  public path = "/users";
+  public router = Router();
 
-const getUserById = (req: Request, res: Response): void => {
-  const { id } = req.params;
+  constructor(private readonly userService: UserService) {
+    this.initializeRoutes();
+  }
 
-  res.json({
-    id,
-    message: "取得單一使用者",
-  });
-};
+  /**
+   * 初始化路由
+   */
+  private initializeRoutes(): void {
+    this.router.post("/", this.createUser);
+    this.router.get("/me", this.getMyUserInfo);
+  }
 
-const createUser = (req: Request, res: Response): void => {
-  const { name, email } = req.body;
+  /**
+   * 建立使用者
+   */
+  private createUser = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
+    try {
+      const user = await this.userService.createUser(req.body);
 
-  res.status(201).json({
-    message: "新增使用者成功",
-    data: {
-      name,
-      email,
-    },
-  });
-};
+      R.success(res, user, "註冊成功");
+    } catch (error) {
+      next(error);
+    }
+  };
 
-export default {
-  getUsers,
-  getUserById,
-  createUser,
-};
+  /**
+   * 取得目前登入使用者資訊
+   */
+  private getMyUserInfo = async (
+    _req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
+    try {
+      const user = await this.userService.getMyUser();
+
+      R.success(res, user);
+    } catch (error) {
+      next(error);
+    }
+  };
+}
