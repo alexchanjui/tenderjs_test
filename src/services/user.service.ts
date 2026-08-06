@@ -3,6 +3,8 @@ import bcrypt from "bcrypt";
 import { plainToInstance } from "class-transformer";
 import { type CreateUserDto, UserResponseDto } from "../dtos/user.dto";
 import type { IServiceContext } from "../types/service.context";
+import { ErrorCode } from "../errors/error.codes";
+import { AppError } from "../errors/app.error";
 
 /**
  * User Service
@@ -23,7 +25,7 @@ export class UserService {
     const existingUser = await this.ctx.repos.user.findByEmail(email);
 
     if (existingUser) {
-      throw new Error("Email 已被使用");
+      throw new AppError(ErrorCode.ACCOUNT_EXIST);
     }
 
     // 2. 密碼加密
@@ -49,17 +51,21 @@ export class UserService {
     const userId = this.ctx.currentUser?.id;
 
     if (!userId) {
-      throw new Error("尚未登入");
+      throw new AppError(ErrorCode.UNAUTH);
     }
 
     const user = await this.ctx.repos.user.findById(userId);
 
     if (!user) {
-      throw new Error("使用者不存在");
+      throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);
     }
 
     return plainToInstance(UserResponseDto, user, {
       excludeExtraneousValues: true,
     });
   }
+
+  /**
+   * 取得使用者列表 (分頁)
+   */
 }

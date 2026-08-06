@@ -3,6 +3,8 @@ import { Router } from "express";
 import type { Request, Response, NextFunction } from "express";
 import type { UserService } from "../services/user.service";
 import type { IController } from "./interface/controller.interface";
+import { validationMiddleware } from "../middlewares/validation.middleware";
+import { CreateUserDto } from "../dtos/user.dto";
 import * as R from "../utils/response";
 
 /**
@@ -20,7 +22,7 @@ export class UserController implements IController {
    * 初始化路由
    */
   private initializeRoutes(): void {
-    this.router.post("/", this.createUser);
+    this.router.post("/", validationMiddleware(CreateUserDto), this.createUser);
     this.router.get("/me", this.getMyUserInfo);
   }
 

@@ -3,15 +3,21 @@ import loggerInstance from "./utils/logger";
 import prismaInstance from "./utils/prisma";
 import redisInstance from "./utils/redis";
 
+// Repositories
+import { UserPrismaRepository } from "./repositories/prisma/user.prisma.repository";
+
 // Services
 import { HealthService } from "./services/health.service";
+import { UserService } from "./services/user.service";
 
 // Controllers
 import { HealthController } from "./controllers/health.controller";
+import { UserController } from "./controllers/user.controller";
 import type { IController } from "./controllers/interface/controller.interface";
 
 // Types
 import type { IServiceContext } from "./types/service.context";
+import type { IDbContext } from "./types/db.context";
 
 /**
  * 應用程式容器
@@ -26,22 +32,42 @@ export class AppContainer {
    */
   public getControllers(): IController[] {
     /**
+     * 建立 Repository Context (DB Context)
+     */
+    const dbContext: IDbContext = {
+      logger: loggerInstance,
+      prisma: prismaInstance.client,
+    };
+
+    /**
+     * 建立 Repositories
+     */
+    const userRepo = new UserPrismaRepository(dbContext);
+
+    /**
      * 建立 Service 共用依賴
      */
     const ctx: IServiceContext = {
       logger: loggerInstance,
       prisma: prismaInstance.client,
       redis: redisInstance.client,
+      repos: {
+        user: userRepo,
+      },
     };
 
     /**
      * 組裝 Services
      */
     const healthService = new HealthService(ctx);
+    const userService = new UserService(ctx);
 
     /**
      * 組裝 Controllers
      */
-    return [new HealthController(healthService)];
+    return [
+      new HealthController(healthService),
+      new UserController(userService),
+    ];
   }
 }
