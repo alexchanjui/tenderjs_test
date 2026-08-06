@@ -7,6 +7,7 @@ import prisma from "./utils/prisma";
 import redis from "./utils/redis";
 import { registerRoutes } from "./routes";
 import { loggerConfigService } from "./configs/logger.config";
+import { errorMiddleware } from "./middlewares/error.middleware";
 
 dotenv.config();
 
@@ -32,6 +33,8 @@ app.use(
 app.use(express.json());
 
 registerRoutes(app);
+
+app.use(errorMiddleware);
 
 /**
  * 啟動應用程式
