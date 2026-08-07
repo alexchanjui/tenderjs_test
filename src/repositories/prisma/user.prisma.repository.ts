@@ -1,5 +1,5 @@
 // src/repositories/prisma/user.prisma.repository.ts
-import type { User } from "@prisma/client";
+import type { Prisma, User } from "@prisma/client";
 import type { CreateUserDto } from "../../dtos/user.dto";
 import type { IUserRepository } from "../interface/user.repository.interface";
 import type { IDbContext } from "../../types/db.context";
@@ -43,5 +43,25 @@ export class UserPrismaRepository implements IUserRepository {
         email,
       },
     });
+  }
+
+  /**
+   * 取得使用者列表 (分頁)
+   */
+  public async findAndCount(params: {
+    skip?: number;
+    take?: number;
+    orderBy?: Prisma.UserOrderByWithRelationInput;
+  }): Promise<[User[], number]> {
+    this.ctx.logger.debug("[DB] Finding users with pagination");
+
+    return this.ctx.prisma.$transaction([
+      this.ctx.prisma.user.findMany({
+        skip: params.skip,
+        take: params.take,
+        orderBy: params.orderBy,
+      }),
+      this.ctx.prisma.user.count(),
+    ]);
   }
 }

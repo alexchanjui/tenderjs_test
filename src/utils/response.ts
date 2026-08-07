@@ -3,12 +3,31 @@ import type { Response } from "express";
 import { ErrorCode, ErrorMessage } from "../errors/error.codes";
 
 /**
+ * 分頁資訊
+ */
+export interface PaginationMeta {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+/**
+ * 帶 Meta 的成功結果
+ */
+export interface SuccessResult<T> {
+  data: T;
+  meta: PaginationMeta;
+}
+
+/**
  * 統一 API 回應格式
  */
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   code: ErrorCode;
   msg: string;
   data: T | null;
+  meta?: PaginationMeta;
 }
 
 /**
@@ -20,11 +39,13 @@ const sendResult = <T>(
   code: ErrorCode,
   msg: string,
   data: T | null = null,
+  meta?: PaginationMeta,
 ): void => {
   const response: ApiResponse<T> = {
     code,
     msg,
     data,
+    ...(meta ? { meta } : {}),
   };
 
   res.status(httpStatus).json(response);
@@ -32,17 +53,51 @@ const sendResult = <T>(
 
 /**
  * 成功回應
+ *
+ * 一般資料：
+ * success(res, result)
+ *
+ * 分頁資料：
+ * success(res, { data: result, meta })
  */
-export const success = <T>(
+export function success<T>(res: Response, data: T, msg?: string): void;
+
+export function success<T>(
   res: Response,
-  data: T | null = null,
+  result: SuccessResult<T>,
+  msg?: string,
+): void;
+
+export function success<T>(
+  res: Response,
+  result: T | SuccessResult<T>,
   msg = ErrorMessage[ErrorCode.SUCCESS],
-): void => {
-  sendResult(res, 200, ErrorCode.SUCCESS, msg, data);
-};
+): void {
+  if (
+    typeof result === "object" &&
+    result !== null &&
+    "data" in result &&
+    "meta" in result
+  ) {
+    const paginationResult = result as SuccessResult<T>;
+
+    sendResult(
+      res,
+      200,
+      ErrorCode.SUCCESS,
+      msg,
+      paginationResult.data,
+      paginationResult.meta,
+    );
+
+    return;
+  }
+
+  sendResult(res, 200, ErrorCode.SUCCESS, msg, result as T);
+}
 
 /**
- * 業務錯誤回應 (HTTP 200)
+ * 業務錯誤回應
  */
 export const failed = (
   res: Response,
@@ -54,7 +109,7 @@ export const failed = (
 };
 
 /**
- * 系統錯誤回應 (HTTP 500)
+ * 系統錯誤回應
  */
 export const error = (
   res: Response,

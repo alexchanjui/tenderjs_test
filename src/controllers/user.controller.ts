@@ -4,7 +4,7 @@ import type { Request, Response, NextFunction } from "express";
 import type { UserService } from "../services/user.service";
 import type { IController } from "./interface/controller.interface";
 import { validationMiddleware } from "../middlewares/validation.middleware";
-import { CreateUserDto } from "../dtos/user.dto";
+import { CreateUserDto, GetUserListRequestDto } from "../dtos/user.dto";
 import * as R from "../utils/response";
 
 /**
@@ -22,8 +22,12 @@ export class UserController implements IController {
    * 初始化路由
    */
   private initializeRoutes(): void {
+    this.router.get(
+      "/",
+      validationMiddleware(GetUserListRequestDto, "query"),
+      this.getUsers,
+    );
     this.router.post("/", validationMiddleware(CreateUserDto), this.createUser);
-    this.router.get("/me", this.getMyUserInfo);
   }
 
   /**
@@ -35,26 +39,28 @@ export class UserController implements IController {
     next: NextFunction,
   ): Promise<void> => {
     try {
-      const user = await this.userService.createUser(req.body);
+      const result = await this.userService.createUser(req.body);
 
-      R.success(res, user, "註冊成功");
+      R.success(res, result);
     } catch (error) {
       next(error);
     }
   };
 
   /**
-   * 取得目前登入使用者資訊
+   * 取得使用者列表
    */
-  private getMyUserInfo = async (
+  private getUsers = async (
     _req: Request,
     res: Response,
     next: NextFunction,
   ): Promise<void> => {
     try {
-      const user = await this.userService.getMyUser();
+      const dto = res.locals.query;
 
-      R.success(res, user);
+      const result = await this.userService.getUsers(dto);
+
+      R.success(res, result);
     } catch (error) {
       next(error);
     }

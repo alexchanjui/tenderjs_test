@@ -1,7 +1,12 @@
 // src/services/user.service.ts
 import bcrypt from "bcrypt";
 import { plainToInstance } from "class-transformer";
-import { type CreateUserDto, UserResponseDto } from "../dtos/user.dto";
+import {
+  UserResponseDto,
+  GetUserListRequestDto,
+  type CreateUserDto,
+  type GetUserListResponseDto,
+} from "../dtos/user.dto";
 import type { IServiceContext } from "../types/service.context";
 import { ErrorCode } from "../errors/error.codes";
 import { AppError } from "../errors/app.error";
@@ -68,4 +73,29 @@ export class UserService {
   /**
    * 取得使用者列表 (分頁)
    */
+  public async getUsers(
+    dto: GetUserListRequestDto,
+  ): Promise<GetUserListResponseDto> {
+    const { page, limit } = dto;
+
+    const skip = (page - 1) * limit;
+
+    const [users, total] = await this.ctx.repos.user.findAndCount({
+      skip,
+      take: limit,
+      orderBy: { createdAt: "desc" },
+    });
+
+    return {
+      data: plainToInstance(UserResponseDto, users, {
+        excludeExtraneousValues: true,
+      }),
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
 }

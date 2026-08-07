@@ -1,24 +1,22 @@
 // src/middlewares/validation.middleware.ts
-import type { ClassConstructor } from "class-transformer";
-import { plainToInstance } from "class-transformer";
+import { plainToInstance, type ClassConstructor } from "class-transformer";
 import { validate } from "class-validator";
 import type { NextFunction, Request, RequestHandler, Response } from "express";
 import { AppError } from "../errors/app.error";
 import { ErrorCode } from "../errors/error.codes";
 
+type ValidationTarget = "body" | "query" | "params";
+
 /**
- * 驗證 Request Body
+ * DTO 驗證 Middleware
  */
 export const validationMiddleware = <T extends object>(
   dtoClass: ClassConstructor<T>,
+  target: ValidationTarget = "body",
 ): RequestHandler => {
-  return async (
-    req: Request,
-    _res: Response,
-    next: NextFunction,
-  ): Promise<void> => {
+  return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const dto = plainToInstance(dtoClass, req.body);
+      const dto = plainToInstance(dtoClass, req[target]);
 
       const errors = await validate(dto, {
         whitelist: true,
@@ -27,16 +25,13 @@ export const validationMiddleware = <T extends object>(
       });
 
       if (errors.length > 0) {
-        const firstError = errors[0];
-        const firstMessage = Object.values(firstError.constraints ?? {})[0];
-
         throw new AppError(
           ErrorCode.REQUEST_DATA,
-          firstMessage ?? "請求參數錯誤",
+          Object.values(errors[0].constraints ?? {})[0],
         );
       }
 
-      req.body = dto;
+      res.locals[target] = dto;
 
       next();
     } catch (error) {
