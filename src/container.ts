@@ -9,10 +9,12 @@ import { UserPrismaRepository } from "./repositories/prisma/user.prisma.reposito
 // Services
 import { HealthService } from "./services/health.service";
 import { UserService } from "./services/user.service";
+import { AuthService } from "./services/auth.service";
 
 // Controllers
 import { HealthController } from "./controllers/health.controller";
 import { UserController } from "./controllers/user.controller";
+import { AuthController } from "./controllers/auth.controller";
 import type { IController } from "./controllers/interface/controller.interface";
 
 // Types
@@ -61,6 +63,7 @@ export class AppContainer {
      */
     const healthService = new HealthService(ctx);
     const userService = new UserService(ctx);
+    const authService = new AuthService(ctx);
 
     /**
      * 組裝 Controllers
@@ -68,6 +71,7 @@ export class AppContainer {
     return [
       new HealthController(healthService),
       new UserController(userService),
+      new AuthController(authService),
     ];
   }
 }

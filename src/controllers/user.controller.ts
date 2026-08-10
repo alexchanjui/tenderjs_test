@@ -1,6 +1,7 @@
 // src/controllers/user.controller.ts
 import { Router } from "express";
 import type { Request, Response, NextFunction } from "express";
+import { plainToInstance } from "class-transformer";
 import type { UserService } from "../services/user.service";
 import type { IController } from "./interface/controller.interface";
 import { validationMiddleware } from "../middlewares/validation.middleware";
@@ -39,7 +40,9 @@ export class UserController implements IController {
     next: NextFunction,
   ): Promise<void> => {
     try {
-      const result = await this.userService.createUser(req.body);
+      const dto = plainToInstance(CreateUserDto, req.body);
+
+      const result = await this.userService.createUser(dto);
 
       R.success(res, result);
     } catch (error) {
@@ -51,12 +54,12 @@ export class UserController implements IController {
    * 取得使用者列表
    */
   private getUsers = async (
-    _req: Request,
+    req: Request,
     res: Response,
     next: NextFunction,
   ): Promise<void> => {
     try {
-      const dto = res.locals.query;
+      const dto = plainToInstance(GetUserListRequestDto, req.query);
 
       const result = await this.userService.getUsers(dto);
 

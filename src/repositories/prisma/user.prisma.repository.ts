@@ -24,7 +24,7 @@ export class UserPrismaRepository implements IUserRepository {
   }
 
   /**
-   * 依 ID 取得使用者
+   * 根據 ID 取得使用者
    */
   public async findById(id: string): Promise<User | null> {
     return this.ctx.prisma.user.findUnique({
@@ -35,12 +35,23 @@ export class UserPrismaRepository implements IUserRepository {
   }
 
   /**
-   * 依 Email 取得使用者
+   * 根據 Email 取得使用者
    */
   public async findByEmail(email: string): Promise<User | null> {
     return this.ctx.prisma.user.findUnique({
       where: {
         email,
+      },
+    });
+  }
+
+  /**
+   * 根據 Username 取得使用者
+   */
+  public async findByUsername(username: string): Promise<User | null> {
+    return this.ctx.prisma.user.findUnique({
+      where: {
+        username,
       },
     });
   }
