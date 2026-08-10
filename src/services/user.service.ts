@@ -52,14 +52,10 @@ export class UserService {
   /**
    * 取得目前登入的使用者資訊
    */
-  public async getMyUser(): Promise<UserResponseDto> {
-    const userId = this.ctx.currentUser?.id;
+  public async getMyUserInfo(): Promise<UserResponseDto> {
+    const id = this.ctx.currentUser?.id || "";
 
-    if (!userId) {
-      throw new AppError(ErrorCode.UNAUTH);
-    }
-
-    const user = await this.ctx.repos.user.findById(userId);
+    const user = await this.ctx.repos.user.findById(id);
 
     if (!user) {
       throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);

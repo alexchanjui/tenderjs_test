@@ -20,6 +20,7 @@ import type { IController } from "./controllers/interface/controller.interface";
 // Types
 import type { IServiceContext } from "./types/service.context";
 import type { IDbContext } from "./types/db.context";
+import { requestContextStorage } from "./utils/request-context";
 
 /**
  * 應用程式容器
@@ -55,6 +56,9 @@ export class AppContainer {
       redis: redisInstance.client,
       repos: {
         user: userRepo,
+      },
+      get currentUser() {
+        return requestContextStorage.getStore();
       },
     };
 

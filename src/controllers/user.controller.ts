@@ -1,5 +1,6 @@
 // src/controllers/user.controller.ts
 import { Router } from "express";
+import { authMiddleware } from "../middlewares/auth.middleware";
 import type { Request, Response, NextFunction } from "express";
 import { plainToInstance } from "class-transformer";
 import type { UserService } from "../services/user.service";
@@ -23,11 +24,13 @@ export class UserController implements IController {
    * 初始化路由
    */
   private initializeRoutes(): void {
+    this.router.use(authMiddleware);
     this.router.get(
       "/",
       validationMiddleware(GetUserListRequestDto, "query"),
       this.getUsers,
     );
+    this.router.get("/me", this.getMyUserInfo);
     this.router.post("/", validationMiddleware(CreateUserDto), this.createUser);
   }
 
@@ -43,6 +46,23 @@ export class UserController implements IController {
       const dto = plainToInstance(CreateUserDto, req.body);
 
       const result = await this.userService.createUser(dto);
+
+      R.success(res, result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  /**
+   * 取得目前登入使用者資訊
+   */
+  private getMyUserInfo = async (
+    _req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
+    try {
+      const result = await this.userService.getMyUserInfo();
 
       R.success(res, result);
     } catch (error) {
