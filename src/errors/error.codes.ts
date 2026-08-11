@@ -31,13 +31,15 @@ export enum ErrorCode {
   DUPLICATE = 118, // 資料已存在
 
   /**
-   * 帳號與使用者
+   * 登入與狀態
    */
+  ACCOUNT_PERMISSION = 300, // 帳戶權限不足
   ACCOUNT_NOT_EXIST = 301, // 帳號不存在
   ACCOUNT_DISABLED = 302, // 帳號已停用
   ACCOUNT_AND_PASSWORD = 303, // 帳號或密碼錯誤
   ACCOUNT_EXIST = 304, // 帳號已存在
   CREATE_USER_FAILED = 306, // 建立使用者失敗
+  AUTH_TOKEN_EXPIRED = 316, // 登入狀態已失效，請重新登入
 
   /**
    * 密碼
@@ -69,11 +71,13 @@ export const ErrorMessage: Record<ErrorCode, string> = {
   [ErrorCode.DATA_NOT_FOUND]: "找不到資料",
   [ErrorCode.DUPLICATE]: "資料重複",
 
+  [ErrorCode.ACCOUNT_PERMISSION]: "帳戶權限不足",
   [ErrorCode.ACCOUNT_NOT_EXIST]: "帳號不存在",
   [ErrorCode.ACCOUNT_DISABLED]: "帳號已停用",
   [ErrorCode.ACCOUNT_AND_PASSWORD]: "帳號或密碼錯誤",
   [ErrorCode.ACCOUNT_EXIST]: "帳號已存在",
   [ErrorCode.CREATE_USER_FAILED]: "建立使用者失敗",
+  [ErrorCode.AUTH_TOKEN_EXPIRED]: "登入狀態已失效，請重新登入",
 
   [ErrorCode.PASSWORD_ERROR]: "密碼錯誤",
   [ErrorCode.PASSWORD_FORMAT]: "密碼格式錯誤",

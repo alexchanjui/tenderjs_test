@@ -1,10 +1,8 @@
 // src/middlewares/auth.middleware.ts
 import type { NextFunction, Request, Response } from "express";
-import { jwtVerify } from "jose";
-
 import { AppError } from "../errors/app.error";
 import { ErrorCode } from "../errors/error.codes";
-import type { CurrentUser } from "../types/service.context";
+import { verifyAuthToken } from "../utils/auth.helper";
 import { requestContextStorage } from "../utils/request-context";
 
 /**
@@ -28,25 +26,10 @@ export const authMiddleware = async (
       ? authHeader.slice(7)
       : authHeader;
 
-    // 3. 取得 JWT Secret
-    const secret = new TextEncoder().encode(
-      process.env.JWT_SECRET || "dev_secret_key",
-    );
+    // 3. 驗證 Token 並取得目前登入者
+    const currentUser = await verifyAuthToken(token);
 
-    // 4. 驗證 Token
-    const { payload } = await jwtVerify(token, secret);
-
-    // 5. 檢查必要資料
-    if (!payload.id) {
-      throw new AppError(ErrorCode.UNAUTH);
-    }
-
-    // 6. 組成目前登入者資料
-    const currentUser: CurrentUser = {
-      id: payload.id as string,
-    };
-
-    // 7. 將目前登入者放進這次 Request 的 Context
+    // 4. 將目前登入者放進這次 Request 的 Context
     requestContextStorage.run(currentUser, () => {
       next();
     });
