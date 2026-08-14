@@ -24,6 +24,8 @@ export class UserController implements IController {
    * 初始化路由
    */
   private initializeRoutes(): void {
+    this.router.post("/", validationMiddleware(CreateUserDto), this.createUser);
+
     this.router.use(authMiddleware);
     this.router.get(
       "/",
@@ -31,7 +33,6 @@ export class UserController implements IController {
       this.getUsers,
     );
     this.router.get("/me", this.getMyUserInfo);
-    this.router.post("/", validationMiddleware(CreateUserDto), this.createUser);
   }
 
   /**

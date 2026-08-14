@@ -3,6 +3,8 @@ import "reflect-metadata";
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
+import swaggerUi from "swagger-ui-express";
+import { swaggerSpec } from "./configs/swagger.config";
 import logger from "./utils/logger";
 import prisma from "./utils/prisma";
 import redis from "./utils/redis";
@@ -33,8 +35,22 @@ app.use(
 
 app.use(express.json());
 
+/**
+ * 設定 Swagger UI
+ */
+if (process.env.ENABLE_SWAGGER === "true") {
+  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+  logger.info("✅ Swagger UI 已啟用: /api-docs");
+}
+
+/**
+ * 註冊 API Routes
+ */
 registerRoutes(app);
 
+/**
+ * 全域錯誤處理
+ */
 app.use(errorMiddleware);
 
 /**
