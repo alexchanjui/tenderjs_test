@@ -3,6 +3,7 @@ import type { PrismaClient } from "@prisma/client";
 import type Redis from "ioredis";
 import type { LoggerService } from "../utils/logger";
 import { IUserRepository } from "../repositories/interface/user.repository.interface";
+import { IRoleRepository } from "../repositories/interface/role.repository.interface";
 
 /**
  * 目前登入的使用者資訊
@@ -16,6 +17,7 @@ export interface CurrentUser {
  */
 export interface IRepositoryContext {
   user: IUserRepository;
+  role: IRoleRepository;
 }
 
 /**

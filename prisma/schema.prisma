@@ -11,26 +11,62 @@ datasource db {
 // 核心系統模組 (Core System Models)
 // ==========================================
 
-/// 系統使用者帳號
-/// 包含登入憑證與帳號狀態
+/// 系統使用者
+/// 負責儲存使用者登入資訊、帳號狀態與基本資料
 model User {
-  /// 使用者 ID（UUID）
+  /// 使用者 ID
   id String @id @default(dbgenerated("newid()")) @db.UniqueIdentifier
 
   /// 使用者名稱
   username String @unique
 
-  /// 登入信箱
+  /// 使用者 Email
   email String @unique
 
-  /// 密碼 Hash (Bcrypt)
+  /// 使用者密碼（Bcrypt Hash）
   password String
 
   /// 帳號是否啟用
   isActive Boolean @default(true) @map("is_active")
 
+  /// 所屬角色 ID
+  roleId String? @map("role_id") @db.UniqueIdentifier
+
+  /// 所屬角色
+  role Role? @relation(fields: [roleId], references: [id])
+
+  /// 建立時間
   createdAt DateTime @default(now()) @map("create_time")
+
+  /// 更新時間
   updatedAt DateTime @updatedAt @map("update_time")
 
   @@map("user")
+}
+
+/// 系統角色
+/// 負責定義使用者角色，例如 ADMIN、USER
+model Role {
+  /// 角色 ID
+  id String @id @default(dbgenerated("newid()")) @db.UniqueIdentifier
+
+  /// 角色名稱
+  name String @unique
+
+  /// 角色說明
+  description String?
+
+  /// 角色是否啟用
+  isActive Boolean @default(true) @map("is_active")
+
+  /// 建立時間
+  createdAt DateTime @default(now()) @map("create_time")
+
+  /// 更新時間
+  updatedAt DateTime @updatedAt @map("update_time")
+
+  /// 使用此角色的使用者
+  users User[]
+
+  @@map("role")
 }

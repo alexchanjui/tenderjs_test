@@ -79,7 +79,6 @@ export class UserService {
     const [users, total] = await this.ctx.repos.user.findAndCount({
       skip,
       take: limit,
-      orderBy: { createdAt: "desc" },
     });
 
     return {

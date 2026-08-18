@@ -26,7 +26,7 @@ export interface SuccessResult<T> {
 export interface ApiResponse<T = unknown> {
   code: ErrorCode;
   msg: string;
-  data: T | null;
+  data?: T | null;
   meta?: PaginationMeta;
 }
 
@@ -38,13 +38,13 @@ const sendResult = <T>(
   httpStatus: 200 | 500,
   code: ErrorCode,
   msg: string,
-  data: T | null = null,
+  data?: T | null,
   meta?: PaginationMeta,
 ): void => {
   const response: ApiResponse<T> = {
     code,
     msg,
-    data,
+    ...(data !== undefined ? { data } : {}),
     ...(meta ? { meta } : {}),
   };
 
@@ -60,7 +60,7 @@ const sendResult = <T>(
  * 分頁資料：
  * success(res, { data: result, meta })
  */
-export function success<T>(res: Response, data: T, msg?: string): void;
+export function success<T>(res: Response, data?: T, msg?: string): void;
 
 export function success<T>(
   res: Response,

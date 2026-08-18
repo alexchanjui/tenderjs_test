@@ -35,10 +35,13 @@ export const validationMiddleware = (
       });
 
       if (errors.length > 0) {
-        throw new AppError(
-          ErrorCode.REQUEST_DATA,
-          Object.values(errors[0].constraints ?? {})[0] ?? "請求參數錯誤",
-        );
+        const error = errors[0];
+
+        const message = error.constraints?.whitelistValidation
+          ? `不允許傳入參數：${error.property}`
+          : (Object.values(error.constraints ?? {})[0] ?? "請求參數錯誤");
+
+        throw new AppError(ErrorCode.REQUEST_DATA, message);
       }
 
       next();

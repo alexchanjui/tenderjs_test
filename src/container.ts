@@ -5,15 +5,18 @@ import redisInstance from "./utils/redis";
 
 // Repositories
 import { UserPrismaRepository } from "./repositories/prisma/user.prisma.repository";
+import { RolePrismaRepository } from "./repositories/prisma/role.prisma.repository";
 
 // Services
 import { HealthService } from "./services/health.service";
 import { UserService } from "./services/user.service";
 import { AuthService } from "./services/auth.service";
+import { RoleService } from "./services/role.service";
 
 // Controllers
 import { HealthController } from "./controllers/health.controller";
 import { UserController } from "./controllers/user.controller";
+import { RoleController } from "./controllers/role.controller";
 import { AuthController } from "./controllers/auth.controller";
 import type { IController } from "./controllers/interface/controller.interface";
 
@@ -46,6 +49,7 @@ export class AppContainer {
      * 建立 Repositories
      */
     const userRepo = new UserPrismaRepository(dbContext);
+    const roleRepo = new RolePrismaRepository(dbContext);
 
     /**
      * 建立 Service 共用依賴
@@ -56,6 +60,7 @@ export class AppContainer {
       redis: redisInstance.client,
       repos: {
         user: userRepo,
+        role: roleRepo,
       },
       get currentUser() {
         return requestContextStorage.getStore();
@@ -68,6 +73,7 @@ export class AppContainer {
     const healthService = new HealthService(ctx);
     const userService = new UserService(ctx);
     const authService = new AuthService(ctx);
+    const roleService = new RoleService(ctx);
 
     /**
      * 組裝 Controllers
@@ -76,6 +82,7 @@ export class AppContainer {
       new HealthController(healthService),
       new UserController(userService),
       new AuthController(authService),
+      new RoleController(roleService),
     ];
   }
 }

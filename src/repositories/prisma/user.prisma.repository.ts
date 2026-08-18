@@ -14,13 +14,7 @@ export class UserPrismaRepository implements IUserRepository {
    * 建立使用者
    */
   public async create(data: CreateUserDto): Promise<User> {
-    return this.ctx.prisma.user.create({
-      data: {
-        username: data.username,
-        email: data.email,
-        password: data.password,
-      },
-    });
+    return this.ctx.prisma.user.create({ data });
   }
 
   /**
@@ -28,9 +22,7 @@ export class UserPrismaRepository implements IUserRepository {
    */
   public async findById(id: string): Promise<User | null> {
     return this.ctx.prisma.user.findUnique({
-      where: {
-        id,
-      },
+      where: { id },
     });
   }
 
@@ -39,9 +31,7 @@ export class UserPrismaRepository implements IUserRepository {
    */
   public async findByEmail(email: string): Promise<User | null> {
     return this.ctx.prisma.user.findUnique({
-      where: {
-        email,
-      },
+      where: { email },
     });
   }
 
@@ -50,9 +40,7 @@ export class UserPrismaRepository implements IUserRepository {
    */
   public async findByUsername(username: string): Promise<User | null> {
     return this.ctx.prisma.user.findUnique({
-      where: {
-        username,
-      },
+      where: { username },
     });
   }
 
@@ -62,15 +50,12 @@ export class UserPrismaRepository implements IUserRepository {
   public async findAndCount(params: {
     skip?: number;
     take?: number;
-    orderBy?: Prisma.UserOrderByWithRelationInput;
   }): Promise<[User[], number]> {
-    this.ctx.logger.debug("[DB] Finding users with pagination");
-
     return this.ctx.prisma.$transaction([
       this.ctx.prisma.user.findMany({
         skip: params.skip,
         take: params.take,
-        orderBy: params.orderBy,
+        orderBy: { createdAt: "desc" },
       }),
       this.ctx.prisma.user.count(),
     ]);

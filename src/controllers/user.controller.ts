@@ -1,7 +1,7 @@
 // src/controllers/user.controller.ts
 import { Router } from "express";
 import { authMiddleware } from "../middlewares/auth.middleware";
-import type { Request, Response, NextFunction } from "express";
+import type { Request, Response } from "express";
 import { plainToInstance } from "class-transformer";
 import type { UserService } from "../services/user.service";
 import type { IController } from "./interface/controller.interface";
@@ -38,20 +38,12 @@ export class UserController implements IController {
   /**
    * 建立使用者
    */
-  private createUser = async (
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ): Promise<void> => {
-    try {
-      const dto = plainToInstance(CreateUserDto, req.body);
+  private createUser = async (req: Request, res: Response): Promise<void> => {
+    const dto = plainToInstance(CreateUserDto, req.body);
 
-      const result = await this.userService.createUser(dto);
+    const result = await this.userService.createUser(dto);
 
-      R.success(res, result);
-    } catch (error) {
-      next(error);
-    }
+    R.success(res, result);
   };
 
   /**
@@ -60,33 +52,20 @@ export class UserController implements IController {
   private getMyUserInfo = async (
     _req: Request,
     res: Response,
-    next: NextFunction,
   ): Promise<void> => {
-    try {
-      const result = await this.userService.getMyUserInfo();
+    const result = await this.userService.getMyUserInfo();
 
-      R.success(res, result);
-    } catch (error) {
-      next(error);
-    }
+    R.success(res, result);
   };
 
   /**
    * 取得使用者列表
    */
-  private getUsers = async (
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ): Promise<void> => {
-    try {
-      const dto = plainToInstance(GetUserListRequestDto, req.query);
+  private getUsers = async (req: Request, res: Response): Promise<void> => {
+    const dto = plainToInstance(GetUserListRequestDto, req.query);
 
-      const result = await this.userService.getUsers(dto);
+    const result = await this.userService.getUsers(dto);
 
-      R.success(res, result);
-    } catch (error) {
-      next(error);
-    }
+    R.success(res, result);
   };
 }
