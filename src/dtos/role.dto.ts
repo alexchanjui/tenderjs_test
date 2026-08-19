@@ -1,6 +1,6 @@
 // src/dtos/role.dto.ts
-import { Expose, Type } from "class-transformer";
-import { IsInt, IsOptional, IsString, Length, Max, Min } from "class-validator";
+import { Expose } from "class-transformer";
+import { IsOptional, IsString, Length } from "class-validator";
 
 /**
  * 建立角色 Request DTO
@@ -43,36 +43,4 @@ export class RoleResponseDto {
 
   @Expose()
   description!: string | null;
-}
-
-/**
- * 取得角色列表 Request DTO
- */
-export class GetRoleListRequestDto {
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt({ message: "page 必須為整數" })
-  @Min(1, { message: "page 最小值為 1" })
-  page = 1;
-
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt({ message: "limit 必須為整數" })
-  @Min(1, { message: "limit 最小值為 1" })
-  @Max(100, { message: "limit 最大值為 100" })
-  limit = 20;
-}
-
-/**
- * 取得角色列表 Response DTO
- */
-export class GetRoleListResponseDto {
-  data!: RoleResponseDto[];
-
-  meta!: {
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-  };
 }

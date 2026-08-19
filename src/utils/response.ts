@@ -5,7 +5,7 @@ import { ErrorCode, ErrorMessage } from "../errors/error.codes";
 /**
  * 分頁資訊
  */
-export interface PaginationMeta {
+interface PaginationMeta {
   total: number;
   page: number;
   limit: number;

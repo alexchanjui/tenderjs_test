@@ -1,5 +1,4 @@
 // src/repositories/prisma/role.prisma.repository.ts
-
 import type { Role } from "@prisma/client";
 import type {
   CreateRoleRequestDto,
@@ -32,9 +31,7 @@ export class RolePrismaRepository implements IRoleRepository {
    */
   public async findByName(name: string): Promise<Role | null> {
     return this.ctx.prisma.role.findUnique({
-      where: {
-        name,
-      },
+      where: { name },
     });
   }
 

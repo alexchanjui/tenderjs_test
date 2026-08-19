@@ -6,18 +6,21 @@ import redisInstance from "./utils/redis";
 // Repositories
 import { UserPrismaRepository } from "./repositories/prisma/user.prisma.repository";
 import { RolePrismaRepository } from "./repositories/prisma/role.prisma.repository";
+import { PermissionPrismaRepository } from "./repositories/prisma/permission.prisma.repository";
 
 // Services
 import { HealthService } from "./services/health.service";
 import { UserService } from "./services/user.service";
 import { AuthService } from "./services/auth.service";
 import { RoleService } from "./services/role.service";
+import { PermissionService } from "./services/permission.service";
 
 // Controllers
 import { HealthController } from "./controllers/health.controller";
 import { UserController } from "./controllers/user.controller";
-import { RoleController } from "./controllers/role.controller";
 import { AuthController } from "./controllers/auth.controller";
+import { RoleController } from "./controllers/role.controller";
+import { PermissionController } from "./controllers/permission.controller";
 import type { IController } from "./controllers/interface/controller.interface";
 
 // Types
@@ -50,6 +53,7 @@ export class AppContainer {
      */
     const userRepo = new UserPrismaRepository(dbContext);
     const roleRepo = new RolePrismaRepository(dbContext);
+    const permissionRepo = new PermissionPrismaRepository(dbContext);
 
     /**
      * 建立 Service 共用依賴
@@ -61,6 +65,7 @@ export class AppContainer {
       repos: {
         user: userRepo,
         role: roleRepo,
+        permission: permissionRepo,
       },
       get currentUser() {
         return requestContextStorage.getStore();
@@ -74,6 +79,7 @@ export class AppContainer {
     const userService = new UserService(ctx);
     const authService = new AuthService(ctx);
     const roleService = new RoleService(ctx);
+    const permissionService = new PermissionService(ctx);
 
     /**
      * 組裝 Controllers
@@ -83,6 +89,7 @@ export class AppContainer {
       new UserController(userService),
       new AuthController(authService),
       new RoleController(roleService),
+      new PermissionController(permissionService),
     ];
   }
 }

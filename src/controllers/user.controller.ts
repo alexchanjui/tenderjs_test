@@ -6,12 +6,10 @@ import { plainToInstance } from "class-transformer";
 import type { UserService } from "../services/user.service";
 import type { IController } from "./interface/controller.interface";
 import { validationMiddleware } from "../middlewares/validation.middleware";
-import { CreateUserDto, GetUserListRequestDto } from "../dtos/user.dto";
+import { CreateUserDto } from "../dtos/user.dto";
+import { PaginationRequestDto } from "../dtos/pagination.dto";
 import * as R from "../utils/response";
 
-/**
- * User Controller
- */
 export class UserController implements IController {
   public path = "/users";
   public router = Router();
@@ -29,7 +27,7 @@ export class UserController implements IController {
     this.router.use(authMiddleware);
     this.router.get(
       "/",
-      validationMiddleware(GetUserListRequestDto, "query"),
+      validationMiddleware(PaginationRequestDto, "query"),
       this.getUsers,
     );
     this.router.get("/me", this.getMyUserInfo);
@@ -62,7 +60,7 @@ export class UserController implements IController {
    * 取得使用者列表
    */
   private getUsers = async (req: Request, res: Response): Promise<void> => {
-    const dto = plainToInstance(GetUserListRequestDto, req.query);
+    const dto = plainToInstance(PaginationRequestDto, req.query);
 
     const result = await this.userService.getUsers(dto);
 

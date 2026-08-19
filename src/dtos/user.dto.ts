@@ -1,14 +1,6 @@
 // src/dtos/user.dto.ts
-import { Expose, Type } from "class-transformer";
-import {
-  IsEmail,
-  IsInt,
-  IsOptional,
-  IsString,
-  Length,
-  Max,
-  Min,
-} from "class-validator";
+import { Expose } from "class-transformer";
+import { IsEmail, IsString, Length } from "class-validator";
 
 /**
  * 建立使用者 Request DTO
@@ -51,36 +43,4 @@ export class UserResponseDto {
 
   @Expose()
   updatedAt!: Date;
-}
-
-/**
- * 取得使用者列表 Request DTO
- */
-export class GetUserListRequestDto {
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt({ message: "page 必須為整數" })
-  @Min(1, { message: "page 最小值為 1" })
-  page = 1;
-
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt({ message: "limit 必須為整數" })
-  @Min(1, { message: "limit 最小值為 1" })
-  @Max(100, { message: "limit 最大值為 100" })
-  limit = 20;
-}
-
-/**
- * 取得使用者列表 Response DTO
- */
-export class GetUserListResponseDto {
-  data!: UserResponseDto[];
-
-  meta!: {
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-  };
 }

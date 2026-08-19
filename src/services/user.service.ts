@@ -1,12 +1,11 @@
 // src/services/user.service.ts
 import bcrypt from "bcrypt";
 import { plainToInstance } from "class-transformer";
-import {
-  UserResponseDto,
-  GetUserListRequestDto,
-  type CreateUserDto,
-  type GetUserListResponseDto,
-} from "../dtos/user.dto";
+import { UserResponseDto, type CreateUserDto } from "../dtos/user.dto";
+import type {
+  PaginationRequestDto,
+  PaginationResponseDto,
+} from "../dtos/pagination.dto";
 import type { IServiceContext } from "../types/service.context";
 import { ErrorCode } from "../errors/error.codes";
 import { AppError } from "../errors/app.error";
@@ -50,7 +49,7 @@ export class UserService {
   }
 
   /**
-   * 取得目前登入的使用者資訊
+   * 取得當前使用者詳細資訊
    */
   public async getMyUserInfo(): Promise<UserResponseDto> {
     const id = this.ctx.currentUser?.id || "";
@@ -70,8 +69,8 @@ export class UserService {
    * 取得使用者列表 (分頁)
    */
   public async getUsers(
-    dto: GetUserListRequestDto,
-  ): Promise<GetUserListResponseDto> {
+    dto: PaginationRequestDto,
+  ): Promise<PaginationResponseDto<UserResponseDto>> {
     const { page, limit } = dto;
 
     const skip = (page - 1) * limit;

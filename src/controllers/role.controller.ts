@@ -1,22 +1,15 @@
 // src/controllers/role.controller.ts
-
 import { plainToInstance } from "class-transformer";
 import { Router } from "express";
-import type { NextFunction, Request, Response } from "express";
-import {
-  CreateRoleRequestDto,
-  GetRoleListRequestDto,
-  UpdateRoleRequestDto,
-} from "../dtos/role.dto";
+import type { Request, Response } from "express";
+import { CreateRoleRequestDto, UpdateRoleRequestDto } from "../dtos/role.dto";
+import { PaginationRequestDto } from "../dtos/pagination.dto";
 import { authMiddleware } from "../middlewares/auth.middleware";
 import { validationMiddleware } from "../middlewares/validation.middleware";
 import type { RoleService } from "../services/role.service";
 import * as R from "../utils/response";
 import type { IController } from "./interface/controller.interface";
 
-/**
- * Role Controller
- */
 export class RoleController implements IController {
   public path = "/roles";
   public router = Router();
@@ -32,7 +25,7 @@ export class RoleController implements IController {
     this.router.use(authMiddleware);
     this.router.get(
       "/",
-      validationMiddleware(GetRoleListRequestDto, "query"),
+      validationMiddleware(PaginationRequestDto, "query"),
       this.getRoles,
     );
     this.router.get("/:id", this.getRoleById);
@@ -64,7 +57,7 @@ export class RoleController implements IController {
    * 取得角色列表
    */
   private getRoles = async (req: Request, res: Response): Promise<void> => {
-    const dto = plainToInstance(GetRoleListRequestDto, req.query);
+    const dto = plainToInstance(PaginationRequestDto, req.query);
 
     const result = await this.roleService.getRoles(dto);
 
@@ -72,7 +65,7 @@ export class RoleController implements IController {
   };
 
   /**
-   * 取得單一角色
+   * 取得角色詳細資訊
    */
   private getRoleById = async (
     req: Request<{ id: string }>,

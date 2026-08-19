@@ -1,13 +1,14 @@
 // src/services/role.service.ts
-
 import { plainToInstance } from "class-transformer";
 import {
   CreateRoleRequestDto,
-  GetRoleListRequestDto,
-  GetRoleListResponseDto,
   RoleResponseDto,
   UpdateRoleRequestDto,
 } from "../dtos/role.dto";
+import type {
+  PaginationRequestDto,
+  PaginationResponseDto,
+} from "../dtos/pagination.dto";
 import { AppError } from "../errors/app.error";
 import { ErrorCode } from "../errors/error.codes";
 import type { IServiceContext } from "../types/service.context";
@@ -38,8 +39,8 @@ export class RoleService {
    * 取得角色列表
    */
   public async getRoles(
-    dto: GetRoleListRequestDto,
-  ): Promise<GetRoleListResponseDto> {
+    dto: PaginationRequestDto,
+  ): Promise<PaginationResponseDto<RoleResponseDto>> {
     const { page, limit } = dto;
 
     const skip = (page - 1) * limit;
@@ -63,7 +64,7 @@ export class RoleService {
   }
 
   /**
-   * 取得單一角色
+   * 取得角色詳細資訊
    */
   public async getRoleById(id: string): Promise<RoleResponseDto> {
     const role = await this.ctx.repos.role.findById(id);

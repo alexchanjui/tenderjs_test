@@ -1,3 +1,5 @@
+/// prisma/schema.prisma
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -68,5 +70,72 @@ model Role {
   /// 使用此角色的使用者
   users User[]
 
+  /// 角色擁有的權限
+  rolePermissions RolePermission[]
+
   @@map("role")
+}
+
+/// 系統權限
+/// 定義後端 API 可執行的操作權限
+model Permission {
+  /// 權限 ID
+  id Int @id @default(autoincrement())
+
+  /// 功能代碼
+  featureCode Int @map("feature_code")
+
+  /// 權限名稱
+  name String @unique
+
+  /// API 路徑 (例如: "/api/users")
+  apiPath String @map("api_path")
+
+  /// API 操作類型 （0: GET, 1: POST, 2: PUT, 3: DELETE）
+  actionType Int @map("action_type")
+
+  /// 權限是否啟用
+  isActive Boolean @default(true) @map("is_active")
+
+  /// 權限說明
+  description String?
+
+  /// 建立時間
+  createdAt DateTime @default(now()) @map("create_time")
+
+  /// 更新時間
+  updatedAt DateTime @updatedAt @map("update_time")
+
+  /// 使用此權限的角色
+  rolePermissions RolePermission[]
+
+  /// 同一個 API 路徑與操作類型不可重複
+  @@unique([apiPath, actionType])
+  /// 建立功能代碼索引查詢
+  @@index([featureCode])
+  @@map("permission")
+}
+
+// ==========================================
+// 關聯中間表 (Join Tables)
+// ==========================================
+
+/// 角色與權限關聯
+model RolePermission {
+  /// 角色 ID
+  roleId String @map("role_id") @db.UniqueIdentifier
+
+  /// 權限 ID
+  permissionId Int @map("permission_id")
+
+  /// 角色
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  /// 權限
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  /// roleId + permissionId 作為複合主鍵
+  @@id([roleId, permissionId])
+  
+  @@map("role_permission")
 }
