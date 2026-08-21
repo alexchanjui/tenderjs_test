@@ -18,6 +18,16 @@ export class PermissionPrismaRepository implements IPermissionRepository {
   }
 
   /**
+   * 取得所有權限
+   */
+  public async findAll(): Promise<Permission[]> {
+    return this.ctx.prisma.permission.findMany({
+      where: { isActive: true },
+      orderBy: { createdAt: "desc" },
+    });
+  }
+
+  /**
    * 根據 ID 查找權限
    */
   public async findById(id: number): Promise<Permission | null> {
@@ -32,6 +42,15 @@ export class PermissionPrismaRepository implements IPermissionRepository {
   public async findByName(name: string): Promise<Permission | null> {
     return this.ctx.prisma.permission.findUnique({
       where: { name },
+    });
+  }
+
+  /**
+   * 根據 featureCode 查找權限
+   */
+  public async findByFeatureCode(featureCode: number): Promise<Permission[]> {
+    return this.ctx.prisma.permission.findMany({
+      where: { featureCode, isActive: true },
     });
   }
 

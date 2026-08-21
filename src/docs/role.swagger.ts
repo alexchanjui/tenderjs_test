@@ -61,7 +61,7 @@
  * /roles/{id}:
  *   get:
  *     tags: [Roles]
- *     summary: 取得單一角色
+ *     summary: 取得角色詳細資料
  *     security:
  *       - BearerAuth: []
  *     parameters:
@@ -119,6 +119,51 @@
  *         schema:
  *           type: string
  *           format: uuid
+ *     responses:
+ *       200:
+ *         description: 成功
+ */
+
+/**
+ * @openapi
+ * /roles/{id}/permissions:
+ *   put:
+ *     tags: [Roles]
+ *     summary: 更新角色權限
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - settings
+ *             properties:
+ *               settings:
+ *                 type: array
+ *                 minItems: 1
+ *                 items:
+ *                   type: object
+ *                   required:
+ *                     - featureCode
+ *                     - accessLevel
+ *                   properties:
+ *                     featureCode:
+ *                       type: integer
+ *                       example: 1001
+ *                     accessLevel:
+ *                       type: string
+ *                       enum: [NONE, VIEW, EDIT]
+ *                       example: VIEW
  *     responses:
  *       200:
  *         description: 成功

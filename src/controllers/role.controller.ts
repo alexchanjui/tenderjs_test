@@ -2,7 +2,11 @@
 import { plainToInstance } from "class-transformer";
 import { Router } from "express";
 import type { Request, Response } from "express";
-import { CreateRoleRequestDto, UpdateRoleRequestDto } from "../dtos/role.dto";
+import {
+  CreateRoleRequestDto,
+  UpdateRolePermissionsRequestDto,
+  UpdateRoleRequestDto,
+} from "../dtos/role.dto";
 import { PaginationRequestDto } from "../dtos/pagination.dto";
 import { authMiddleware } from "../middlewares/auth.middleware";
 import { validationMiddleware } from "../middlewares/validation.middleware";
@@ -40,6 +44,11 @@ export class RoleController implements IController {
       this.updateRole,
     );
     this.router.delete("/:id", this.deleteRole);
+    this.router.put(
+      "/:id/permissions",
+      validationMiddleware(UpdateRolePermissionsRequestDto),
+      this.updateRolePermissions,
+    );
   }
 
   /**
@@ -98,6 +107,20 @@ export class RoleController implements IController {
     res: Response,
   ): Promise<void> => {
     await this.roleService.deleteRole(req.params.id);
+
+    R.success(res);
+  };
+
+  /**
+   * 更新角色權限
+   */
+  private updateRolePermissions = async (
+    req: Request<{ id: string }>,
+    res: Response,
+  ): Promise<void> => {
+    const dto = plainToInstance(UpdateRolePermissionsRequestDto, req.body);
+
+    await this.roleService.updateRolePermissions(req.params.id, dto);
 
     R.success(res);
   };

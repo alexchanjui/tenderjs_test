@@ -7,8 +7,10 @@ import {
 
 export interface IPermissionRepository {
   create(data: CreatePermissionRequestDto): Promise<Permission>;
+  findAll(): Promise<Permission[]>;
   findById(id: number): Promise<Permission | null>;
   findByName(name: string): Promise<Permission | null>;
+  findByFeatureCode(featureCode: number): Promise<Permission[]>;
   findAndCount(params: {
     skip?: number;
     take?: number;

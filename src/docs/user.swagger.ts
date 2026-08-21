@@ -66,7 +66,7 @@
  * /users/me:
  *   get:
  *     tags: [Users]
- *     summary: 取得目前登入使用者
+ *     summary: 取得當前使用者詳細資料
  *     security:
  *       - BearerAuth: []
  *     responses:

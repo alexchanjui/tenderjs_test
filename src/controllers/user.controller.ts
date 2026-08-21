@@ -45,7 +45,7 @@ export class UserController implements IController {
   };
 
   /**
-   * 取得目前登入使用者資訊
+   * 取得當前使用者詳細資料
    */
   private getMyUserInfo = async (
     _req: Request,

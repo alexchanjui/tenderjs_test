@@ -1,5 +1,6 @@
 // src/repositories/prisma/role.prisma.repository.ts
 import type { Role } from "@prisma/client";
+import type { RoleWithPermissions } from "../interface/role.repository.interface";
 import type {
   CreateRoleRequestDto,
   UpdateRoleRequestDto,
@@ -20,9 +21,14 @@ export class RolePrismaRepository implements IRoleRepository {
   /**
    * 根據 ID 查找角色
    */
-  public async findById(id: string): Promise<Role | null> {
+  public async findById(id: string): Promise<RoleWithPermissions | null> {
     return this.ctx.prisma.role.findUnique({
       where: { id },
+      include: {
+        rolePermissions: {
+          include: { permission: true },
+        },
+      },
     });
   }
 
@@ -68,6 +74,33 @@ export class RolePrismaRepository implements IRoleRepository {
   public async delete(id: string): Promise<void> {
     await this.ctx.prisma.role.delete({
       where: { id },
+    });
+  }
+
+  /**
+   * 更新角色的權限
+   */
+  public async updatePermissions(
+    roleId: string,
+    permissionIds: number[],
+  ): Promise<void> {
+    await this.ctx.prisma.$transaction(async (tx) => {
+      // 先清除原本權限
+      await tx.rolePermission.deleteMany({
+        where: {
+          roleId,
+        },
+      });
+
+      // 再重新建立新的權限
+      if (permissionIds.length > 0) {
+        await tx.rolePermission.createMany({
+          data: permissionIds.map((permissionId) => ({
+            roleId,
+            permissionId,
+          })),
+        });
+      }
     });
   }
 }
