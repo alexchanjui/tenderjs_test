@@ -10,7 +10,6 @@ import {
 } from "../dtos/permission.dto";
 import type { IController } from "./interface/controller.interface";
 import * as R from "../utils/response";
-import { authMiddleware } from "../middlewares/auth.middleware";
 
 export class PermissionController implements IController {
   public path = "/permissions";
@@ -24,7 +23,6 @@ export class PermissionController implements IController {
    * 初始化路由
    */
   private initializeRoutes(): void {
-    this.router.use(authMiddleware);
     this.router.get(
       "/",
       validationMiddleware(PaginationRequestDto, "query"),

@@ -5,12 +5,13 @@ import dotenv from "dotenv";
 import express from "express";
 import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./configs/swagger.config";
+import { loggerConfigService } from "./configs/logger.config";
+import { errorMiddleware } from "./middlewares/error.middleware";
+import { registerRoutes } from "./routes";
+import { reloadRules } from "./services/permission.cache";
 import logger from "./utils/logger";
 import prisma from "./utils/prisma";
 import redis from "./utils/redis";
-import { registerRoutes } from "./routes";
-import { loggerConfigService } from "./configs/logger.config";
-import { errorMiddleware } from "./middlewares/error.middleware";
 
 dotenv.config();
 
@@ -44,16 +45,6 @@ if (process.env.ENABLE_SWAGGER === "true") {
 }
 
 /**
- * 註冊 API Routes
- */
-registerRoutes(app);
-
-/**
- * 全域錯誤處理
- */
-app.use(errorMiddleware);
-
-/**
  * 啟動應用程式
  */
 const bootstrap = async (): Promise<void> => {
@@ -70,6 +61,29 @@ const bootstrap = async (): Promise<void> => {
      */
     await redis.connect();
 
+    /**
+     * 載入 API 權限規則
+     */
+    const permissions = await prisma.client.permission.findMany({
+      where: { isActive: true },
+      orderBy: { id: "asc" },
+    });
+
+    reloadRules(permissions);
+
+    /**
+     * 註冊 API Routes
+     */
+    registerRoutes(app);
+
+    /**
+     * 全域錯誤處理
+     */
+    app.use(errorMiddleware);
+
+    /**
+     * 啟動 Server
+     */
     app.listen(port, () => {
       logger.info("=================================");
       logger.info(`🚀 CPS System Ready on Port ${port}`);

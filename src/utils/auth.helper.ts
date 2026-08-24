@@ -24,6 +24,7 @@ export const verifyAuthToken = async (token: string): Promise<CurrentUser> => {
     // 3. 回傳目前登入者
     return {
       id: payload.id as string,
+      roleId: (payload.roleId as string) ?? null,
     };
   } catch (error) {
     // 保留自己定義的錯誤

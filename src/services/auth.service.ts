@@ -55,6 +55,7 @@ export class AuthService {
       id: user.id,
       username: user.username,
       email: user.email,
+      roleId: user.roleId,
     };
 
     // 產生 JWT Token

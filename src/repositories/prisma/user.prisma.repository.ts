@@ -1,6 +1,6 @@
 // src/repositories/prisma/user.prisma.repository.ts
 import type { Prisma, User } from "@prisma/client";
-import type { CreateUserDto } from "../../dtos/user.dto";
+import type { CreateUserDto, UpdateUserRequestDto } from "../../dtos/user.dto";
 import type { IUserRepository } from "../interface/user.repository.interface";
 import type { IDbContext } from "../../types/db.context";
 
@@ -59,5 +59,15 @@ export class UserPrismaRepository implements IUserRepository {
       }),
       this.ctx.prisma.user.count(),
     ]);
+  }
+
+  /**
+   * 更新使用者
+   */
+  public async update(id: string, data: UpdateUserRequestDto): Promise<void> {
+    await this.ctx.prisma.user.update({
+      where: { id },
+      data,
+    });
   }
 }

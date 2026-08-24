@@ -1,6 +1,6 @@
 // src/repositories/interface/user.repository.interface.ts
 import type { User } from "@prisma/client";
-import type { CreateUserDto } from "../../dtos/user.dto";
+import type { CreateUserDto, UpdateUserRequestDto } from "../../dtos/user.dto";
 
 export interface IUserRepository {
   create(data: CreateUserDto): Promise<User>;
@@ -11,4 +11,5 @@ export interface IUserRepository {
     skip?: number;
     take?: number;
   }): Promise<[User[], number]>;
+  update(id: string, data: UpdateUserRequestDto): Promise<void>;
 }

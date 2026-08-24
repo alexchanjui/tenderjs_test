@@ -16,6 +16,7 @@ import type {
 import { AppError } from "../errors/app.error";
 import { ErrorCode } from "../errors/error.codes";
 import type { IServiceContext } from "../types/service.context";
+import { CacheService } from "../utils/cache.service";
 
 export class RoleService {
   constructor(private readonly ctx: IServiceContext) {}
@@ -156,17 +157,14 @@ export class RoleService {
     roleId: string,
     dto: UpdateRolePermissionsRequestDto,
   ): Promise<void> {
-    // 1. 確認角色存在
     const role = await this.ctx.repos.role.findById(roleId);
 
     if (!role) {
       throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
     }
 
-    // 2. 收集最後要綁定的 Permission ID
     const permissionIds = new Set<number>();
 
-    // 3. 將 featureCode + accessLevel 轉換成 Permission ID
     for (const setting of dto.settings) {
       const permissions = await this.ctx.repos.permission.findByFeatureCode(
         setting.featureCode,
@@ -174,11 +172,9 @@ export class RoleService {
 
       switch (setting.accessLevel) {
         case PermissionAccessLevel.NONE:
-          // 不加入任何權限
           break;
 
         case PermissionAccessLevel.VIEW:
-          // VIEW 只加入 GET 權限
           permissions
             .filter(
               (permission) =>
@@ -190,7 +186,6 @@ export class RoleService {
           break;
 
         case PermissionAccessLevel.EDIT:
-          // EDIT 加入該 featureCode 下所有權限
           permissions.forEach((permission) => {
             permissionIds.add(permission.id);
           });
@@ -198,10 +193,13 @@ export class RoleService {
       }
     }
 
-    // 4. 更新角色權限
+    // 1. 更新 DB
     await this.ctx.repos.role.updatePermissions(
       roleId,
       Array.from(permissionIds),
     );
+
+    // 2. 清除這個角色的 Redis 權限快取
+    await CacheService.invalidateRolePermissions(roleId);
   }
 }

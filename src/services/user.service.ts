@@ -1,7 +1,11 @@
 // src/services/user.service.ts
 import bcrypt from "bcrypt";
 import { plainToInstance } from "class-transformer";
-import { UserResponseDto, type CreateUserDto } from "../dtos/user.dto";
+import {
+  UserResponseDto,
+  type CreateUserDto,
+  type UpdateUserRequestDto,
+} from "../dtos/user.dto";
 import type {
   PaginationRequestDto,
   PaginationResponseDto,
@@ -52,9 +56,13 @@ export class UserService {
    * 取得當前使用者詳細資訊
    */
   public async getMyUserInfo(): Promise<UserResponseDto> {
-    const id = this.ctx.currentUser?.id || "";
+    const currentUser = this.ctx.currentUser;
 
-    const user = await this.ctx.repos.user.findById(id);
+    if (!currentUser) {
+      throw new AppError(ErrorCode.UNAUTH);
+    }
+
+    const user = await this.ctx.repos.user.findById(currentUser.id);
 
     if (!user) {
       throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);
@@ -91,5 +99,30 @@ export class UserService {
         totalPages: Math.ceil(total / limit),
       },
     };
+  }
+
+  /**
+   * 更新使用者
+   */
+  public async updateUser(
+    id: string,
+    data: UpdateUserRequestDto,
+  ): Promise<void> {
+    const user = await this.ctx.repos.user.findById(id);
+
+    if (!user) {
+      throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);
+    }
+
+    // 如果有更新角色，先確認角色存在
+    if (data.roleId) {
+      const role = await this.ctx.repos.role.findById(data.roleId);
+
+      if (!role) {
+        throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
+      }
+    }
+
+    await this.ctx.repos.user.update(id, data);
   }
 }

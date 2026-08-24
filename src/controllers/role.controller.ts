@@ -8,7 +8,6 @@ import {
   UpdateRoleRequestDto,
 } from "../dtos/role.dto";
 import { PaginationRequestDto } from "../dtos/pagination.dto";
-import { authMiddleware } from "../middlewares/auth.middleware";
 import { validationMiddleware } from "../middlewares/validation.middleware";
 import type { RoleService } from "../services/role.service";
 import * as R from "../utils/response";
@@ -26,7 +25,6 @@ export class RoleController implements IController {
    * 初始化路由
    */
   private initializeRoutes(): void {
-    this.router.use(authMiddleware);
     this.router.get(
       "/",
       validationMiddleware(PaginationRequestDto, "query"),

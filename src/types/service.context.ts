@@ -11,6 +11,7 @@ import { IPermissionRepository } from "../repositories/interface/permission.repo
  */
 export interface CurrentUser {
   id: string;
+  roleId: string | null;
 }
 
 /**

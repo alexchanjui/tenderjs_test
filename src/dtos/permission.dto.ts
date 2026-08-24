@@ -28,6 +28,10 @@ export class CreatePermissionRequestDto {
   actionType!: number;
 
   @IsOptional()
+  @IsBoolean({ message: "是否需要登入權限驗證必須為布林值" })
+  isRequired?: boolean;
+
+  @IsOptional()
   @IsString({ message: "權限說明必須為字串" })
   @Length(0, 200, { message: "權限說明長度需介於 0~200 字元" })
   description?: string;
@@ -57,8 +61,12 @@ export class UpdatePermissionRequestDto {
   actionType?: number;
 
   @IsOptional()
-  @IsBoolean({ message: "狀態必須為布林值" })
+  @IsBoolean({ message: "啟用狀態必須為布林值" })
   isActive?: boolean;
+
+  @IsOptional()
+  @IsBoolean({ message: "是否需要登入權限驗證必須為布林值" })
+  isRequired?: boolean;
 
   @IsOptional()
   @IsString({ message: "權限說明必須為字串" })

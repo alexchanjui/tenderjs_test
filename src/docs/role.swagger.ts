@@ -169,4 +169,47 @@
  *         description: 成功
  */
 
+/**
+ * @openapi
+ * /roles/{id}/permissions:
+ *   put:
+ *     tags: [Roles]
+ *     summary: 更新角色權限
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - settings
+ *             properties:
+ *               settings:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   required:
+ *                     - featureCode
+ *                     - accessLevel
+ *                   properties:
+ *                     featureCode:
+ *                       type: integer
+ *                       example: 1001
+ *                     accessLevel:
+ *                       type: string
+ *                       enum: [NONE, VIEW, EDIT]
+ *                       example: EDIT
+ *     responses:
+ *       200:
+ *         description: 成功
+ */
 export {};

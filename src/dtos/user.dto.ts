@@ -1,6 +1,13 @@
 // src/dtos/user.dto.ts
 import { Expose } from "class-transformer";
-import { IsEmail, IsString, Length } from "class-validator";
+import {
+  IsEmail,
+  IsString,
+  Length,
+  IsOptional,
+  IsUUID,
+  IsBoolean,
+} from "class-validator";
 
 /**
  * 建立使用者 Request DTO
@@ -23,6 +30,30 @@ export class CreateUserDto {
 }
 
 /**
+ * 更新使用者 Request DTO
+ */
+export class UpdateUserRequestDto {
+  @IsOptional()
+  @IsString({ message: "使用者名稱必須為字串" })
+  @Length(2, 20, {
+    message: "使用者名稱長度需介於 2~20 字元",
+  })
+  username!: string;
+
+  @IsOptional()
+  @IsEmail({}, { message: "Email 格式錯誤" })
+  email!: string;
+
+  @IsOptional()
+  @IsUUID("4", { message: "角色 ID 格式錯誤" })
+  roleId?: string;
+
+  @IsOptional()
+  @IsBoolean({ message: "啟用狀態必須為布林值" })
+  isActive?: boolean;
+}
+
+/**
  * 使用者 Response DTO
  */
 export class UserResponseDto {
@@ -37,6 +68,9 @@ export class UserResponseDto {
 
   @Expose()
   isActive!: boolean;
+
+  @Expose()
+  roleId!: string;
 
   @Expose()
   createdAt!: Date;

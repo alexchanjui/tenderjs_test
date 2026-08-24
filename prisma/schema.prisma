@@ -97,6 +97,9 @@ model Permission {
   /// 權限是否啟用
   isActive Boolean @default(true) @map("is_active")
 
+  /// 是否需要登入及權限驗證
+  isRequired Boolean @default(true) @map("is_required")
+
   /// 權限說明
   description String?
 

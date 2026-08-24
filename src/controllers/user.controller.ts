@@ -1,9 +1,9 @@
 // src/controllers/user.controller.ts
 import { Router } from "express";
-import { authMiddleware } from "../middlewares/auth.middleware";
 import type { Request, Response } from "express";
 import { plainToInstance } from "class-transformer";
 import type { UserService } from "../services/user.service";
+import { UpdateUserRequestDto } from "../dtos/user.dto";
 import type { IController } from "./interface/controller.interface";
 import { validationMiddleware } from "../middlewares/validation.middleware";
 import { CreateUserDto } from "../dtos/user.dto";
@@ -23,14 +23,17 @@ export class UserController implements IController {
    */
   private initializeRoutes(): void {
     this.router.post("/", validationMiddleware(CreateUserDto), this.createUser);
-
-    this.router.use(authMiddleware);
     this.router.get(
       "/",
       validationMiddleware(PaginationRequestDto, "query"),
       this.getUsers,
     );
     this.router.get("/me", this.getMyUserInfo);
+    this.router.put(
+      "/:id",
+      validationMiddleware(UpdateUserRequestDto),
+      this.updateUser,
+    );
   }
 
   /**
@@ -65,5 +68,19 @@ export class UserController implements IController {
     const result = await this.userService.getUsers(dto);
 
     R.success(res, result);
+  };
+
+  /**
+   * 更新使用者
+   */
+  private updateUser = async (
+    req: Request<{ id: string }>,
+    res: Response,
+  ): Promise<void> => {
+    const dto = plainToInstance(UpdateUserRequestDto, req.body);
+
+    await this.userService.updateUser(req.params.id, dto);
+
+    R.success(res);
   };
 }

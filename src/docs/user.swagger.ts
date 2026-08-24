@@ -73,4 +73,47 @@
  *       200:
  *         description: 成功
  */
+
+/**
+ * @openapi
+ * /users/{id}:
+ *   put:
+ *     tags: [Users]
+ *     summary: 更新使用者
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 minLength: 2
+ *                 maxLength: 20
+ *                 example: test
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: test@example.com
+ *               roleId:
+ *                 type: string
+ *                 format: uuid
+ *                 example: 5a07d8e0-ae57-4887-b6a1-b9dfd6bf5a6c
+ *               isActive:
+ *                 type: boolean
+ *                 example: true
+ *     responses:
+ *       200:
+ *         description: 成功
+ */
 export {};
