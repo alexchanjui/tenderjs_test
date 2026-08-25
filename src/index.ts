@@ -3,6 +3,7 @@ import "reflect-metadata";
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
+import { auditLogMiddleware } from "./middlewares/audit.middleware";
 import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./configs/swagger.config";
 import { loggerConfigService } from "./configs/logger.config";
@@ -35,6 +36,12 @@ app.use(
 );
 
 app.use(express.json());
+
+/**
+ * API 稽核日誌
+ */
+
+app.use(auditLogMiddleware);
 
 /**
  * 設定 Swagger UI

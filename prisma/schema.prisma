@@ -37,6 +37,9 @@ model User {
   /// 所屬角色
   role Role? @relation(fields: [roleId], references: [id])
 
+  /// 使用者的 API 稽核日誌
+  auditLogs AuditLog[]
+
   /// 建立時間
   createdAt DateTime @default(now()) @map("create_time")
 
@@ -141,4 +144,60 @@ model RolePermission {
   @@id([roleId, permissionId])
   
   @@map("role_permission")
+}
+
+
+// ==========================================
+// 系統日誌模組 (System Log Models)
+// ==========================================
+
+/// API 稽核日誌
+/// 記錄使用者 API 操作、Request、Response 與執行結果
+model AuditLog {
+  /// 稽核日誌 ID
+  id BigInt @id @default(autoincrement())
+
+  /// 操作使用者 ID
+  /// 未登入的 API 可為 null
+  userId String? @map("user_id") @db.UniqueIdentifier
+
+  /// API 操作
+  /// 例如：GET /api/roles
+  action String @db.VarChar(200)
+
+  /// Request IP
+  ipAddress String? @map("ip_address") @db.VarChar(45)
+
+  /// User Agent
+  userAgent String? @map("user_agent") @db.NVarChar(Max)
+
+  /// HTTP Status Code
+  statusCode Int @map("status_code")
+
+  /// 系統 Business Code
+  bizCode Int @default(0) @map("biz_code")
+
+  /// Request 資料
+  reqData String? @map("req_data") @db.NVarChar(Max)
+
+  /// Response 資料
+  resData String? @map("res_data") @db.NVarChar(Max)
+
+  /// API 執行時間（毫秒）
+  duration Int @default(0)
+
+  /// API 是否執行成功
+  isSuccess Boolean @default(true) @map("is_success")
+
+  /// 建立時間
+  createdAt DateTime @default(now()) @map("create_time")
+
+  /// 操作使用者
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([statusCode])
+
+  @@map("audit_log")
 }
