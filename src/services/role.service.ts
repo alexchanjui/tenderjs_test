@@ -27,15 +27,15 @@ export class RoleService {
   public async createRole(
     data: CreateRoleRequestDto,
   ): Promise<RoleResponseDto> {
-    const existingRole = await this.ctx.repos.role.findByName(data.name);
+    const role = await this.ctx.repos.role.findByName(data.name);
 
-    if (existingRole) {
+    if (role) {
       throw new AppError(ErrorCode.DUPLICATE, "角色名稱已存在");
     }
 
-    const role = await this.ctx.repos.role.create(data);
+    const newRole = await this.ctx.repos.role.create(data);
 
-    return plainToInstance(RoleResponseDto, role, {
+    return plainToInstance(RoleResponseDto, newRole, {
       excludeExtraneousValues: true,
     });
   }

@@ -22,20 +22,18 @@ export class PermissionService {
   public async createPermission(
     data: CreatePermissionRequestDto,
   ): Promise<PermissionResponseDto> {
-    const existingPermission = await this.ctx.repos.permission.findByName(
-      data.name,
-    );
+    const permission = await this.ctx.repos.permission.findByName(data.name);
 
     // 重新載入 Permission 本機快取
     await cacheInitService.reloadPermissionRules();
 
-    if (existingPermission) {
+    if (permission) {
       throw new AppError(ErrorCode.DUPLICATE, "權限名稱已存在");
     }
 
-    const permission = await this.ctx.repos.permission.create(data);
+    const newPermission = await this.ctx.repos.permission.create(data);
 
-    return plainToInstance(PermissionResponseDto, permission, {
+    return plainToInstance(PermissionResponseDto, newPermission, {
       excludeExtraneousValues: true,
     });
   }
@@ -75,7 +73,7 @@ export class PermissionService {
     const permission = await this.ctx.repos.permission.findById(id);
 
     if (!permission) {
-      throw new AppError(ErrorCode.NOT_FOUND, "權限不存在");
+      throw new AppError(ErrorCode.DATA_NOT_FOUND, "權限不存在");
     }
 
     return plainToInstance(PermissionResponseDto, permission, {
@@ -93,15 +91,15 @@ export class PermissionService {
     const permission = await this.ctx.repos.permission.findById(id);
 
     if (!permission) {
-      throw new AppError(ErrorCode.NOT_FOUND, "權限不存在");
+      throw new AppError(ErrorCode.DATA_NOT_FOUND, "權限不存在");
     }
 
-    const updatedPermission = await this.ctx.repos.permission.update(id, data);
+    const newPermission = await this.ctx.repos.permission.update(id, data);
 
     // 重新載入 Permission 本機快取
     await cacheInitService.reloadPermissionRules();
 
-    return plainToInstance(PermissionResponseDto, updatedPermission, {
+    return plainToInstance(PermissionResponseDto, newPermission, {
       excludeExtraneousValues: true,
     });
   }
@@ -113,7 +111,7 @@ export class PermissionService {
     const permission = await this.ctx.repos.permission.findById(id);
 
     if (!permission) {
-      throw new AppError(ErrorCode.NOT_FOUND, "權限不存在");
+      throw new AppError(ErrorCode.DATA_NOT_FOUND, "權限不存在");
     }
 
     await this.ctx.repos.permission.delete(id);

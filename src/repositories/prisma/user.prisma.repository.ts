@@ -70,4 +70,13 @@ export class UserPrismaRepository implements IUserRepository {
       data,
     });
   }
+
+  /**
+   * 刪除使用者
+   */
+  public async delete(id: string): Promise<void> {
+    await this.ctx.prisma.user.delete({
+      where: { id },
+    });
+  }
 }

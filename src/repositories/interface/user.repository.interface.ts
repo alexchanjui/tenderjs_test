@@ -12,4 +12,5 @@ export interface IUserRepository {
     take?: number;
   }): Promise<[User[], number]>;
   update(id: string, data: UpdateUserRequestDto): Promise<void>;
+  delete(id: string): Promise<void>;
 }

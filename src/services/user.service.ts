@@ -14,12 +14,6 @@ import type { IServiceContext } from "../types/service.context";
 import { ErrorCode } from "../errors/error.codes";
 import { AppError } from "../errors/app.error";
 
-/**
- * User Service
- *
- * 負責處理使用者相關的商業邏輯，
- * 並透過 User Repository 操作使用者資料。
- */
 export class UserService {
   constructor(private readonly ctx: IServiceContext) {}
 
@@ -30,9 +24,9 @@ export class UserService {
     const { username, email, password } = data;
 
     // 1. 檢查 Email 是否已存在
-    const existingUser = await this.ctx.repos.user.findByEmail(email);
+    const user = await this.ctx.repos.user.findByEmail(email);
 
-    if (existingUser) {
+    if (user) {
       throw new AppError(ErrorCode.ACCOUNT_EXIST);
     }
 
@@ -53,16 +47,10 @@ export class UserService {
   }
 
   /**
-   * 取得當前使用者詳細資訊
+   * 取得使用者詳細資料
    */
-  public async getMyUserInfo(): Promise<UserResponseDto> {
-    const currentUser = this.ctx.currentUser;
-
-    if (!currentUser) {
-      throw new AppError(ErrorCode.UNAUTH);
-    }
-
-    const user = await this.ctx.repos.user.findById(currentUser.id);
+  public async getUserById(id: string): Promise<UserResponseDto> {
+    const user = await this.ctx.repos.user.findById(id);
 
     if (!user) {
       throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);
@@ -124,5 +112,39 @@ export class UserService {
     }
 
     await this.ctx.repos.user.update(id, data);
+  }
+
+  /**
+   * 刪除使用者
+   */
+  public async deleteUser(id: string): Promise<void> {
+    const user = await this.ctx.repos.user.findById(id);
+
+    if (!user) {
+      throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);
+    }
+
+    await this.ctx.repos.user.delete(id);
+  }
+
+  /**
+   * 取得當前使用者詳細資訊
+   */
+  public async getMyUserInfo(): Promise<UserResponseDto> {
+    const currentUser = this.ctx.currentUser;
+
+    if (!currentUser) {
+      throw new AppError(ErrorCode.UNAUTH);
+    }
+
+    const user = await this.ctx.repos.user.findById(currentUser.id);
+
+    if (!user) {
+      throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);
+    }
+
+    return plainToInstance(UserResponseDto, user, {
+      excludeExtraneousValues: true,
+    });
   }
 }
