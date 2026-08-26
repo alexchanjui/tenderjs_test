@@ -1,4 +1,4 @@
-// src/services/permission.cache.ts
+// src/caches/permission.cache.ts
 import type { Permission } from "@prisma/client";
 import { pathToRegexp } from "path-to-regexp";
 import logger from "../utils/logger";
@@ -14,18 +14,18 @@ export interface ICachedRule {
 }
 
 /**
- * 本機權限規則快取
+ * API 權限規則本機快取
  */
 const cachedRules: ICachedRule[] = [];
 
 /**
- * 重新載入權限規則
+ * 重新載入 API 權限規則
  */
 export const reloadRules = (permissions: Permission[]): void => {
-  // 1. 清空原本快取
+  // 清空原本快取
   cachedRules.length = 0;
 
-  // 2. 重新載入權限規則
+  // 重新載入權限規則
   for (const permission of permissions) {
     if (!permission.isActive) {
       continue;
@@ -53,8 +53,6 @@ export const reloadRules = (permissions: Permission[]): void => {
       );
     }
   }
-
-  logger.info("✅ 權限快取載入完成");
 };
 
 /**

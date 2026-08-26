@@ -16,7 +16,7 @@ import * as R from "../utils/response";
  */
 export const errorMiddleware: ErrorRequestHandler = (
   error: unknown,
-  _req: Request,
+  req: Request,
   res: Response,
   _next: NextFunction,
 ): void => {
@@ -28,9 +28,12 @@ export const errorMiddleware: ErrorRequestHandler = (
    */
   if (error instanceof AppError) {
     if (error.statusCode === 500) {
-      logger.error("[System Error]", error);
+      logger.error(`[System Error] ${req.method} ${req.originalUrl}`, error);
     } else {
-      logger.warn(`[Business Error] ${error.message} (${error.bizCode})`);
+      logger.warn(
+        `[Business Error] ${req.method} ${req.originalUrl} - ` +
+          `${error.message} (${error.bizCode})`,
+      );
     }
 
     if (error.statusCode === 500) {

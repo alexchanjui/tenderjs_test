@@ -32,7 +32,9 @@ export class LoggerService {
      * - json：輸出 JSON 格式
      */
     const logFormat = winston.format.combine(
-      winston.format.timestamp({ format: "ISO8601" }),
+      winston.format.timestamp({
+        format: "YYYY-MM-DD HH:mm:ss",
+      }),
       winston.format.splat(),
       winston.format.json(),
     );

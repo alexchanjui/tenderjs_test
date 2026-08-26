@@ -9,6 +9,7 @@ import {
   CreatePermissionRequestDto,
   PermissionResponseDto,
 } from "../dtos/permission.dto";
+import cacheInitService from "./cache-init.service";
 import { AppError } from "../errors/app.error";
 import { ErrorCode } from "../errors/error.codes";
 
@@ -24,6 +25,9 @@ export class PermissionService {
     const existingPermission = await this.ctx.repos.permission.findByName(
       data.name,
     );
+
+    // 重新載入 Permission 本機快取
+    await cacheInitService.reloadPermissionRules();
 
     if (existingPermission) {
       throw new AppError(ErrorCode.DUPLICATE, "權限名稱已存在");
@@ -94,6 +98,9 @@ export class PermissionService {
 
     const updatedPermission = await this.ctx.repos.permission.update(id, data);
 
+    // 重新載入 Permission 本機快取
+    await cacheInitService.reloadPermissionRules();
+
     return plainToInstance(PermissionResponseDto, updatedPermission, {
       excludeExtraneousValues: true,
     });
@@ -110,5 +117,8 @@ export class PermissionService {
     }
 
     await this.ctx.repos.permission.delete(id);
+
+    // 重新載入 Permission 本機快取
+    await cacheInitService.reloadPermissionRules();
   }
 }

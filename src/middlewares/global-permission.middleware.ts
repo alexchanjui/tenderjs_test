@@ -2,10 +2,10 @@
 import type { NextFunction, Request, Response } from "express";
 import { AppError } from "../errors/app.error";
 import { ErrorCode } from "../errors/error.codes";
-import { findRouteRule } from "../services/permission.cache";
+import { findRouteRule } from "../caches/permission.cache";
 import { verifyAuthToken } from "../utils/auth.helper";
-import { CacheService } from "../utils/cache.service";
 import { requestContextStorage } from "../utils/request-context";
+import { getRolePermissions } from "../caches/role-permission.cache";
 
 /**
  * 全域權限驗證 Middleware
@@ -66,9 +66,7 @@ export const globalPermissionGuard = async (
     }
 
     // 7. 取得角色權限
-    const permissionIds = await CacheService.getRolePermissions(
-      currentUser.roleId,
-    );
+    const permissionIds = await getRolePermissions(currentUser.roleId);
 
     // 8. 檢查角色是否擁有目前 API 權限
     if (!permissionIds.includes(rule.id)) {

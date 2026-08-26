@@ -16,7 +16,7 @@ import type {
 import { AppError } from "../errors/app.error";
 import { ErrorCode } from "../errors/error.codes";
 import type { IServiceContext } from "../types/service.context";
-import { CacheService } from "../utils/cache.service";
+import { invalidateRolePermissions } from "../caches/role-permission.cache";
 
 export class RoleService {
   constructor(private readonly ctx: IServiceContext) {}
@@ -148,6 +148,9 @@ export class RoleService {
     }
 
     await this.ctx.repos.role.delete(id);
+
+    // 清除角色權限 Redis 快取
+    await invalidateRolePermissions(id);
   }
 
   /**
@@ -193,13 +196,12 @@ export class RoleService {
       }
     }
 
-    // 1. 更新 DB
     await this.ctx.repos.role.updatePermissions(
       roleId,
       Array.from(permissionIds),
     );
 
-    // 2. 清除這個角色的 Redis 權限快取
-    await CacheService.invalidateRolePermissions(roleId);
+    // 清除角色權限 Redis 快取
+    await invalidateRolePermissions(roleId);
   }
 }
