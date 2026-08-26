@@ -24,12 +24,12 @@ export class UserController implements IController {
   private initializeRoutes(): void {
     this.router.post("/", validationMiddleware(CreateUserDto), this.createUser);
     this.router.get("/me", this.getMyUserInfo);
-    this.router.get("/:id", this.getUserById);
     this.router.get(
       "/",
       validationMiddleware(PaginationRequestDto, "query"),
       this.getUsers,
     );
+    this.router.get("/:id", this.getUserById);
     this.router.put(
       "/:id",
       validationMiddleware(UpdateUserRequestDto),

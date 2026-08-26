@@ -141,16 +141,15 @@ export class RoleService {
    * 刪除角色
    */
   public async deleteRole(id: string): Promise<void> {
-    const role = await this.ctx.repos.role.findById(id);
+    const userCount = await this.ctx.prisma.user.count({
+      where: { roleId: id },
+    });
 
-    if (!role) {
-      throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
+    if (userCount > 0) {
+      throw new Error(`此角色仍有 ${userCount} 位使用者使用，無法刪除。`);
     }
 
     await this.ctx.repos.role.delete(id);
-
-    // 清除角色權限 Redis 快取
-    await invalidateRolePermissions(id);
   }
 
   /**

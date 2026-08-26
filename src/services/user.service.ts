@@ -118,6 +118,17 @@ export class UserService {
    * 刪除使用者
    */
   public async deleteUser(id: string): Promise<void> {
+    const currentUser = this.ctx.currentUser;
+
+    if (!currentUser) {
+      throw new AppError(ErrorCode.UNAUTH);
+    }
+
+    // 不可刪除自己
+    if (id === currentUser.id) {
+      throw new AppError(ErrorCode.REQUEST_DATA, "無法刪除自己");
+    }
+
     const user = await this.ctx.repos.user.findById(id);
 
     if (!user) {
