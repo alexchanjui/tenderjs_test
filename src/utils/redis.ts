@@ -6,19 +6,19 @@ export class RedisService {
   public readonly client: Redis;
 
   constructor() {
-    const redisUrl = process.env.REDIS_URL;
-
-    if (!redisUrl) {
-      throw new Error("缺少 REDIS_URL 環境變數");
-    }
+    const host = process.env.REDIS_HOST ?? "localhost";
+    const port = Number(process.env.REDIS_PORT ?? 6380);
+    const password = process.env.REDIS_PASSWORD || undefined;
+    const db = Number(process.env.REDIS_DB ?? 0);
 
     /**
      * 建立 Redis Client
-     *
-     * lazyConnect：
-     * 建立實例時不立即連線，由 connect() 統一控制。
      */
-    this.client = new Redis(redisUrl, {
+    this.client = new Redis({
+      host,
+      port,
+      password,
+      db,
       lazyConnect: true,
       retryStrategy: (times) => Math.min(times * 50, 2000),
     });

@@ -22,8 +22,8 @@ services:
     command: redis-server --appendonly yes
 
   app:
-    image: tenderjs-api:1.0.0
-    container_name: tenderjs_api
+    image: alex46732/tenderjs-api:${APP_VERSION}
+    container_name: tenderjs-api
     restart: always
     ports:
       - "3001:3001"

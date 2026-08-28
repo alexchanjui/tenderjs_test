@@ -1,0 +1,1 @@
+兩個 docker 文件都要重寫，因為我不想使用 .env.docker 只想用一個 .env

@@ -1,6 +1,7 @@
 // src/configs/swagger.config.ts
-
 import swaggerJsdoc from "swagger-jsdoc";
+
+const appVersion = process.env.APP_VERSION ?? "1.0.0";
 
 const options: swaggerJsdoc.Options = {
   definition: {
@@ -8,7 +9,7 @@ const options: swaggerJsdoc.Options = {
 
     info: {
       title: "TenderJS API",
-      version: "1.0.0",
+      version: appVersion,
       description: "TenderJS Backend API 文件",
     },
 

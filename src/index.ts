@@ -1,7 +1,7 @@
 // src/index.ts
 import "reflect-metadata";
+import "dotenv/config";
 import cors from "cors";
-import dotenv from "dotenv";
 import express from "express";
 import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./configs/swagger.config";
@@ -13,8 +13,6 @@ import cacheInitService from "./services/cache-init.service";
 import logger from "./utils/logger";
 import prisma from "./utils/prisma";
 import redis from "./utils/redis";
-
-dotenv.config();
 
 /**
  * 初始化 Logger
