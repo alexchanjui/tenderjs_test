@@ -70,7 +70,7 @@ export class UserResponseDto {
   isActive!: boolean;
 
   @Expose()
-  roleId!: string;
+  roleId!: string | null;
 
   @Expose()
   createdAt!: Date;
