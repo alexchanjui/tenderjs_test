@@ -24,14 +24,14 @@ export class PermissionService {
   ): Promise<PermissionResponseDto> {
     const permission = await this.ctx.repos.permission.findByName(data.name);
 
-    // 重新載入 Permission 本機快取
-    await cacheInitService.reloadPermissionRules();
-
     if (permission) {
       throw new AppError(ErrorCode.DUPLICATE, "權限名稱已存在");
     }
 
     const newPermission = await this.ctx.repos.permission.create(data);
+
+    // 重新載入 Permission 本機快取
+    await cacheInitService.reloadPermissionRules();
 
     return plainToInstance(PermissionResponseDto, newPermission, {
       excludeExtraneousValues: true,
