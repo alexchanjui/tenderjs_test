@@ -1,0 +1,38 @@
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: tenderjs_mssql
+    restart: always
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "1434:1433"
+    volumes:
+      - tenderjs_mssql_data:/var/opt/mssql
+
+  redis:
+    image: redis:alpine
+    container_name: tenderjs_redis
+    restart: always
+    ports:
+      - "6380:6379"
+    volumes:
+      - tenderjs_redis_data:/data
+    command: redis-server --appendonly yes
+
+  app:
+    image: tenderjs-api:1.0.0
+    container_name: tenderjs_api
+    restart: always
+    ports:
+      - "3001:3001"
+    env_file:
+      - .env.docker
+    depends_on:
+      - db
+      - redis
+
+volumes:
+  tenderjs_mssql_data:
+  tenderjs_redis_data:
