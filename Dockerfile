@@ -15,12 +15,7 @@ COPY . .
 RUN npm run build
 
 # 編譯 Seed
-RUN npx tsc prisma/seed.ts \
-  --outDir dist \
-  --skipLibCheck \
-  --module commonjs \
-  --target es2020 \
-  --esModuleInterop
+RUN npm run build:seed
 
 # API Port
 EXPOSE 3001
