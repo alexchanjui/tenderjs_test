@@ -24,4 +24,9 @@ RUN npm run build
 EXPOSE 3001
 
 # 啟動 API
-CMD ["npm", "start"]
+CMD ["sh", "-c", "\
+  echo '⏳ Waiting for DB & running migrations...'; \
+  until npx prisma migrate deploy; do sleep 5; done && \
+  echo '🚀 Starting app...'; \
+  npm start \
+"]
