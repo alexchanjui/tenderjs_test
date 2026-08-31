@@ -13,16 +13,28 @@ export class PermissionService {
   /**
    * 建立權限
    */
+  /**
+   * 建立權限
+   */
   public async createPermission(data: CreatePermissionRequestDto): Promise<PermissionResponseDto> {
-    const permission = await this.ctx.repos.permission.findByName(data.name);
+    // 檢查 ID
+    const permissionById = await this.ctx.repos.permission.findById(data.id);
 
-    if (permission) {
+    if (permissionById) {
+      throw new AppError(ErrorCode.DUPLICATE, "權限 ID 已存在");
+    }
+
+    // 檢查名稱
+    const permissionByName = await this.ctx.repos.permission.findByName(data.name);
+
+    if (permissionByName) {
       throw new AppError(ErrorCode.DUPLICATE, "權限名稱已存在");
     }
 
+    // 建立權限
     const newPermission = await this.ctx.repos.permission.create(data);
 
-    // 重新載入 Permission 本機快取
+    // 重新載入權限快取
     await cacheInitService.reloadPermissionRules();
 
     return plainToInstance(PermissionResponseDto, newPermission, {
@@ -88,7 +100,7 @@ export class PermissionService {
 
     const newPermission = await this.ctx.repos.permission.update(id, data);
 
-    // 重新載入 Permission 本機快取
+    // 重新載入權限快取
     await cacheInitService.reloadPermissionRules();
 
     return plainToInstance(PermissionResponseDto, newPermission, {
@@ -108,7 +120,7 @@ export class PermissionService {
 
     await this.ctx.repos.permission.delete(id);
 
-    // 重新載入 Permission 本機快取
+    // 重新載入權限快取
     await cacheInitService.reloadPermissionRules();
   }
 }

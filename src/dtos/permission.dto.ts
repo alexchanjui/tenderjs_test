@@ -1,12 +1,16 @@
 // src/dtos/permission.dto.ts
 import { Expose, Type } from "class-transformer";
-import { IsString, IsOptional, IsInt, Length, IsBoolean } from "class-validator";
+import { IsString, IsOptional, IsInt, Length, IsBoolean, IsNotEmpty } from "class-validator";
 
 /**
  * 建立權限 Request DTO
  */
 export class CreatePermissionRequestDto {
   @Type(() => Number)
+  @IsInt()
+  @IsNotEmpty()
+  id!: number;
+
   @IsInt({ message: "功能代碼必須為整數" })
   featureCode!: number;
 
