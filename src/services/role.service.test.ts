@@ -71,10 +71,7 @@ describe("RoleService", () => {
         ],
       });
 
-      expect(mockContext.repos.role.updatePermissions).toHaveBeenCalledWith(
-        roleId,
-        [],
-      );
+      expect(mockContext.repos.role.updatePermissions).toHaveBeenCalledWith(roleId, []);
     });
 
     it("VIEW 應只加入 GET Permission", async () => {
@@ -126,10 +123,7 @@ describe("RoleService", () => {
         ],
       });
 
-      expect(mockContext.repos.role.updatePermissions).toHaveBeenCalledWith(
-        roleId,
-        [1],
-      );
+      expect(mockContext.repos.role.updatePermissions).toHaveBeenCalledWith(roleId, [1]);
     });
 
     it("EDIT 應加入全部 Permission", async () => {
@@ -181,10 +175,7 @@ describe("RoleService", () => {
         ],
       });
 
-      expect(mockContext.repos.role.updatePermissions).toHaveBeenCalledWith(
-        roleId,
-        [1, 2],
-      );
+      expect(mockContext.repos.role.updatePermissions).toHaveBeenCalledWith(roleId, [1, 2]);
     });
   });
 });

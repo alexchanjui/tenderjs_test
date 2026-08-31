@@ -9,10 +9,7 @@ import {
   UpdateRolePermissionsRequestDto,
   UpdateRoleRequestDto,
 } from "../dtos/role.dto";
-import type {
-  PaginationRequestDto,
-  PaginationResponseDto,
-} from "../dtos/pagination.dto";
+import type { PaginationRequestDto, PaginationResponseDto } from "../dtos/pagination.dto";
 import { AppError } from "../errors/app.error";
 import { ErrorCode } from "../errors/error.codes";
 import type { IServiceContext } from "../types/service.context";
@@ -24,9 +21,7 @@ export class RoleService {
   /**
    * 建立角色
    */
-  public async createRole(
-    data: CreateRoleRequestDto,
-  ): Promise<RoleResponseDto> {
+  public async createRole(data: CreateRoleRequestDto): Promise<RoleResponseDto> {
     const role = await this.ctx.repos.role.findByName(data.name);
 
     if (role) {
@@ -116,10 +111,7 @@ export class RoleService {
   /**
    * 更新角色
    */
-  public async updateRole(
-    id: string,
-    data: UpdateRoleRequestDto,
-  ): Promise<void> {
+  public async updateRole(id: string, data: UpdateRoleRequestDto): Promise<void> {
     const role = await this.ctx.repos.role.findById(id);
 
     if (!role) {
@@ -168,9 +160,7 @@ export class RoleService {
     const permissionIds = new Set<number>();
 
     for (const setting of dto.settings) {
-      const permissions = await this.ctx.repos.permission.findByFeatureCode(
-        setting.featureCode,
-      );
+      const permissions = await this.ctx.repos.permission.findByFeatureCode(setting.featureCode);
 
       switch (setting.accessLevel) {
         case PermissionAccessLevel.NONE:
@@ -178,10 +168,7 @@ export class RoleService {
 
         case PermissionAccessLevel.VIEW:
           permissions
-            .filter(
-              (permission) =>
-                permission.actionType === PermissionActionType.GET,
-            )
+            .filter((permission) => permission.actionType === PermissionActionType.GET)
             .forEach((permission) => {
               permissionIds.add(permission.id);
             });
@@ -195,10 +182,7 @@ export class RoleService {
       }
     }
 
-    await this.ctx.repos.role.updatePermissions(
-      roleId,
-      Array.from(permissionIds),
-    );
+    await this.ctx.repos.role.updatePermissions(roleId, Array.from(permissionIds));
 
     // 清除角色權限 Redis 快取
     await invalidateRolePermissions(roleId);

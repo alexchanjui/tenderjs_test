@@ -14,11 +14,7 @@ export const validationMiddleware = (
   dtoClass: ClassConstructor<object>,
   target: ValidationTarget = "body",
 ): RequestHandler => {
-  return async (
-    req: Request,
-    _res: Response,
-    next: NextFunction,
-  ): Promise<void> => {
+  return async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
     try {
       const source = req[target];
 

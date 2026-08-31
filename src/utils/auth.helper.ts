@@ -9,9 +9,7 @@ import type { CurrentUser } from "../types/service.context";
  */
 export const verifyAuthToken = async (token: string): Promise<CurrentUser> => {
   try {
-    const secret = new TextEncoder().encode(
-      process.env.JWT_SECRET || "dev_secret_key",
-    );
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET || "dev_secret_key");
 
     // 1. 驗證 Token
     const { payload } = await jwtVerify(token, secret);

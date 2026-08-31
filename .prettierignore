@@ -1,0 +1,5 @@
+node_modules
+dist
+coverage
+logs
+src/configs/swagger-output.json

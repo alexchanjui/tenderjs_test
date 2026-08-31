@@ -1,11 +1,6 @@
 // src/middlewares/error.middleware.ts
 import { Prisma } from "@prisma/client";
-import type {
-  ErrorRequestHandler,
-  NextFunction,
-  Request,
-  Response,
-} from "express";
+import type { ErrorRequestHandler, Request, Response } from "express";
 import { AppError } from "../errors/app.error";
 import { ErrorCode } from "../errors/error.codes";
 import logger from "../utils/logger";
@@ -18,7 +13,6 @@ export const errorMiddleware: ErrorRequestHandler = (
   error: unknown,
   req: Request,
   res: Response,
-  _next: NextFunction,
 ): void => {
   /**
    * AppError
@@ -63,12 +57,7 @@ export const errorMiddleware: ErrorRequestHandler = (
        * 例如 username 或 email 已存在。
        */
       case "P2002":
-        R.failed(
-          res,
-          ErrorCode.DUPLICATE,
-          "資料已存在，請勿重複建立",
-          error.meta ?? null,
-        );
+        R.failed(res, ErrorCode.DUPLICATE, "資料已存在，請勿重複建立", error.meta ?? null);
         return;
 
       /**
@@ -82,24 +71,14 @@ export const errorMiddleware: ErrorRequestHandler = (
        * 外鍵關聯錯誤
        */
       case "P2003":
-        R.failed(
-          res,
-          ErrorCode.REQUEST_DATA,
-          "關聯資料不存在或格式錯誤",
-          error.meta ?? null,
-        );
+        R.failed(res, ErrorCode.REQUEST_DATA, "關聯資料不存在或格式錯誤", error.meta ?? null);
         return;
 
       /**
        * 欄位內容超過資料庫限制
        */
       case "P2000":
-        R.failed(
-          res,
-          ErrorCode.STRING_LIMIT,
-          "輸入資料長度超過限制",
-          error.meta ?? null,
-        );
+        R.failed(res, ErrorCode.STRING_LIMIT, "輸入資料長度超過限制", error.meta ?? null);
         return;
 
       /**
@@ -108,11 +87,7 @@ export const errorMiddleware: ErrorRequestHandler = (
       default:
         logger.error("[Prisma System Error]", error);
 
-        R.error(
-          res,
-          ErrorCode.DATABASE_ERROR,
-          `資料庫內部錯誤 (${error.code})`,
-        );
+        R.error(res, ErrorCode.DATABASE_ERROR, `資料庫內部錯誤 (${error.code})`);
         return;
     }
   }
@@ -148,8 +123,7 @@ export const errorMiddleware: ErrorRequestHandler = (
 
   const isDevelopment = process.env.NODE_ENV !== "production";
 
-  const message =
-    isDevelopment && error instanceof Error ? error.message : "伺服器內部錯誤";
+  const message = isDevelopment && error instanceof Error ? error.message : "伺服器內部錯誤";
 
   R.error(res, ErrorCode.LOCAL_ERROR, message);
 };

@@ -2,10 +2,7 @@
 import { Permission } from "@prisma/client";
 import { IPermissionRepository } from "../interface/permission.repository.interface";
 import { IDbContext } from "../../types/db.context";
-import {
-  CreatePermissionRequestDto,
-  UpdatePermissionRequestDto,
-} from "../../dtos/permission.dto";
+import { CreatePermissionRequestDto, UpdatePermissionRequestDto } from "../../dtos/permission.dto";
 
 export class PermissionPrismaRepository implements IPermissionRepository {
   constructor(private readonly ctx: IDbContext) {}
@@ -74,10 +71,7 @@ export class PermissionPrismaRepository implements IPermissionRepository {
   /**
    * 更新權限資料
    */
-  public async update(
-    id: number,
-    data: UpdatePermissionRequestDto,
-  ): Promise<void> {
+  public async update(id: number, data: UpdatePermissionRequestDto): Promise<void> {
     await this.ctx.prisma.permission.update({
       where: { id },
       data,

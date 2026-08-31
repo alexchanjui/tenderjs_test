@@ -47,10 +47,7 @@ export const reloadRules = (permissions: Permission[]): void => {
         isRequired: permission.isRequired,
       });
     } catch (error) {
-      logger.error(
-        `[PermissionCache] 路徑解析失敗: ${permission.apiPath}`,
-        error,
-      );
+      logger.error(`[PermissionCache] 路徑解析失敗: ${permission.apiPath}`, error);
     }
   }
 };
@@ -58,13 +55,8 @@ export const reloadRules = (permissions: Permission[]): void => {
 /**
  * 找出目前 API 對應的權限規則
  */
-export const findRouteRule = (
-  method: string,
-  path: string,
-): ICachedRule | undefined => {
-  return cachedRules.find(
-    (rule) => rule.method === method && rule.regex.test(path),
-  );
+export const findRouteRule = (method: string, path: string): ICachedRule | undefined => {
+  return cachedRules.find((rule) => rule.method === method && rule.regex.test(path));
 };
 
 /**

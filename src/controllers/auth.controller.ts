@@ -22,21 +22,13 @@ export class AuthController implements IController {
    * 初始化路由
    */
   private initializeRoutes(): void {
-    this.router.post(
-      "/login",
-      validationMiddleware(LoginRequestDto),
-      this.login,
-    );
+    this.router.post("/login", validationMiddleware(LoginRequestDto), this.login);
   }
 
   /**
    * 使用者登入
    */
-  private login = async (
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ): Promise<void> => {
+  private login = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const result = await this.authService.login(req.body);
 

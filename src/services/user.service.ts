@@ -1,15 +1,8 @@
 // src/services/user.service.ts
 import bcrypt from "bcrypt";
 import { plainToInstance } from "class-transformer";
-import {
-  UserResponseDto,
-  type CreateUserDto,
-  type UpdateUserRequestDto,
-} from "../dtos/user.dto";
-import type {
-  PaginationRequestDto,
-  PaginationResponseDto,
-} from "../dtos/pagination.dto";
+import { UserResponseDto, type CreateUserDto, type UpdateUserRequestDto } from "../dtos/user.dto";
+import type { PaginationRequestDto, PaginationResponseDto } from "../dtos/pagination.dto";
 import type { IServiceContext } from "../types/service.context";
 import { ErrorCode } from "../errors/error.codes";
 import { AppError } from "../errors/app.error";
@@ -92,10 +85,7 @@ export class UserService {
   /**
    * 更新使用者
    */
-  public async updateUser(
-    id: string,
-    data: UpdateUserRequestDto,
-  ): Promise<void> {
+  public async updateUser(id: string, data: UpdateUserRequestDto): Promise<void> {
     const user = await this.ctx.repos.user.findById(id);
 
     if (!user) {

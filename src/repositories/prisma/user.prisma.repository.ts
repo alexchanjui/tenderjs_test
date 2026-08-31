@@ -1,5 +1,5 @@
 // src/repositories/prisma/user.prisma.repository.ts
-import type { Prisma, User } from "@prisma/client";
+import type { User } from "@prisma/client";
 import type { CreateUserDto, UpdateUserRequestDto } from "../../dtos/user.dto";
 import type { IUserRepository } from "../interface/user.repository.interface";
 import type { IDbContext } from "../../types/db.context";
@@ -47,10 +47,7 @@ export class UserPrismaRepository implements IUserRepository {
   /**
    * 取得使用者列表 (分頁)
    */
-  public async findAndCount(params: {
-    skip?: number;
-    take?: number;
-  }): Promise<[User[], number]> {
+  public async findAndCount(params: { skip?: number; take?: number }): Promise<[User[], number]> {
     return this.ctx.prisma.$transaction([
       this.ctx.prisma.user.findMany({
         skip: params.skip,

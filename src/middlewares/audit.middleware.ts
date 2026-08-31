@@ -7,11 +7,7 @@ import { requestContextStorage } from "../utils/request-context";
 /**
  * API 稽核日誌 Middleware
  */
-export const auditLogMiddleware = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): void => {
+export const auditLogMiddleware = (req: Request, res: Response, next: NextFunction): void => {
   // 1. 紀錄 API 開始時間
   const startTime = Date.now();
 
@@ -87,8 +83,7 @@ export const auditLogMiddleware = (
         bizCode = responseBody.code;
       }
 
-      const responseString =
-        resData !== undefined ? JSON.stringify(resData) : null;
+      const responseString = resData !== undefined ? JSON.stringify(resData) : null;
 
       const isSuccess = statusCode >= 200 && statusCode < 400 && bizCode === 0;
 

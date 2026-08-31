@@ -29,9 +29,7 @@ export const globalPermissionGuard = async (
         return;
       }
 
-      const token = authHeader.startsWith("Bearer ")
-        ? authHeader.slice(7)
-        : authHeader;
+      const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : authHeader;
 
       const currentUser = await verifyAuthToken(token);
 
@@ -53,9 +51,7 @@ export const globalPermissionGuard = async (
       throw new AppError(ErrorCode.UNAUTH);
     }
 
-    const token = authHeader.startsWith("Bearer ")
-      ? authHeader.slice(7)
-      : authHeader;
+    const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : authHeader;
 
     // 5. 驗證 Token 並取得登入者
     const currentUser = await verifyAuthToken(token);

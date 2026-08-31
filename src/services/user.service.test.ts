@@ -53,7 +53,7 @@ describe("UserService", () => {
     });
 
     it("刪除自己時應拋出 REQUEST_DATA", async () => {
-      mockContext.currentUser = { id: "test-user-id" } as any;
+      mockContext.currentUser = { id: "test-user-id", roleId: null };
 
       await expect(service.deleteUser("test-user-id")).rejects.toMatchObject({
         bizCode: ErrorCode.REQUEST_DATA,

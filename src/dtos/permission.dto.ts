@@ -1,12 +1,6 @@
 // src/dtos/permission.dto.ts
 import { Expose, Type } from "class-transformer";
-import {
-  IsString,
-  IsOptional,
-  IsInt,
-  Length,
-  IsBoolean,
-} from "class-validator";
+import { IsString, IsOptional, IsInt, Length, IsBoolean } from "class-validator";
 
 /**
  * 建立權限 Request DTO

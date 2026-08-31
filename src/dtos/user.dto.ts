@@ -1,13 +1,6 @@
 // src/dtos/user.dto.ts
 import { Expose } from "class-transformer";
-import {
-  IsEmail,
-  IsString,
-  Length,
-  IsOptional,
-  IsUUID,
-  IsBoolean,
-} from "class-validator";
+import { IsEmail, IsString, Length, IsOptional, IsUUID, IsBoolean } from "class-validator";
 
 /**
  * 建立使用者 Request DTO

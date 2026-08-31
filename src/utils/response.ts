@@ -62,33 +62,17 @@ const sendResult = <T>(
  */
 export function success<T>(res: Response, data?: T, msg?: string): void;
 
-export function success<T>(
-  res: Response,
-  result: SuccessResult<T>,
-  msg?: string,
-): void;
+export function success<T>(res: Response, result: SuccessResult<T>, msg?: string): void;
 
 export function success<T>(
   res: Response,
   result: T | SuccessResult<T>,
   msg = ErrorMessage[ErrorCode.SUCCESS],
 ): void {
-  if (
-    typeof result === "object" &&
-    result !== null &&
-    "data" in result &&
-    "meta" in result
-  ) {
+  if (typeof result === "object" && result !== null && "data" in result && "meta" in result) {
     const paginationResult = result as SuccessResult<T>;
 
-    sendResult(
-      res,
-      200,
-      ErrorCode.SUCCESS,
-      msg,
-      paginationResult.data,
-      paginationResult.meta,
-    );
+    sendResult(res, 200, ErrorCode.SUCCESS, msg, paginationResult.data, paginationResult.meta);
 
     return;
   }

@@ -40,17 +40,10 @@ export const getRolePermissions = async (roleId: string): Promise<number[]> => {
   }
 
   // 3. 取得角色擁有的 Permission ID
-  const permissionIds = role.rolePermissions.map(
-    (rolePermission) => rolePermission.permissionId,
-  );
+  const permissionIds = role.rolePermissions.map((rolePermission) => rolePermission.permissionId);
 
   // 4. 寫入 Redis，1 小時後過期
-  await redisInstance.client.set(
-    key,
-    JSON.stringify(permissionIds),
-    "EX",
-    3600,
-  );
+  await redisInstance.client.set(key, JSON.stringify(permissionIds), "EX", 3600);
 
   return permissionIds;
 };
@@ -58,9 +51,7 @@ export const getRolePermissions = async (roleId: string): Promise<number[]> => {
 /**
  * 清除角色權限 Redis 快取
  */
-export const invalidateRolePermissions = async (
-  roleId: string,
-): Promise<void> => {
+export const invalidateRolePermissions = async (roleId: string): Promise<void> => {
   const key = getRolePermissionKey(roleId);
 
   await redisInstance.client.del(key);

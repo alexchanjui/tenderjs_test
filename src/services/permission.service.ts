@@ -1,14 +1,8 @@
 // src/services/permission.service.ts
 import { plainToInstance } from "class-transformer";
 import { IServiceContext } from "../types/service.context";
-import {
-  PaginationRequestDto,
-  PaginationResponseDto,
-} from "../dtos/pagination.dto";
-import {
-  CreatePermissionRequestDto,
-  PermissionResponseDto,
-} from "../dtos/permission.dto";
+import { PaginationRequestDto, PaginationResponseDto } from "../dtos/pagination.dto";
+import { CreatePermissionRequestDto, PermissionResponseDto } from "../dtos/permission.dto";
 import cacheInitService from "./cache-init.service";
 import { AppError } from "../errors/app.error";
 import { ErrorCode } from "../errors/error.codes";
@@ -19,9 +13,7 @@ export class PermissionService {
   /**
    * 建立權限
    */
-  public async createPermission(
-    data: CreatePermissionRequestDto,
-  ): Promise<PermissionResponseDto> {
+  public async createPermission(data: CreatePermissionRequestDto): Promise<PermissionResponseDto> {
     const permission = await this.ctx.repos.permission.findByName(data.name);
 
     if (permission) {

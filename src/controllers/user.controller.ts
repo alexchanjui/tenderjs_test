@@ -24,17 +24,9 @@ export class UserController implements IController {
   private initializeRoutes(): void {
     this.router.post("/", validationMiddleware(CreateUserDto), this.createUser);
     this.router.get("/me", this.getMyUserInfo);
-    this.router.get(
-      "/",
-      validationMiddleware(PaginationRequestDto, "query"),
-      this.getUsers,
-    );
+    this.router.get("/", validationMiddleware(PaginationRequestDto, "query"), this.getUsers);
     this.router.get("/:id", this.getUserById);
-    this.router.put(
-      "/:id",
-      validationMiddleware(UpdateUserRequestDto),
-      this.updateUser,
-    );
+    this.router.put("/:id", validationMiddleware(UpdateUserRequestDto), this.updateUser);
     this.router.delete("/:id", this.deleteUser);
   }
 
@@ -52,10 +44,7 @@ export class UserController implements IController {
   /**
    * 取得使用者詳細資料
    */
-  private getUserById = async (
-    req: Request<{ id: string }>,
-    res: Response,
-  ): Promise<void> => {
+  private getUserById = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
     const result = await this.userService.getUserById(req.params.id);
 
     R.success(res, result);
@@ -75,10 +64,7 @@ export class UserController implements IController {
   /**
    * 更新使用者
    */
-  private updateUser = async (
-    req: Request<{ id: string }>,
-    res: Response,
-  ): Promise<void> => {
+  private updateUser = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
     const dto = plainToInstance(UpdateUserRequestDto, req.body);
 
     await this.userService.updateUser(req.params.id, dto);
@@ -89,10 +75,7 @@ export class UserController implements IController {
   /**
    * 刪除使用者
    */
-  private deleteUser = async (
-    req: Request<{ id: string }>,
-    res: Response,
-  ): Promise<void> => {
+  private deleteUser = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
     await this.userService.deleteUser(req.params.id);
 
     R.success(res);
@@ -101,10 +84,7 @@ export class UserController implements IController {
   /**
    * 取得當前使用者詳細資料
    */
-  private getMyUserInfo = async (
-    _req: Request,
-    res: Response,
-  ): Promise<void> => {
+  private getMyUserInfo = async (_req: Request, res: Response): Promise<void> => {
     const result = await this.userService.getMyUserInfo();
 
     R.success(res, result);

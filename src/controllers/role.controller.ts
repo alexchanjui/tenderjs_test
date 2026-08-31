@@ -25,22 +25,10 @@ export class RoleController implements IController {
    * 初始化路由
    */
   private initializeRoutes(): void {
-    this.router.get(
-      "/",
-      validationMiddleware(PaginationRequestDto, "query"),
-      this.getRoles,
-    );
+    this.router.get("/", validationMiddleware(PaginationRequestDto, "query"), this.getRoles);
     this.router.get("/:id", this.getRoleById);
-    this.router.post(
-      "/",
-      validationMiddleware(CreateRoleRequestDto),
-      this.createRole,
-    );
-    this.router.put(
-      "/:id",
-      validationMiddleware(UpdateRoleRequestDto),
-      this.updateRole,
-    );
+    this.router.post("/", validationMiddleware(CreateRoleRequestDto), this.createRole);
+    this.router.put("/:id", validationMiddleware(UpdateRoleRequestDto), this.updateRole);
     this.router.delete("/:id", this.deleteRole);
     this.router.put(
       "/:id/permissions",
@@ -74,10 +62,7 @@ export class RoleController implements IController {
   /**
    * 取得角色詳細資訊
    */
-  private getRoleById = async (
-    req: Request<{ id: string }>,
-    res: Response,
-  ): Promise<void> => {
+  private getRoleById = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
     const result = await this.roleService.getRoleById(req.params.id);
 
     R.success(res, result);
@@ -86,10 +71,7 @@ export class RoleController implements IController {
   /**
    * 更新角色
    */
-  private updateRole = async (
-    req: Request<{ id: string }>,
-    res: Response,
-  ): Promise<void> => {
+  private updateRole = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
     const dto = plainToInstance(UpdateRoleRequestDto, req.body);
 
     await this.roleService.updateRole(req.params.id, dto);
@@ -100,10 +82,7 @@ export class RoleController implements IController {
   /**
    * 刪除角色
    */
-  private deleteRole = async (
-    req: Request<{ id: string }>,
-    res: Response,
-  ): Promise<void> => {
+  private deleteRole = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
     await this.roleService.deleteRole(req.params.id);
 
     R.success(res);

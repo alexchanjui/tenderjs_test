@@ -49,11 +49,7 @@ export class RedisService {
 
     const timeoutPromise = new Promise<never>((_, reject) => {
       timeoutId = setTimeout(() => {
-        reject(
-          new Error(
-            `Redis 連線逾時 (${TIMEOUT_MS}ms) - 請檢查 Redis 是否已啟動`,
-          ),
-        );
+        reject(new Error(`Redis 連線逾時 (${TIMEOUT_MS}ms) - 請檢查 Redis 是否已啟動`));
       }, TIMEOUT_MS);
     });
 

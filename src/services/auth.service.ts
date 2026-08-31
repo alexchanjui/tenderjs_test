@@ -66,7 +66,7 @@ export class AuthService {
       .sign(this.jwtSecret);
 
     // 排除 password，避免回傳給前端
-    const { password, ...userData } = user;
+    const { password: _password, ...userData } = user;
 
     return {
       token,

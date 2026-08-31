@@ -22,9 +22,7 @@ export const authMiddleware = async (
     }
 
     // 2. 取得 Token
-    const token = authHeader.startsWith("Bearer ")
-      ? authHeader.slice(7)
-      : authHeader;
+    const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : authHeader;
 
     // 3. 驗證 Token 並取得目前登入者
     const currentUser = await verifyAuthToken(token);

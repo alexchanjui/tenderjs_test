@@ -46,10 +46,7 @@ export class LoggerService {
       transports.push(
         new winston.transports.Console({
           level,
-          format: winston.format.combine(
-            winston.format.colorize(),
-            winston.format.simple(),
-          ),
+          format: winston.format.combine(winston.format.colorize(), winston.format.simple()),
         }),
       );
     }
