@@ -1,14 +1,14 @@
 #!/usr/bin/env sh
 
-echo "🔍 執行 lint-staged 處理 Prettier + ESLint..."
+echo "🔍 執行提交前程式碼檢查..."
 
 npx lint-staged
 
 status=$?
 
 if [ $status -ne 0 ]; then
-  echo "❌ lint-staged 錯誤，請修復後再提交。"
+  echo "❌ 程式碼檢查失敗，請修正後再提交。"
   exit $status
 fi
 
-echo "✅ 通過 pre-commit 檢查！"
+echo "✅ 程式碼檢查通過！"
