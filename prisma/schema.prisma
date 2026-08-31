@@ -83,7 +83,7 @@ model Role {
 /// 定義後端 API 可執行的操作權限
 model Permission {
   /// 權限 ID
-  id Int @id @default(autoincrement())
+  id Int @id
 
   /// 功能代碼
   featureCode Int @map("feature_code")

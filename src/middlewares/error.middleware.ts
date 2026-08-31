@@ -1,6 +1,6 @@
 // src/middlewares/error.middleware.ts
 import { Prisma } from "@prisma/client";
-import type { ErrorRequestHandler, Request, Response } from "express";
+import type { ErrorRequestHandler, NextFunction, Request, Response } from "express";
 import { AppError } from "../errors/app.error";
 import { ErrorCode } from "../errors/error.codes";
 import logger from "../utils/logger";
@@ -13,6 +13,7 @@ export const errorMiddleware: ErrorRequestHandler = (
   error: unknown,
   req: Request,
   res: Response,
+  _next: NextFunction,
 ): void => {
   /**
    * AppError
