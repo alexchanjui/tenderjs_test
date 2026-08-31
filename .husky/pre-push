@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+
+echo "🔍 執行 Push 前 Build 檢查..."
+
+npm run build
+
+status=$?
+
+if [ $status -ne 0 ]; then
+  echo "❌ Build 失敗，請修正後再 Push。"
+  exit $status
+fi
+
+echo "✅ Build 檢查通過！"
