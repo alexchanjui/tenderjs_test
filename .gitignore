@@ -1,7 +1,6 @@
 node_modules
 data-log
-/src/generated/prisma
 .env
-/src/generated/prisma
-
+.env.local
+/dist
 /src/generated/prisma
