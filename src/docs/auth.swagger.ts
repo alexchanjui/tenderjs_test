@@ -18,10 +18,10 @@
  *             properties:
  *               username:
  *                 type: string
- *                 example: test
+ *                 example: admin
  *               password:
  *                 type: string
- *                 example: "12345678"
+ *                 example: "password123"
  *     responses:
  *       200:
  *         description: 成功
