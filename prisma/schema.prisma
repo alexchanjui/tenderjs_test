@@ -46,6 +46,9 @@ model User {
   /// 更新時間
   updatedAt DateTime @updatedAt @map("update_time")
 
+  /// 測試
+ remark String?
+
   @@map("user")
 }
 
