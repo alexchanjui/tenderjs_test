@@ -1,8 +1,9 @@
 node_modules
 dist
 .git
-.gitignore
+.github
+.husky
+data-log
+
 .env
-.env.docker
-logs
-coverage
+.env.*
