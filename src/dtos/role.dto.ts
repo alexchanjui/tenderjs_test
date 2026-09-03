@@ -59,7 +59,7 @@ export class RoleResponseDto {
  */
 export class RoleDetailResponseDto extends RoleResponseDto {
   @Expose()
-  permissionSettings!: FeaturePermissionSetting[];
+  permissionSettings!: PermissionSetting[];
 }
 
 // ==========================================
@@ -93,10 +93,12 @@ export enum PermissionActionType {
 /**
  * 功能權限設定
  */
-export class FeaturePermissionSetting {
+export class PermissionSetting {
+  @Expose()
   @IsInt({ message: "功能代碼必須為整數" })
   featureCode!: number;
 
+  @Expose()
   @IsEnum(PermissionAccessLevel, {
     message: "權限等級必須為 NONE、VIEW 或 EDIT",
   })
@@ -110,6 +112,6 @@ export class UpdateRolePermissionsRequestDto {
   @IsArray({ message: "設定必須為陣列" })
   @ArrayMinSize(1, { message: "至少需要設定一個功能" })
   @ValidateNested({ each: true })
-  @Type(() => FeaturePermissionSetting)
-  settings!: FeaturePermissionSetting[];
+  @Type(() => PermissionSetting)
+  settings!: PermissionSetting[];
 }

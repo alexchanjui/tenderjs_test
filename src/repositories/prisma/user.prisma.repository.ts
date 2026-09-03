@@ -1,5 +1,6 @@
 // src/repositories/prisma/user.prisma.repository.ts
 import type { User } from "@prisma/client";
+import type { UserWithRole } from "../interface/user.repository.interface";
 import type { CreateUserDto, UpdateUserRequestDto } from "../../dtos/user.dto";
 import type { IUserRepository } from "../interface/user.repository.interface";
 import type { IDbContext } from "../../types/db.context";
@@ -20,27 +21,60 @@ export class UserPrismaRepository implements IUserRepository {
   /**
    * 根據 ID 取得使用者
    */
-  public async findById(id: string): Promise<User | null> {
+  public async findById(id: string): Promise<UserWithRole | null> {
     return this.ctx.prisma.user.findUnique({
       where: { id },
+      include: {
+        role: {
+          include: {
+            rolePermissions: {
+              include: {
+                permission: true,
+              },
+            },
+          },
+        },
+      },
     });
   }
 
   /**
    * 根據 Email 取得使用者
    */
-  public async findByEmail(email: string): Promise<User | null> {
+  public async findByEmail(email: string): Promise<UserWithRole | null> {
     return this.ctx.prisma.user.findUnique({
       where: { email },
+      include: {
+        role: {
+          include: {
+            rolePermissions: {
+              include: {
+                permission: true,
+              },
+            },
+          },
+        },
+      },
     });
   }
 
   /**
    * 根據 Username 取得使用者
    */
-  public async findByUsername(username: string): Promise<User | null> {
+  public async findByUsername(username: string): Promise<UserWithRole | null> {
     return this.ctx.prisma.user.findUnique({
       where: { username },
+      include: {
+        role: {
+          include: {
+            rolePermissions: {
+              include: {
+                permission: true,
+              },
+            },
+          },
+        },
+      },
     });
   }
 
