@@ -34,6 +34,16 @@ const permissionsData = [
     isActive: true,
     description: "使用者登入",
   },
+  {
+    id: 3,
+    featureCode: 0,
+    name: "auth:captcha",
+    apiPath: "/api/v1/auth/captcha",
+    actionType: 0, // GET
+    isRequired: false,
+    isActive: true,
+    description: "取得登入驗證碼",
+  },
 
   // 100 - 使用者管理
   {

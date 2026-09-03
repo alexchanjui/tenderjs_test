@@ -40,6 +40,8 @@ export enum ErrorCode {
   ACCOUNT_EXIST = 304, // 帳號已存在
   CREATE_USER_FAILED = 306, // 建立使用者失敗
   AUTH_TOKEN_EXPIRED = 316, // 登入狀態已失效，請重新登入
+  CAPTCHA_ERROR = 317, // 驗證碼錯誤
+  CAPTCHA_EXPIRED = 318, // 驗證碼已過期
 
   /**
    * 密碼
@@ -48,6 +50,8 @@ export enum ErrorCode {
   PASSWORD_FORMAT = 311, // 密碼格式錯誤
   ENCODE_FAIL = 314, // 密碼加密失敗
   DECODE_FAIL = 315, // 密碼驗證失敗
+
+  ROUTE_NOT_FOUND = 404, // API 路由不存在
 }
 
 /**
@@ -78,11 +82,15 @@ export const ErrorMessage: Record<ErrorCode, string> = {
   [ErrorCode.ACCOUNT_EXIST]: "帳號已存在",
   [ErrorCode.CREATE_USER_FAILED]: "建立使用者失敗",
   [ErrorCode.AUTH_TOKEN_EXPIRED]: "登入狀態已失效，請重新登入",
+  [ErrorCode.CAPTCHA_ERROR]: "驗證碼錯誤",
+  [ErrorCode.CAPTCHA_EXPIRED]: "驗證碼已過期",
 
   [ErrorCode.PASSWORD_ERROR]: "密碼錯誤",
   [ErrorCode.PASSWORD_FORMAT]: "密碼格式錯誤",
   [ErrorCode.ENCODE_FAIL]: "密碼加密失敗",
   [ErrorCode.DECODE_FAIL]: "密碼驗證失敗",
+
+  [ErrorCode.ROUTE_NOT_FOUND]: "API 路由不存在",
 };
 
 /**
