@@ -2,10 +2,11 @@
 import bcrypt from "bcrypt";
 import { SignJWT } from "jose";
 import type { IServiceContext } from "../types/service.context";
-import type { LoginRequestDto } from "../dtos/auth.dto";
+import { type LoginRequestDto, LoginResponseDto } from "../dtos/auth.dto";
 import { AppError } from "../errors/app.error";
 import { ErrorCode } from "../errors/error.codes";
 import type { User } from "@prisma/client";
+import { plainToInstance } from "class-transformer";
 
 export class AuthService {
   private readonly jwtSecret: Uint8Array;
@@ -20,7 +21,7 @@ export class AuthService {
   /**
    * 使用者登入
    */
-  public async login(data: LoginRequestDto) {
+  public async login(data: LoginRequestDto): Promise<LoginResponseDto> {
     const { username, password } = data;
 
     // 1. 查詢使用者
@@ -49,7 +50,7 @@ export class AuthService {
   /**
    * 產生 JWT Token 與使用者資料
    */
-  private async generateTokenResponse(user: User) {
+  private async generateTokenResponse(user: User): Promise<LoginResponseDto> {
     // 放進 JWT 的使用者資料
     const userPayload = {
       id: user.id,
@@ -65,12 +66,15 @@ export class AuthService {
       .setExpirationTime(process.env.JWT_EXPIRES_IN || "1d")
       .sign(this.jwtSecret);
 
-    // 排除 password，避免回傳給前端
-    const { password: _password, ...userData } = user;
-
-    return {
-      token,
-      data: userData,
-    };
+    return plainToInstance(
+      LoginResponseDto,
+      {
+        token,
+        user,
+      },
+      {
+        excludeExtraneousValues: true,
+      },
+    );
   }
 }

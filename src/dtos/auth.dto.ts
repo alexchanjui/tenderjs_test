@@ -1,4 +1,5 @@
 // src/dtos/auth.dto.ts
+import { Expose, Type } from "class-transformer";
 import { IsString, Length } from "class-validator";
 
 /**
@@ -14,4 +15,30 @@ export class LoginRequestDto {
     message: "密碼長度需介於 8~16 字元",
   })
   password!: string;
+}
+
+/**
+ * 登入使用者資訊 DTO
+ */
+export class LoginUserDto {
+  @Expose()
+  id!: string;
+
+  @Expose()
+  username!: string;
+
+  @Expose()
+  email!: string;
+}
+
+/**
+ * 登入 Response DTO
+ */
+export class LoginResponseDto {
+  @Expose()
+  token!: string;
+
+  @Expose()
+  @Type(() => LoginUserDto)
+  user!: LoginUserDto;
 }
