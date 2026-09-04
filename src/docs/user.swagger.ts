@@ -63,6 +63,26 @@
 
 /**
  * @openapi
+ * /users/{id}:
+ *   get:
+ *     tags: [Users]
+ *     summary: 取得使用者詳細資料
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: 成功
+ */
+
+/**
+ * @openapi
  * /users/me:
  *   get:
  *     tags: [Users]
