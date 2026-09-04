@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it } from "@jest/globals";
 import { mockDeep, type DeepMockProxy } from "jest-mock-extended";
 import { ErrorCode } from "../errors/error.codes";
 import type { IServiceContext } from "../types/service.context";
-import { UserService } from "./user.service";
+import { UserService } from "../services/user.service";
 
 describe("UserService", () => {
   let mockContext: DeepMockProxy<IServiceContext>;
@@ -31,6 +31,7 @@ describe("UserService", () => {
         password: "hashed-password",
         isActive: true,
         roleId: null,
+        role: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       };

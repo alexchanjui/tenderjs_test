@@ -2,7 +2,9 @@
 
 echo "🔍 執行 Push 前 Build 檢查..."
 
-npm run build && npm run build:seed
+npm run build &&
+npm run build:seed &&
+npm test
 
 status=$?
 

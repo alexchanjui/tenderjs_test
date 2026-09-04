@@ -6,7 +6,7 @@ import { mockDeep, type DeepMockProxy } from "jest-mock-extended";
 import { PermissionActionType, PermissionAccessLevel } from "../dtos/role.dto";
 import { ErrorCode } from "../errors/error.codes";
 import type { IServiceContext } from "../types/service.context";
-import { RoleService } from "./role.service";
+import { RoleService } from "../services/role.service";
 
 jest.mock("../caches/role-permission.cache", () => ({
   invalidateRolePermissions: jest.fn(),
