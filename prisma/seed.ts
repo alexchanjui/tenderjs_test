@@ -104,7 +104,7 @@ const permissionsData = [
     actionType: 0, // GET
     isRequired: true,
     isActive: true,
-    description: "取得當前使用者詳細資料",
+    description: "取得當前使用者詳細資訊",
   },
 
   // 200 - 角色管理
@@ -219,6 +219,58 @@ const permissionsData = [
     isRequired: true,
     isActive: true,
     description: "刪除權限",
+  },
+
+  // 400 - 招呼站管理
+  {
+    id: 401,
+    featureCode: 400,
+    name: "stop:list",
+    apiPath: "/api/v1/stops",
+    actionType: 0, // GET
+    isRequired: true,
+    isActive: true,
+    description: "查詢招呼站列表",
+  },
+  {
+    id: 402,
+    featureCode: 400,
+    name: "stop:create",
+    apiPath: "/api/v1/stops",
+    actionType: 1, // POST
+    isRequired: true,
+    isActive: true,
+    description: "新增招呼站",
+  },
+  {
+    id: 403,
+    featureCode: 400,
+    name: "stop:detail",
+    apiPath: "/api/v1/stops/:id",
+    actionType: 0, // GET
+    isRequired: true,
+    isActive: true,
+    description: "查詢招呼站詳細資訊",
+  },
+  {
+    id: 404,
+    featureCode: 400,
+    name: "stop:update",
+    apiPath: "/api/v1/stops/:id",
+    actionType: 2, // PUT
+    isRequired: true,
+    isActive: true,
+    description: "更新招呼站資訊",
+  },
+  {
+    id: 405,
+    featureCode: 400,
+    name: "stop:delete",
+    apiPath: "/api/v1/stops/:id",
+    actionType: 3, // DELETE
+    isRequired: true,
+    isActive: true,
+    description: "刪除招呼站",
   },
 ];
 

@@ -61,7 +61,7 @@
  * /roles/{id}:
  *   get:
  *     tags: [Roles]
- *     summary: 取得角色詳細資料
+ *     summary: 取得角色詳細資訊
  *     security:
  *       - BearerAuth: []
  *     parameters:

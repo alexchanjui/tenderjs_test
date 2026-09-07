@@ -66,7 +66,7 @@
  * /users/{id}:
  *   get:
  *     tags: [Users]
- *     summary: 取得使用者詳細資料
+ *     summary: 取得使用者詳細資訊
  *     security:
  *       - BearerAuth: []
  *     parameters:
@@ -86,7 +86,7 @@
  * /users/me:
  *   get:
  *     tags: [Users]
- *     summary: 取得當前使用者詳細資料
+ *     summary: 取得當前使用者詳細資訊
  *     security:
  *       - BearerAuth: []
  *     responses:

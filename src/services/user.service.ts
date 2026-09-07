@@ -41,7 +41,7 @@ export class UserService {
   }
 
   /**
-   * 取得使用者詳細資料
+   * 取得使用者詳細資訊
    */
   public async getUserById(id: string): Promise<UserResponseDto> {
     const user = await this.ctx.repos.user.findById(id);

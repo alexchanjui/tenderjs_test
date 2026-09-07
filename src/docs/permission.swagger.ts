@@ -77,7 +77,7 @@
  * /permissions/{id}:
  *   get:
  *     tags: [Permissions]
- *     summary: 取得權限詳細資料
+ *     summary: 取得權限詳細資訊
  *     security:
  *       - BearerAuth: []
  *     parameters:

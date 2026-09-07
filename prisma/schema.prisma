@@ -10,11 +10,11 @@ datasource db {
 }
 
 // ==========================================
-// 核心系統模組 (Core System Models)
+// 核心系統
 // ==========================================
 
 /// 系統使用者
-/// 負責儲存使用者登入資訊、帳號狀態與基本資料
+/// 用途：管理使用者帳號與登入資訊
 model User {
   /// 使用者 ID
   id String @id @default(dbgenerated("newid()")) @db.UniqueIdentifier
@@ -28,7 +28,7 @@ model User {
   /// 使用者密碼（Bcrypt Hash）
   password String
 
-  /// 帳號是否啟用
+  /// 啟用狀態
   isActive Boolean @default(true) @map("is_active")
 
   /// 所屬角色 ID
@@ -50,7 +50,7 @@ model User {
 }
 
 /// 系統角色
-/// 負責定義使用者角色，例如 ADMIN、USER
+/// 用途：管理系統角色
 model Role {
   /// 角色 ID
   id String @id @default(dbgenerated("newid()")) @db.UniqueIdentifier
@@ -61,7 +61,7 @@ model Role {
   /// 角色說明
   description String?
 
-  /// 角色是否啟用
+  /// 啟用狀態
   isActive Boolean @default(true) @map("is_active")
 
   /// 建立時間
@@ -80,7 +80,7 @@ model Role {
 }
 
 /// 系統權限
-/// 定義後端 API 可執行的操作權限
+/// 用途：管理 API 存取權限
 model Permission {
   /// 權限 ID
   id Int @id
@@ -97,7 +97,7 @@ model Permission {
   /// API 操作類型 （0: GET, 1: POST, 2: PUT, 3: DELETE）
   actionType Int @map("action_type")
 
-  /// 權限是否啟用
+  /// 啟用狀態
   isActive Boolean @default(true) @map("is_active")
 
   /// 是否需要登入及權限驗證
@@ -123,7 +123,7 @@ model Permission {
 }
 
 // ==========================================
-// 關聯中間表 (Join Tables)
+// 關聯資料
 // ==========================================
 
 /// 角色與權限關聯
@@ -142,17 +142,14 @@ model RolePermission {
 
   /// roleId + permissionId 作為複合主鍵
   @@id([roleId, permissionId])
-  
   @@map("role_permission")
 }
 
-
 // ==========================================
-// 系統日誌模組 (System Log Models)
+// 系統日誌
+// 用途: API 稽核日誌
 // ==========================================
 
-/// API 稽核日誌
-/// 記錄使用者 API 操作、Request、Response 與執行結果
 model AuditLog {
   /// 稽核日誌 ID
   id BigInt @id @default(autoincrement())
@@ -198,6 +195,57 @@ model AuditLog {
   @@index([userId])
   @@index([createdAt])
   @@index([statusCode])
-
   @@map("audit_log")
+}
+
+// ==========================================
+// 基礎資料
+// ==========================================
+
+/// 招呼站主檔
+/// 用途：管理招呼站基本資料
+model Stop {
+  /// 招呼站 ID
+  id Int @id @default(autoincrement()) @map("stop_id")
+
+  /// 票機招呼站代碼
+  bvStopCode String @map("bv_stop_code") @db.NVarChar(10)
+
+  /// 業者招呼站代碼
+  opStopCode String @map("op_stop_code") @db.NVarChar(10)
+
+  /// 招呼站全名
+  fullName String @map("stop_full_name") @db.NVarChar(50)
+
+  /// 招呼站名稱
+  name String @map("stop_name") @db.NVarChar(50)
+
+  /// 緯度 1
+  gpsX String @map("gps1_x") @db.NVarChar(10)
+
+  /// 經度 1
+  gpsY String @map("gps1_y") @db.NVarChar(10)
+
+  /// 緯度 2
+  gps2X String @map("gps2_x") @db.NVarChar(10)
+
+  /// 經度 2
+  gps2Y String @map("gps2_y") @db.NVarChar(10)
+
+  /// GPS 備註
+  gpsMemo String @map("gps_memo") @db.NVarChar(255)
+
+  /// 免費公車區碼
+  freeBusAreaCode String @map("free_bus_area_code") @db.NVarChar(20)
+
+  /// 啟用狀態
+  isActive Boolean @default(true) @map("is_active")
+
+  /// 更新時間
+  updatedAt DateTime @updatedAt @map("update_time")
+
+  /// 更新者 ID
+  updateUserId String @map("update_user_id") @db.UniqueIdentifier
+
+  @@map("sys_stop")
 }

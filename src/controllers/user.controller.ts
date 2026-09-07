@@ -42,7 +42,7 @@ export class UserController implements IController {
   };
 
   /**
-   * 取得使用者詳細資料
+   * 取得使用者詳細資訊
    */
   private getUserById = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
     const result = await this.userService.getUserById(req.params.id);
@@ -82,7 +82,7 @@ export class UserController implements IController {
   };
 
   /**
-   * 取得當前使用者詳細資料
+   * 取得當前使用者詳細資訊
    */
   private getMyUserInfo = async (_req: Request, res: Response): Promise<void> => {
     const result = await this.userService.getMyUserInfo();
