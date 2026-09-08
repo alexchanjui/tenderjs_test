@@ -18,18 +18,22 @@ import { PermissionService } from "./services/permission.service";
 import { StopService } from "./services/stop.service";
 
 // Controllers
+import type { IController } from "./controllers/interface/controller.interface";
 import { HealthController } from "./controllers/health.controller";
 import { UserController } from "./controllers/user.controller";
 import { AuthController } from "./controllers/auth.controller";
 import { RoleController } from "./controllers/role.controller";
 import { PermissionController } from "./controllers/permission.controller";
 import { StopController } from "./controllers/stop.controller";
-import type { IController } from "./controllers/interface/controller.interface";
+import { ImportController } from "./controllers/import.controller";
+import { ExportController } from "./controllers/export.controller";
 
 // Types
 import type { IServiceContext } from "./types/service.context";
 import type { IDbContext } from "./types/db.context";
 import { requestContextStorage } from "./utils/request-context";
+import { ImportService } from "./services/import.service";
+import { ExportService } from "./services/export.service";
 
 /**
  * 應用程式容器
@@ -86,6 +90,8 @@ export class AppContainer {
     const roleService = new RoleService(ctx);
     const permissionService = new PermissionService(ctx);
     const stopService = new StopService(ctx);
+    const importService = new ImportService(ctx);
+    const exportService = new ExportService(ctx);
 
     /**
      * 組裝 Controllers
@@ -97,6 +103,8 @@ export class AppContainer {
       new RoleController(roleService),
       new PermissionController(permissionService),
       new StopController(stopService),
+      new ImportController(importService),
+      new ExportController(exportService),
     ];
   }
 }

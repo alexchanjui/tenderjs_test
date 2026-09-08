@@ -11,6 +11,16 @@ export class StopPrismaRepository implements IStopRepository {
     return this.ctx.prisma.stop.create({ data });
   }
 
+  public async createMany(data: Prisma.StopCreateManyInput[]): Promise<Prisma.BatchPayload> {
+    return this.ctx.prisma.stop.createMany({ data });
+  }
+
+  public async findAll(): Promise<StopResponseDto[]> {
+    return this.ctx.prisma.stop.findMany({
+      orderBy: { updatedAt: "desc" },
+    });
+  }
+
   public async findById(id: number): Promise<StopResponseDto | null> {
     return this.ctx.prisma.stop.findUnique({
       where: { id },

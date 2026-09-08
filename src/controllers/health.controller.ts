@@ -4,9 +4,6 @@ import type { Request, Response } from "express";
 import type { HealthService } from "../services/health.service";
 import type { IController } from "./interface/controller.interface";
 
-/**
- * 系統健康檢查 Controller
- */
 export class HealthController implements IController {
   public path = "/health";
   public router = Router();

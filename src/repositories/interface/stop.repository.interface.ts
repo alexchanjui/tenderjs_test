@@ -5,6 +5,8 @@ import type { Prisma } from "@prisma/client";
 
 export interface IStopRepository {
   create(data: Prisma.StopCreateInput): Promise<StopResponseDto>;
+  createMany(data: Prisma.StopCreateManyInput[]): Promise<Prisma.BatchPayload>;
+  findAll(): Promise<StopResponseDto[]>;
   findById(id: number): Promise<StopResponseDto | null>;
   findAndCount(params: { skip?: number; take?: number }): Promise<[Stop[], number]>;
   update(id: number, data: Prisma.StopUpdateInput): Promise<void>;
