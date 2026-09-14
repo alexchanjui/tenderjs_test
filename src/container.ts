@@ -2,6 +2,7 @@
 import loggerInstance from "./utils/logger";
 import prismaInstance from "./utils/prisma";
 import redisInstance from "./utils/redis";
+import { requestContextStorage } from "./utils/request-context";
 
 // Repositories
 import { UserPrismaRepository } from "./repositories/prisma/user.prisma.repository";
@@ -16,6 +17,8 @@ import { AuthService } from "./services/auth.service";
 import { RoleService } from "./services/role.service";
 import { PermissionService } from "./services/permission.service";
 import { StopService } from "./services/stop.service";
+import { ImportService } from "./services/import.service";
+import { ExportService } from "./services/export.service";
 
 // Controllers
 import type { IController } from "./controllers/interface/controller.interface";
@@ -31,9 +34,6 @@ import { ExportController } from "./controllers/export.controller";
 // Types
 import type { IServiceContext } from "./types/service.context";
 import type { IDbContext } from "./types/db.context";
-import { requestContextStorage } from "./utils/request-context";
-import { ImportService } from "./services/import.service";
-import { ExportService } from "./services/export.service";
 
 /**
  * 應用程式容器
