@@ -15,7 +15,7 @@ export class UserService {
    * 建立使用者
    */
   public async createUser(data: CreateUserDto): Promise<UserResponseDto> {
-    const { username, email, password } = data;
+    const { username, nickname, email, password } = data;
 
     // 1. 檢查 Email 是否已存在
     const user = await this.ctx.repos.user.findByEmail(email);
@@ -30,6 +30,7 @@ export class UserService {
     // 3. 建立使用者
     const newUser = await this.ctx.repos.user.create({
       username,
+      nickname,
       email,
       password: hashedPassword,
     });

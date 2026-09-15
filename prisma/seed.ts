@@ -322,6 +322,7 @@ async function main() {
     update: {},
     create: {
       username: "admin",
+      nickname: "Admin",
       email: "admin@example.com",
       password,
       isActive: true,

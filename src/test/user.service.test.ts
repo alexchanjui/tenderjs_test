@@ -27,6 +27,7 @@ describe("UserService", () => {
       const mockUser = {
         id: "test-user-id",
         username: "test",
+        nickname: "Test Nickname",
         email: "test@example.com",
         password: "hashed-password",
         isActive: true,

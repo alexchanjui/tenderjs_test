@@ -20,7 +20,7 @@ export interface IUserRepository {
   findById(id: string): Promise<UserWithRole | null>;
   findByEmail(email: string): Promise<UserWithRole | null>;
   findByUsername(username: string): Promise<UserWithRole | null>;
-  findAndCount(params: { skip?: number; take?: number }): Promise<[User[], number]>;
+  findAndCount(params: { skip?: number; take?: number }): Promise<[UserWithRole[], number]>;
   update(id: string, data: UpdateUserRequestDto): Promise<void>;
   delete(id: string): Promise<void>;
 }

@@ -19,8 +19,11 @@ model User {
   /// 使用者 ID
   id String @id @default(dbgenerated("newid()")) @db.UniqueIdentifier
 
-  /// 使用者名稱
+  /// 使用者帳號
   username String @unique
+
+  /// 使用者暱稱
+  nickname String
 
   /// 使用者 Email
   email String @unique

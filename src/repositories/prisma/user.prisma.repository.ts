@@ -81,12 +81,26 @@ export class UserPrismaRepository implements IUserRepository {
   /**
    * 取得使用者列表 (分頁)
    */
-  public async findAndCount(params: { skip?: number; take?: number }): Promise<[User[], number]> {
+  public async findAndCount(params: {
+    skip?: number;
+    take?: number;
+  }): Promise<[UserWithRole[], number]> {
     return this.ctx.prisma.$transaction([
       this.ctx.prisma.user.findMany({
         skip: params.skip,
         take: params.take,
         orderBy: { createdAt: "desc" },
+        include: {
+          role: {
+            include: {
+              rolePermissions: {
+                include: {
+                  permission: true,
+                },
+              },
+            },
+          },
+        },
       }),
       this.ctx.prisma.user.count(),
     ]);

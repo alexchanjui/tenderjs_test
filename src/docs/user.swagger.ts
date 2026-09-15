@@ -39,13 +39,15 @@
  *             type: object
  *             required:
  *               - username
+ *               - nickname
  *               - email
  *               - password
  *             properties:
+ *               nickname:
+ *                 type: string
+ *                 example: "測試人員"
  *               username:
  *                 type: string
- *                 minLength: 2
- *                 maxLength: 20
  *                 example: test
  *               email:
  *                 type: string
@@ -118,9 +120,10 @@
  *             properties:
  *               username:
  *                 type: string
- *                 minLength: 2
- *                 maxLength: 20
  *                 example: test
+ *               nickname:
+ *                 type: string
+ *                 example: "測試人員"
  *               email:
  *                 type: string
  *                 format: email
