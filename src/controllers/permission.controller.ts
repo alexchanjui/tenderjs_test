@@ -5,6 +5,7 @@ import { plainToInstance } from "class-transformer";
 import { PaginationRequestDto } from "../dtos/pagination.dto";
 import { PermissionService } from "../services/permission.service";
 import { CreatePermissionRequestDto, UpdatePermissionRequestDto } from "../dtos/permission.dto";
+import { BatchDeleteNumberIdsDto } from "../dtos/common.dto";
 import type { IController } from "./interface/controller.interface";
 import * as R from "../utils/response";
 
@@ -28,7 +29,7 @@ export class PermissionController implements IController {
       validationMiddleware(UpdatePermissionRequestDto),
       this.updatePermission,
     );
-    this.router.delete("/:id", this.deletePermission);
+    this.router.delete("/batch", this.batchDeletePermission);
   }
 
   /**
@@ -78,8 +79,10 @@ export class PermissionController implements IController {
   /**
    * 刪除權限
    */
-  private deletePermission = async (req: Request, res: Response): Promise<void> => {
-    await this.permissionService.deletePermission(Number(req.params.id));
+  private batchDeletePermission = async (req: Request, res: Response): Promise<void> => {
+    const dto = plainToInstance(BatchDeleteNumberIdsDto, req.body);
+
+    await this.permissionService.batchDeletePermission(dto.ids);
 
     R.success(res);
   };

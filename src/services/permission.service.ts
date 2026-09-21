@@ -13,9 +13,6 @@ export class PermissionService {
   /**
    * 建立權限
    */
-  /**
-   * 建立權限
-   */
   public async createPermission(data: CreatePermissionRequestDto): Promise<PermissionResponseDto> {
     // 檢查 ID
     const permissionById = await this.ctx.repos.permission.findById(data.id);
@@ -109,16 +106,10 @@ export class PermissionService {
   }
 
   /**
-   * 刪除權限
+   * 批次刪除權限
    */
-  public async deletePermission(id: number): Promise<void> {
-    const permission = await this.ctx.repos.permission.findById(id);
-
-    if (!permission) {
-      throw new AppError(ErrorCode.DATA_NOT_FOUND, "權限不存在");
-    }
-
-    await this.ctx.repos.permission.delete(id);
+  public async batchDeletePermission(ids: number[]): Promise<void> {
+    await this.ctx.repos.permission.batchDelete(ids);
 
     // 重新載入權限快取
     await cacheInitService.reloadPermissionRules();

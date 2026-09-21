@@ -79,11 +79,15 @@ export class PermissionPrismaRepository implements IPermissionRepository {
   }
 
   /**
-   * 刪除權限
+   * 批次刪除權限
    */
-  public async delete(id: number): Promise<void> {
-    await this.ctx.prisma.permission.delete({
-      where: { id },
+  public async batchDelete(ids: number[]): Promise<void> {
+    await this.ctx.prisma.permission.deleteMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
     });
   }
 }

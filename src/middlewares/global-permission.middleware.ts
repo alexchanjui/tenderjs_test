@@ -22,39 +22,30 @@ export const globalPermissionGuard = async (
     // 1. 找出目前 API 對應的權限規則
     const rule = findRouteRule(req.method, requestPath);
 
-    // 2. 未設定權限規則時，只處理登入身分
-    if (!rule) {
-      if (!authHeader) {
-        next();
-        return;
-      }
-
-      const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : authHeader;
-
-      const currentUser = await verifyAuthToken(token);
-
-      requestContextStorage.run(currentUser, () => {
-        next();
-      });
-
-      return;
-    }
-
-    // 3. 公開 API 不需要登入及權限驗證
-    if (!rule.isRequired) {
+    // 2. 公開 API 不需要登入及權限驗證
+    if (rule && !rule.isRequired) {
       next();
       return;
     }
 
-    // 4. 受權限保護的 API 必須有 Token
+    // 3. 非公開 API 必須登入
     if (!authHeader) {
       throw new AppError(ErrorCode.UNAUTH);
     }
 
     const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : authHeader;
 
-    // 5. 驗證 Token 並取得登入者
+    // 4. 驗證 Token 並取得登入者
     const currentUser = await verifyAuthToken(token);
+
+    // 5. 未設定權限規則，只驗證登入身分
+    if (!rule) {
+      requestContextStorage.run(currentUser, () => {
+        next();
+      });
+
+      return;
+    }
 
     // 6. 沒有角色代表沒有權限
     if (!currentUser.roleId) {

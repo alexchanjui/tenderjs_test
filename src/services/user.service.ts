@@ -11,6 +11,12 @@ import { PermissionSetting, PermissionAccessLevel } from "../dtos/role.dto";
 export class UserService {
   constructor(private readonly ctx: IServiceContext) {}
 
+  private getCurrentUser() {
+    const currentUser = this.ctx.currentUser;
+    if (!currentUser) throw new AppError(ErrorCode.UNAUTH, "使用者未登入");
+    return currentUser;
+  }
+
   /**
    * 建立使用者
    */
@@ -107,27 +113,20 @@ export class UserService {
   }
 
   /**
-   * 刪除使用者
+   * 批次刪除使用者
    */
-  public async deleteUser(id: string): Promise<void> {
-    const currentUser = this.ctx.currentUser;
+  public async batchDeleteUser(ids: string[]): Promise<void> {
+    const currentUser = this.getCurrentUser();
 
-    if (!currentUser) {
-      throw new AppError(ErrorCode.UNAUTH);
-    }
-
-    // 不可刪除自己
-    if (id === currentUser.id) {
+    if (ids.includes(currentUser.id)) {
       throw new AppError(ErrorCode.REQUEST_DATA, "無法刪除自己");
     }
 
-    const user = await this.ctx.repos.user.findById(id);
+    const count = await this.ctx.repos.user.batchDelete(ids);
 
-    if (!user) {
+    if (count !== ids.length) {
       throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);
     }
-
-    await this.ctx.repos.user.delete(id);
   }
 
   /**

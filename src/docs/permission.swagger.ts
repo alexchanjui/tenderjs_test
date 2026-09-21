@@ -60,9 +60,6 @@
  *                 type: integer
  *                 description: 0=GET, 1=POST, 2=PUT, 3=DELETE
  *                 example: 0
- *               isActive:
- *                 type: boolean
- *                 example: true
  *               description:
  *                 type: string
  *                 maxLength: 200
@@ -133,18 +130,29 @@
  *     responses:
  *       200:
  *         description: 成功
- *
+ */
+
+/**
+ * @openapi
+ * /permissions/batch:
  *   delete:
  *     tags: [Permissions]
- *     summary: 刪除權限
+ *     summary: 批次刪除權限
  *     security:
  *       - BearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               ids:
+ *                 type: array
+ *                 items:
+ *                   type: integer
+ *                 minItems: 1
+ *                 example: [1, 2, 3]
  *     responses:
  *       200:
  *         description: 成功

@@ -31,6 +31,8 @@
  *   post:
  *     tags: [Users]
  *     summary: 建立使用者
+ *     security:
+ *       - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -135,6 +137,33 @@
  *               isActive:
  *                 type: boolean
  *                 example: true
+ *     responses:
+ *       200:
+ *         description: 成功
+ */
+
+/**
+ * @openapi
+ * /users/batch:
+ *   delete:
+ *     tags: [Users]
+ *     summary: 批次刪除使用者
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - ids
+ *             properties:
+ *               ids:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: uuid
  *     responses:
  *       200:
  *         description: 成功

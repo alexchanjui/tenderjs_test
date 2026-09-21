@@ -9,6 +9,7 @@ import { validationMiddleware } from "../middlewares/validation.middleware";
 import { CreateUserDto } from "../dtos/user.dto";
 import { PaginationRequestDto } from "../dtos/pagination.dto";
 import * as R from "../utils/response";
+import { BatchDeleteStringIdsDto } from "../dtos/common.dto";
 
 export class UserController implements IController {
   public path = "/users";
@@ -27,7 +28,7 @@ export class UserController implements IController {
     this.router.get("/", validationMiddleware(PaginationRequestDto, "query"), this.getUsers);
     this.router.get("/:id", this.getUserById);
     this.router.put("/:id", validationMiddleware(UpdateUserRequestDto), this.updateUser);
-    this.router.delete("/:id", this.deleteUser);
+    this.router.delete("/batch", this.batchDeleteUser);
   }
 
   /**
@@ -73,10 +74,11 @@ export class UserController implements IController {
   };
 
   /**
-   * 刪除使用者
+   * 批次刪除使用者
    */
-  private deleteUser = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
-    await this.userService.deleteUser(req.params.id);
+  private batchDeleteUser = async (req: Request, res: Response): Promise<void> => {
+    const dto = plainToInstance(BatchDeleteStringIdsDto, req.body);
+    await this.userService.batchDeleteUser(dto.ids);
 
     R.success(res);
   };

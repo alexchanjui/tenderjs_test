@@ -49,7 +49,7 @@ describe("UserService", () => {
     it("沒有登入資訊時應拋出 UNAUTH", async () => {
       mockContext.currentUser = undefined;
 
-      await expect(service.deleteUser("test-user-id")).rejects.toMatchObject({
+      await expect(service.batchDeleteUser(["test-user-id"])).rejects.toMatchObject({
         bizCode: ErrorCode.UNAUTH,
       });
     });
@@ -57,7 +57,7 @@ describe("UserService", () => {
     it("刪除自己時應拋出 REQUEST_DATA", async () => {
       mockContext.currentUser = { id: "test-user-id", roleId: null };
 
-      await expect(service.deleteUser("test-user-id")).rejects.toMatchObject({
+      await expect(service.batchDeleteUser(["test-user-id"])).rejects.toMatchObject({
         bizCode: ErrorCode.REQUEST_DATA,
       });
     });
@@ -69,7 +69,7 @@ describe("UserService", () => {
       };
       mockContext.repos.user.findById.mockResolvedValue(null);
 
-      await expect(service.deleteUser("target-user-id")).rejects.toMatchObject({
+      await expect(service.batchDeleteUser(["target-user-id"])).rejects.toMatchObject({
         bizCode: ErrorCode.ACCOUNT_NOT_EXIST,
       });
     });

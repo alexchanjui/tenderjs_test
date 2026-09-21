@@ -37,6 +37,17 @@
 
 /**
  * @openapi
+ * /auth/captcha:
+ *   get:
+ *     tags: [Auth]
+ *     summary: 取得登入驗證碼
+ *     responses:
+ *       200:
+ *         description: 成功
+ */
+
+/**
+ * @openapi
  * /auth/auto-login:
  *   post:
  *     tags: [Auth]

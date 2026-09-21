@@ -10,5 +10,5 @@ export interface IPermissionRepository {
   findByFeatureCode(featureCode: number): Promise<Permission[]>;
   findAndCount(params: { skip?: number; take?: number }): Promise<[Permission[], number]>;
   update(id: number, data: UpdatePermissionRequestDto): Promise<void>;
-  delete(id: number): Promise<void>;
+  batchDelete(ids: number[]): Promise<void>;
 }

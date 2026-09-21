@@ -18,7 +18,7 @@ const permissionsData = [
     id: 1,
     featureCode: 0,
     name: "system:health",
-    apiPath: "/api/v1/health",
+    apiPath: "/api/health",
     actionType: 0, // GET
     isRequired: false,
     isActive: true,
@@ -28,7 +28,7 @@ const permissionsData = [
     id: 2,
     featureCode: 0,
     name: "auth:login",
-    apiPath: "/api/v1/auth/login",
+    apiPath: "/api/auth/login",
     actionType: 1, // POST
     isRequired: false,
     isActive: true,
@@ -38,19 +38,32 @@ const permissionsData = [
     id: 3,
     featureCode: 0,
     name: "auth:captcha",
-    apiPath: "/api/v1/auth/captcha",
+    apiPath: "/api/auth/captcha",
     actionType: 0, // GET
     isRequired: false,
     isActive: true,
     description: "取得登入驗證碼",
   },
-
+  ...(process.env.NODE_ENV === "development"
+    ? [
+        {
+          id: 4,
+          featureCode: 0,
+          name: "auth:auto-login",
+          apiPath: "/api/auth/auto-login",
+          actionType: 1,
+          isRequired: false,
+          isActive: true,
+          description: "自動登入",
+        },
+      ]
+    : []),
   // 100 - 使用者管理
   {
     id: 101,
     featureCode: 100,
     name: "user:list",
-    apiPath: "/api/v1/users",
+    apiPath: "/api/users",
     actionType: 0, // GET
     isRequired: true,
     isActive: true,
@@ -60,7 +73,7 @@ const permissionsData = [
     id: 102,
     featureCode: 100,
     name: "user:create",
-    apiPath: "/api/v1/users",
+    apiPath: "/api/users",
     actionType: 1, // POST
     isRequired: true,
     isActive: true,
@@ -70,7 +83,7 @@ const permissionsData = [
     id: 103,
     featureCode: 100,
     name: "user:detail",
-    apiPath: "/api/v1/users/:id",
+    apiPath: "/api/users/:id",
     actionType: 0, // GET
     isRequired: true,
     isActive: true,
@@ -80,7 +93,7 @@ const permissionsData = [
     id: 104,
     featureCode: 100,
     name: "user:update",
-    apiPath: "/api/v1/users/:id",
+    apiPath: "/api/users/:id",
     actionType: 2, // PUT
     isRequired: true,
     isActive: true,
@@ -90,7 +103,7 @@ const permissionsData = [
     id: 105,
     featureCode: 100,
     name: "user:delete",
-    apiPath: "/api/v1/users/:id",
+    apiPath: "/api/users/:id",
     actionType: 3, // DELETE
     isRequired: true,
     isActive: true,
@@ -100,7 +113,7 @@ const permissionsData = [
     id: 106,
     featureCode: 100,
     name: "user:me",
-    apiPath: "/api/v1/users/me",
+    apiPath: "/api/users/me",
     actionType: 0, // GET
     isRequired: true,
     isActive: true,
@@ -112,7 +125,7 @@ const permissionsData = [
     id: 201,
     featureCode: 200,
     name: "role:list",
-    apiPath: "/api/v1/roles",
+    apiPath: "/api/roles",
     actionType: 0, // GET
     isRequired: true,
     isActive: true,
@@ -122,7 +135,7 @@ const permissionsData = [
     id: 202,
     featureCode: 200,
     name: "role:create",
-    apiPath: "/api/v1/roles",
+    apiPath: "/api/roles",
     actionType: 1, // POST
     isRequired: true,
     isActive: true,
@@ -132,7 +145,7 @@ const permissionsData = [
     id: 203,
     featureCode: 200,
     name: "role:detail",
-    apiPath: "/api/v1/roles/:id",
+    apiPath: "/api/roles/:id",
     actionType: 0, // GET
     isRequired: true,
     isActive: true,
@@ -142,7 +155,7 @@ const permissionsData = [
     id: 204,
     featureCode: 200,
     name: "role:update",
-    apiPath: "/api/v1/roles/:id",
+    apiPath: "/api/roles/:id",
     actionType: 2, // PUT
     isRequired: true,
     isActive: true,
@@ -152,7 +165,7 @@ const permissionsData = [
     id: 205,
     featureCode: 200,
     name: "role:delete",
-    apiPath: "/api/v1/roles/:id",
+    apiPath: "/api/roles/:id",
     actionType: 3, // DELETE
     isRequired: true,
     isActive: true,
@@ -162,7 +175,7 @@ const permissionsData = [
     id: 206,
     featureCode: 200,
     name: "role/:id/permissions",
-    apiPath: "/api/v1/roles/:id/permissions",
+    apiPath: "/api/roles/:id/permissions",
     actionType: 2, // PUT
     isRequired: true,
     isActive: true,
@@ -174,7 +187,7 @@ const permissionsData = [
     id: 301,
     featureCode: 300,
     name: "permission:list",
-    apiPath: "/api/v1/permissions",
+    apiPath: "/api/permissions",
     actionType: 0, // GET
     isRequired: true,
     isActive: true,
@@ -184,7 +197,7 @@ const permissionsData = [
     id: 302,
     featureCode: 300,
     name: "permission:create",
-    apiPath: "/api/v1/permissions",
+    apiPath: "/api/permissions",
     actionType: 1, // POST
     isRequired: true,
     isActive: true,
@@ -194,7 +207,7 @@ const permissionsData = [
     id: 303,
     featureCode: 300,
     name: "permission:detail",
-    apiPath: "/api/v1/permissions/:id",
+    apiPath: "/api/permissions/:id",
     actionType: 0, // GET
     isRequired: true,
     isActive: true,
@@ -204,7 +217,7 @@ const permissionsData = [
     id: 304,
     featureCode: 300,
     name: "permission:update",
-    apiPath: "/api/v1/permissions/:id",
+    apiPath: "/api/permissions/:id",
     actionType: 2, // PUT
     isRequired: true,
     isActive: true,
@@ -214,7 +227,7 @@ const permissionsData = [
     id: 305,
     featureCode: 300,
     name: "permission:delete",
-    apiPath: "/api/v1/permissions/:id",
+    apiPath: "/api/permissions/:id",
     actionType: 3, // DELETE
     isRequired: true,
     isActive: true,
@@ -226,7 +239,7 @@ const permissionsData = [
     id: 401,
     featureCode: 400,
     name: "stop:list",
-    apiPath: "/api/v1/stops",
+    apiPath: "/api/stops",
     actionType: 0, // GET
     isRequired: true,
     isActive: true,
@@ -236,7 +249,7 @@ const permissionsData = [
     id: 402,
     featureCode: 400,
     name: "stop:create",
-    apiPath: "/api/v1/stops",
+    apiPath: "/api/stops",
     actionType: 1, // POST
     isRequired: true,
     isActive: true,
@@ -246,7 +259,7 @@ const permissionsData = [
     id: 403,
     featureCode: 400,
     name: "stop:detail",
-    apiPath: "/api/v1/stops/:id",
+    apiPath: "/api/stops/:id",
     actionType: 0, // GET
     isRequired: true,
     isActive: true,
@@ -256,7 +269,7 @@ const permissionsData = [
     id: 404,
     featureCode: 400,
     name: "stop:update",
-    apiPath: "/api/v1/stops/:id",
+    apiPath: "/api/stops/:id",
     actionType: 2, // PUT
     isRequired: true,
     isActive: true,
@@ -266,7 +279,7 @@ const permissionsData = [
     id: 405,
     featureCode: 400,
     name: "stop:delete",
-    apiPath: "/api/v1/stops/:id",
+    apiPath: "/api/stops/:id",
     actionType: 3, // DELETE
     isRequired: true,
     isActive: true,
@@ -295,23 +308,55 @@ async function main() {
   logger.info("✅ Permissions 建立完成");
 
   // ==========================================
-  // Step 2: 建立 Admin Role
+  // Step 2: 建立 superAdmin Role
   // ==========================================
-  const adminRole = await prisma.role.upsert({
+  const superAdminRole = await prisma.role.upsert({
     where: {
-      name: "Admin",
+      name: "superAdmin",
     },
-    update: {},
+    update: {
+      description: "超級管理員",
+    },
     create: {
-      name: "Admin",
-      description: "系統管理員",
+      name: "superAdmin",
+      description: "超級管理員",
     },
   });
 
-  logger.info("✅ Admin Role 建立完成");
+  logger.info("✅ superAdmin Role 建立完成");
 
   // ==========================================
-  // Step 3: 建立 Admin User
+  // Step 3: superAdmin 加入所有權限
+  // ==========================================
+  const permissions = await prisma.permission.findMany({
+    where: {
+      isActive: true,
+      isRequired: true,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  await prisma.$transaction([
+    prisma.rolePermission.deleteMany({
+      where: {
+        roleId: superAdminRole.id,
+      },
+    }),
+
+    prisma.rolePermission.createMany({
+      data: permissions.map((permission) => ({
+        roleId: superAdminRole.id,
+        permissionId: permission.id,
+      })),
+    }),
+  ]);
+
+  logger.info(`✅ superAdmin 權限同步完成 (${permissions.length} 筆)`);
+
+  // ==========================================
+  // Step 4: 建立 admin User
   // ==========================================
   const password = await bcrypt.hash("password123", 10);
 
@@ -319,18 +364,20 @@ async function main() {
     where: {
       username: "admin",
     },
-    update: {},
+    update: {
+      roleId: superAdminRole.id,
+    },
     create: {
       username: "admin",
       nickname: "Admin",
       email: "admin@example.com",
       password,
       isActive: true,
-      roleId: adminRole.id,
+      roleId: superAdminRole.id,
     },
   });
 
-  logger.info("✅ Admin User 建立完成");
+  logger.info("✅ admin User 建立完成");
 
   logger.info("🎉 Seed 完成");
 }

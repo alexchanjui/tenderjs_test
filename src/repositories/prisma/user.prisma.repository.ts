@@ -117,11 +117,17 @@ export class UserPrismaRepository implements IUserRepository {
   }
 
   /**
-   * 刪除使用者
+   * 批次刪除使用者
    */
-  public async delete(id: string): Promise<void> {
-    await this.ctx.prisma.user.delete({
-      where: { id },
+  public async batchDelete(ids: string[]): Promise<number> {
+    const result = await this.ctx.prisma.user.deleteMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
     });
+
+    return result.count;
   }
 }
