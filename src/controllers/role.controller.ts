@@ -12,6 +12,7 @@ import { validationMiddleware } from "../middlewares/validation.middleware";
 import type { RoleService } from "../services/role.service";
 import * as R from "../utils/response";
 import type { IController } from "./interface/controller.interface";
+import { BatchDeleteStringIdsDto } from "../dtos/common.dto";
 
 export class RoleController implements IController {
   public path = "/roles";
@@ -29,7 +30,11 @@ export class RoleController implements IController {
     this.router.get("/:id", this.getRoleById);
     this.router.post("/", validationMiddleware(CreateRoleRequestDto), this.createRole);
     this.router.put("/:id", validationMiddleware(UpdateRoleRequestDto), this.updateRole);
-    this.router.delete("/:id", this.deleteRole);
+    this.router.delete(
+      "/batch",
+      validationMiddleware(BatchDeleteStringIdsDto),
+      this.batchDeleteRole,
+    );
     this.router.put(
       "/:id/permissions",
       validationMiddleware(UpdateRolePermissionsRequestDto),
@@ -80,10 +85,12 @@ export class RoleController implements IController {
   };
 
   /**
-   * 刪除角色
+   * 批次刪除角色
    */
-  private deleteRole = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
-    await this.roleService.deleteRole(req.params.id);
+  private batchDeleteRole = async (req: Request, res: Response): Promise<void> => {
+    const dto = plainToInstance(BatchDeleteStringIdsDto, req.body);
+
+    await this.roleService.batchDeleteRole(dto.ids);
 
     R.success(res);
   };

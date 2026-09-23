@@ -29,7 +29,11 @@ export class PermissionController implements IController {
       validationMiddleware(UpdatePermissionRequestDto),
       this.updatePermission,
     );
-    this.router.delete("/batch", this.batchDeletePermission);
+    this.router.delete(
+      "/batch",
+      validationMiddleware(BatchDeleteNumberIdsDto),
+      this.batchDeletePermission,
+    );
   }
 
   /**
@@ -77,7 +81,7 @@ export class PermissionController implements IController {
   };
 
   /**
-   * 刪除權限
+   * 批次刪除權限
    */
   private batchDeletePermission = async (req: Request, res: Response): Promise<void> => {
     const dto = plainToInstance(BatchDeleteNumberIdsDto, req.body);

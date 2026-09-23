@@ -50,8 +50,13 @@ export class RoleService {
       take: limit,
     });
 
+    const data = roles.map((role) => ({
+      ...role,
+      userCount: role._count.users,
+    }));
+
     return {
-      data: plainToInstance(RoleResponseDto, roles, {
+      data: plainToInstance(RoleResponseDto, data, {
         excludeExtraneousValues: true,
       }),
       meta: {
@@ -147,18 +152,16 @@ export class RoleService {
   }
 
   /**
-   * 刪除角色
+   * 批次刪除角色
    */
-  public async deleteRole(id: string): Promise<void> {
-    const userCount = await this.ctx.prisma.user.count({
-      where: { roleId: id },
-    });
+  public async batchDeleteRole(ids: string[]): Promise<void> {
+    const userCount = await this.ctx.repos.role.countUsersByRoleIds(ids);
 
     if (userCount > 0) {
-      throw new Error(`此角色仍有 ${userCount} 位使用者使用，無法刪除。`);
+      throw new Error(`選取的角色仍有 ${userCount} 位使用者使用，無法刪除。`);
     }
 
-    await this.ctx.repos.role.delete(id);
+    await this.ctx.repos.role.batchDelete(ids);
   }
 
   /**

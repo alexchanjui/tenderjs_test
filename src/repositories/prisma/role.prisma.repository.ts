@@ -1,8 +1,11 @@
 // src/repositories/prisma/role.prisma.repository.ts
 import type { Role } from "@prisma/client";
-import type { RoleWithPermissions } from "../interface/role.repository.interface";
+import type {
+  IRoleRepository,
+  RoleWithPermissions,
+  RoleWithUserCount,
+} from "../interface/role.repository.interface";
 import type { CreateRoleRequestDto, UpdateRoleRequestDto } from "../../dtos/role.dto";
-import type { IRoleRepository } from "../interface/role.repository.interface";
 import { IDbContext } from "../../types/db.context";
 
 export class RolePrismaRepository implements IRoleRepository {
@@ -23,7 +26,14 @@ export class RolePrismaRepository implements IRoleRepository {
       where: { id },
       include: {
         rolePermissions: {
-          include: { permission: true },
+          include: {
+            permission: true,
+          },
+        },
+        _count: {
+          select: {
+            users: true,
+          },
         },
       },
     });
@@ -41,12 +51,22 @@ export class RolePrismaRepository implements IRoleRepository {
   /**
    * 取得角色列表 (分頁)
    */
-  public async findAndCount(params: { skip?: number; take?: number }): Promise<[Role[], number]> {
+  public async findAndCount(params: {
+    skip?: number;
+    take?: number;
+  }): Promise<[RoleWithUserCount[], number]> {
     return this.ctx.prisma.$transaction([
       this.ctx.prisma.role.findMany({
         skip: params.skip,
         take: params.take,
         orderBy: { createdAt: "desc" },
+        include: {
+          _count: {
+            select: {
+              users: true,
+            },
+          },
+        },
       }),
       this.ctx.prisma.role.count(),
     ]);
@@ -63,11 +83,28 @@ export class RolePrismaRepository implements IRoleRepository {
   }
 
   /**
-   * 刪除角色
+   * 計算角色使用人數
    */
-  public async delete(id: string): Promise<void> {
-    await this.ctx.prisma.role.delete({
-      where: { id },
+  public async countUsersByRoleIds(ids: string[]): Promise<number> {
+    return this.ctx.prisma.user.count({
+      where: {
+        roleId: {
+          in: ids,
+        },
+      },
+    });
+  }
+
+  /**
+   * 批次刪除角色
+   */
+  public async batchDelete(ids: string[]): Promise<void> {
+    await this.ctx.prisma.role.deleteMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
     });
   }
 

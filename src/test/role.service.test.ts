@@ -45,15 +45,32 @@ describe("RoleService", () => {
         createdAt: new Date(),
         updatedAt: new Date(),
         rolePermissions: [],
+        _count: {
+          users: 0,
+        },
       });
 
       mockContext.repos.permission.findByFeatureCode.mockResolvedValue([
         {
           id: 1,
+          sortOrder: 1,
           featureCode: 1001,
           name: "取得使用者",
           apiPath: "/api/users",
           actionType: PermissionActionType.GET,
+          isActive: true,
+          isRequired: true,
+          description: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          id: 2,
+          sortOrder: 2,
+          featureCode: 1001,
+          name: "新增使用者",
+          apiPath: "/api/users",
+          actionType: PermissionActionType.POST,
           isActive: true,
           isRequired: true,
           description: null,
@@ -85,11 +102,15 @@ describe("RoleService", () => {
         createdAt: new Date(),
         updatedAt: new Date(),
         rolePermissions: [],
+        _count: {
+          users: 0,
+        },
       });
 
       mockContext.repos.permission.findByFeatureCode.mockResolvedValue([
         {
           id: 1,
+          sortOrder: 1,
           featureCode: 1001,
           name: "取得使用者",
           apiPath: "/api/users",
@@ -102,6 +123,7 @@ describe("RoleService", () => {
         },
         {
           id: 2,
+          sortOrder: 2,
           featureCode: 1001,
           name: "新增使用者",
           apiPath: "/api/users",
@@ -137,11 +159,15 @@ describe("RoleService", () => {
         createdAt: new Date(),
         updatedAt: new Date(),
         rolePermissions: [],
+        _count: {
+          users: 0,
+        },
       });
 
       mockContext.repos.permission.findByFeatureCode.mockResolvedValue([
         {
           id: 1,
+          sortOrder: 1,
           featureCode: 1001,
           name: "取得使用者",
           apiPath: "/api/users",
@@ -154,6 +180,7 @@ describe("RoleService", () => {
         },
         {
           id: 2,
+          sortOrder: 2,
           featureCode: 1001,
           name: "新增使用者",
           apiPath: "/api/users",

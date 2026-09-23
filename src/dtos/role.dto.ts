@@ -3,6 +3,7 @@ import { Expose, Type } from "class-transformer";
 import {
   ArrayMinSize,
   IsArray,
+  IsBoolean,
   IsEnum,
   IsInt,
   IsOptional,
@@ -38,6 +39,10 @@ export class UpdateRoleRequestDto {
   @IsString({ message: "角色說明必須為字串" })
   @Length(0, 200, { message: "角色說明長度需介於 0~200 字元" })
   description?: string;
+
+  @IsOptional()
+  @IsBoolean({ message: "啟用狀態必須為布林值" })
+  isActive?: boolean;
 }
 
 /**
@@ -52,6 +57,12 @@ export class RoleResponseDto {
 
   @Expose()
   description!: string | null;
+
+  @Expose()
+  isActive!: number;
+
+  @Expose()
+  userCount!: number;
 }
 
 /**

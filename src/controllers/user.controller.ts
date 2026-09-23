@@ -28,7 +28,11 @@ export class UserController implements IController {
     this.router.get("/", validationMiddleware(PaginationRequestDto, "query"), this.getUsers);
     this.router.get("/:id", this.getUserById);
     this.router.put("/:id", validationMiddleware(UpdateUserRequestDto), this.updateUser);
-    this.router.delete("/batch", this.batchDeleteUser);
+    this.router.delete(
+      "/batch",
+      validationMiddleware(BatchDeleteStringIdsDto),
+      this.batchDeleteUser,
+    );
   }
 
   /**
@@ -78,6 +82,7 @@ export class UserController implements IController {
    */
   private batchDeleteUser = async (req: Request, res: Response): Promise<void> => {
     const dto = plainToInstance(BatchDeleteStringIdsDto, req.body);
+
     await this.userService.batchDeleteUser(dto.ids);
 
     R.success(res);

@@ -106,19 +106,28 @@
  *     responses:
  *       200:
  *         description: 成功
- *
+ */
+
+/**
+ * @openapi
+ * /roles/batch:
  *   delete:
  *     tags: [Roles]
- *     summary: 刪除角色
+ *     summary: 批次刪除角色
  *     security:
  *       - BearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               ids:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: uuid
  *     responses:
  *       200:
  *         description: 成功
