@@ -21,6 +21,7 @@ export class PermissionController implements IController {
    * 初始化路由
    */
   private initializeRoutes(): void {
+    this.router.get("/all", this.getAllPermissions);
     this.router.get("/", validationMiddleware(PaginationRequestDto, "query"), this.getPermissions);
     this.router.get("/:id", this.getPermissionById);
     this.router.post("/", validationMiddleware(CreatePermissionRequestDto), this.createPermission);
@@ -89,5 +90,14 @@ export class PermissionController implements IController {
     await this.permissionService.batchDeletePermission(dto.ids);
 
     R.success(res);
+  };
+
+  /**
+   * 取得所有權限
+   */
+  private getAllPermissions = async (req: Request, res: Response): Promise<void> => {
+    const result = await this.permissionService.getAllPermissions();
+
+    R.success(res, result);
   };
 }

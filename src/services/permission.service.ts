@@ -37,7 +37,7 @@ export class PermissionService {
   }
 
   /**
-   * 取得權限列表
+   * 取得權限列表 (分頁)
    */
   public async getPermissions(
     dto: PaginationRequestDto,
@@ -62,6 +62,17 @@ export class PermissionService {
         totalPages: Math.ceil(total / limit),
       },
     };
+  }
+
+  /**
+   * 取得所有權限
+   */
+  public async getAllPermissions(): Promise<PermissionResponseDto[]> {
+    const permissions = await this.ctx.repos.permission.findAll();
+
+    return plainToInstance(PermissionResponseDto, permissions, {
+      excludeExtraneousValues: true,
+    });
   }
 
   /**

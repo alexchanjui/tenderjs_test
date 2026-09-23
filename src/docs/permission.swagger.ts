@@ -71,6 +71,19 @@
 
 /**
  * @openapi
+ * /permissions/all:
+ *   get:
+ *     tags: [Permissions]
+ *     summary: 取得所有權限
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: 成功
+ */
+
+/**
+ * @openapi
  * /permissions/{id}:
  *   get:
  *     tags: [Permissions]

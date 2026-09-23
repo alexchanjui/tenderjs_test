@@ -19,8 +19,15 @@ export class PermissionPrismaRepository implements IPermissionRepository {
    */
   public async findAll(): Promise<Permission[]> {
     return this.ctx.prisma.permission.findMany({
-      where: { isActive: true },
-      orderBy: { createdAt: "desc" },
+      where: {
+        isActive: true,
+        featureCode: {
+          not: 0,
+        },
+      },
+      orderBy: {
+        sortOrder: "asc",
+      },
     });
   }
 
