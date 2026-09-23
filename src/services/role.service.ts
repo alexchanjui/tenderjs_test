@@ -5,7 +5,6 @@ import {
   PermissionAccessLevel,
   PermissionActionType,
   RoleResponseDto,
-  RoleDetailResponseDto,
   UpdateRolePermissionsRequestDto,
   UpdateRoleRequestDto,
 } from "../dtos/role.dto";
@@ -36,7 +35,7 @@ export class RoleService {
   }
 
   /**
-   * 取得角色列表
+   * 取得角色列表 (分頁)
    */
   public async getRoles(
     dto: PaginationRequestDto,
@@ -50,9 +49,20 @@ export class RoleService {
       take: limit,
     });
 
+    const allPermissions = await this.ctx.repos.permission.findAll();
+
+    const featureCodes = [
+      ...new Set(
+        allPermissions
+          .filter((permission) => permission.isRequired)
+          .map((permission) => permission.featureCode),
+      ),
+    ];
+
     const data = roles.map((role) => ({
       ...role,
       userCount: role._count.users,
+      permissionSettings: this.getPermissionSettings(role.rolePermissions, featureCodes),
     }));
 
     return {
@@ -70,59 +80,30 @@ export class RoleService {
 
   /**
    * 取得角色詳細資訊
-   *
-   * 根據角色擁有的 API 權限，整理各功能的權限等級：
-   * - NONE：沒有該功能的權限
-   * - VIEW：只有查詢（GET）權限
-   * - EDIT：擁有新增、修改或刪除等操作權限
-   *
-   * isRequired = false 為公開 API，
-   * 不需要登入及權限驗證，因此不參與角色權限計算。
    */
-  public async getRoleById(id: string): Promise<RoleDetailResponseDto> {
+  public async getRoleById(id: string): Promise<RoleResponseDto> {
     const role = await this.ctx.repos.role.findById(id);
 
     if (!role) {
       throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
     }
 
-    // 取得所有啟用中的 API 權限
     const allPermissions = await this.ctx.repos.permission.findAll();
 
-    // 排除公開 API，只保留需要權限驗證的 API
-    const requiredPermissions = allPermissions.filter((p) => p.isRequired);
-
-    // 取得所有需要權限驗證的功能代碼，並移除重複項目
-    const featureCodes = [...new Set(requiredPermissions.map((p) => p.featureCode))];
-
-    // 計算角色在各功能下的權限等級
-    const permissionSettings = featureCodes.map((featureCode) => {
-      // 取得角色在此功能下擁有的非公開 API 權限
-      const permissions = role.rolePermissions
-        .map((rp) => rp.permission)
-        .filter((p) => p.isRequired && p.featureCode === featureCode);
-
-      let accessLevel = PermissionAccessLevel.NONE;
-
-      // 只要擁有非 GET 權限，即視為可編輯
-      if (permissions.some((p) => p.actionType !== PermissionActionType.GET)) {
-        accessLevel = PermissionAccessLevel.EDIT;
-      } else if (permissions.length > 0) {
-        // 僅擁有 GET 權限，則為檢視
-        accessLevel = PermissionAccessLevel.VIEW;
-      }
-
-      return {
-        featureCode,
-        accessLevel,
-      };
-    });
+    const featureCodes = [
+      ...new Set(
+        allPermissions
+          .filter((permission) => permission.isRequired)
+          .map((permission) => permission.featureCode),
+      ),
+    ];
 
     return plainToInstance(
-      RoleDetailResponseDto,
+      RoleResponseDto,
       {
         ...role,
-        permissionSettings,
+        userCount: role._count.users,
+        permissionSettings: this.getPermissionSettings(role.rolePermissions, featureCodes),
       },
       {
         excludeExtraneousValues: true,
@@ -206,5 +187,38 @@ export class RoleService {
 
     // 清除角色權限 Redis 快取
     await invalidateRolePermissions(roleId);
+  }
+
+  /**
+   * 計算角色權限設定
+   */
+  private getPermissionSettings(
+    rolePermissions: {
+      permission: {
+        featureCode: number;
+        actionType: number;
+        isRequired: boolean;
+      };
+    }[],
+    featureCodes: number[],
+  ) {
+    return featureCodes.map((featureCode) => {
+      const permissions = rolePermissions
+        .map((rolePermission) => rolePermission.permission)
+        .filter((permission) => permission.isRequired && permission.featureCode === featureCode);
+
+      let accessLevel = PermissionAccessLevel.NONE;
+
+      if (permissions.some((permission) => permission.actionType !== PermissionActionType.GET)) {
+        accessLevel = PermissionAccessLevel.EDIT;
+      } else if (permissions.length > 0) {
+        accessLevel = PermissionAccessLevel.VIEW;
+      }
+
+      return {
+        featureCode,
+        accessLevel,
+      };
+    });
   }
 }

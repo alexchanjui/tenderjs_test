@@ -59,16 +59,11 @@ export class RoleResponseDto {
   description!: string | null;
 
   @Expose()
-  isActive!: number;
+  isActive!: boolean;
 
   @Expose()
   userCount!: number;
-}
 
-/**
- * 角色詳細 Response DTO
- */
-export class RoleDetailResponseDto extends RoleResponseDto {
   @Expose()
   permissionSettings!: PermissionSetting[];
 }

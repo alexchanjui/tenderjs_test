@@ -3,15 +3,6 @@ import type { Permission, Role } from "@prisma/client";
 import type { CreateRoleRequestDto, UpdateRoleRequestDto } from "../../dtos/role.dto";
 
 /**
- * 包含使用人數的角色資料
- */
-export type RoleWithUserCount = Role & {
-  _count: {
-    users: number;
-  };
-};
-
-/**
  * 包含權限與使用人數的角色資料
  */
 export type RoleWithPermissions = Role & {
@@ -27,7 +18,7 @@ export interface IRoleRepository {
   create(data: CreateRoleRequestDto): Promise<Role>;
   findById(id: string): Promise<RoleWithPermissions | null>;
   findByName(name: string): Promise<Role | null>;
-  findAndCount(params: { skip?: number; take?: number }): Promise<[RoleWithUserCount[], number]>;
+  findAndCount(params: { skip?: number; take?: number }): Promise<[RoleWithPermissions[], number]>;
   update(id: string, data: UpdateRoleRequestDto): Promise<void>;
   countUsersByRoleIds(ids: string[]): Promise<number>;
   batchDelete(ids: string[]): Promise<void>;

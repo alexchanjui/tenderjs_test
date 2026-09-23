@@ -1,10 +1,6 @@
 // src/repositories/prisma/role.prisma.repository.ts
 import type { Role } from "@prisma/client";
-import type {
-  IRoleRepository,
-  RoleWithPermissions,
-  RoleWithUserCount,
-} from "../interface/role.repository.interface";
+import type { IRoleRepository, RoleWithPermissions } from "../interface/role.repository.interface";
 import type { CreateRoleRequestDto, UpdateRoleRequestDto } from "../../dtos/role.dto";
 import { IDbContext } from "../../types/db.context";
 
@@ -54,13 +50,18 @@ export class RolePrismaRepository implements IRoleRepository {
   public async findAndCount(params: {
     skip?: number;
     take?: number;
-  }): Promise<[RoleWithUserCount[], number]> {
+  }): Promise<[RoleWithPermissions[], number]> {
     return this.ctx.prisma.$transaction([
       this.ctx.prisma.role.findMany({
         skip: params.skip,
         take: params.take,
         orderBy: { createdAt: "desc" },
         include: {
+          rolePermissions: {
+            include: {
+              permission: true,
+            },
+          },
           _count: {
             select: {
               users: true,
