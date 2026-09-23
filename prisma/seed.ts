@@ -15,7 +15,7 @@ const logger = {
 const permissionsData = [
   // 公開 API
   {
-    id: 1,
+    sortOrder: 1,
     featureCode: 0,
     name: "system:health",
     apiPath: "/api/health",
@@ -25,7 +25,7 @@ const permissionsData = [
     description: "健康檢測",
   },
   {
-    id: 2,
+    sortOrder: 2,
     featureCode: 0,
     name: "auth:login",
     apiPath: "/api/auth/login",
@@ -35,7 +35,7 @@ const permissionsData = [
     description: "使用者登入",
   },
   {
-    id: 3,
+    sortOrder: 3,
     featureCode: 0,
     name: "auth:captcha",
     apiPath: "/api/auth/captcha",
@@ -47,7 +47,7 @@ const permissionsData = [
   ...(process.env.NODE_ENV === "development"
     ? [
         {
-          id: 4,
+          sortOrder: 4,
           featureCode: 0,
           name: "auth:auto-login",
           apiPath: "/api/auth/auto-login",
@@ -60,7 +60,7 @@ const permissionsData = [
     : []),
   // 100 - 使用者管理
   {
-    id: 101,
+    sortOrder: 5,
     featureCode: 100,
     name: "user:list",
     apiPath: "/api/users",
@@ -70,7 +70,7 @@ const permissionsData = [
     description: "查詢使用者列表",
   },
   {
-    id: 102,
+    sortOrder: 6,
     featureCode: 100,
     name: "user:create",
     apiPath: "/api/users",
@@ -80,7 +80,7 @@ const permissionsData = [
     description: "新增使用者",
   },
   {
-    id: 103,
+    sortOrder: 7,
     featureCode: 100,
     name: "user:detail",
     apiPath: "/api/users/:id",
@@ -90,7 +90,7 @@ const permissionsData = [
     description: "查詢使用者詳細資訊",
   },
   {
-    id: 104,
+    sortOrder: 8,
     featureCode: 100,
     name: "user:update",
     apiPath: "/api/users/:id",
@@ -100,17 +100,17 @@ const permissionsData = [
     description: "更新使用者資訊",
   },
   {
-    id: 105,
+    sortOrder: 9,
     featureCode: 100,
-    name: "user:delete",
-    apiPath: "/api/users/:id",
+    name: "user:batch-delete",
+    apiPath: "/api/users/batch",
     actionType: 3, // DELETE
     isRequired: true,
     isActive: true,
     description: "刪除使用者",
   },
   {
-    id: 106,
+    sortOrder: 10,
     featureCode: 100,
     name: "user:me",
     apiPath: "/api/users/me",
@@ -122,7 +122,7 @@ const permissionsData = [
 
   // 200 - 角色管理
   {
-    id: 201,
+    sortOrder: 11,
     featureCode: 200,
     name: "role:list",
     apiPath: "/api/roles",
@@ -132,7 +132,7 @@ const permissionsData = [
     description: "查詢角色列表",
   },
   {
-    id: 202,
+    sortOrder: 12,
     featureCode: 200,
     name: "role:create",
     apiPath: "/api/roles",
@@ -142,7 +142,7 @@ const permissionsData = [
     description: "新增角色",
   },
   {
-    id: 203,
+    sortOrder: 13,
     featureCode: 200,
     name: "role:detail",
     apiPath: "/api/roles/:id",
@@ -152,7 +152,7 @@ const permissionsData = [
     description: "查詢角色詳細資訊",
   },
   {
-    id: 204,
+    sortOrder: 14,
     featureCode: 200,
     name: "role:update",
     apiPath: "/api/roles/:id",
@@ -162,7 +162,7 @@ const permissionsData = [
     description: "更新角色資訊",
   },
   {
-    id: 205,
+    sortOrder: 15,
     featureCode: 200,
     name: "role:delete",
     apiPath: "/api/roles/:id",
@@ -172,7 +172,7 @@ const permissionsData = [
     description: "刪除角色",
   },
   {
-    id: 206,
+    sortOrder: 16,
     featureCode: 200,
     name: "role/:id/permissions",
     apiPath: "/api/roles/:id/permissions",
@@ -184,7 +184,7 @@ const permissionsData = [
 
   // 300 - 權限管理
   {
-    id: 301,
+    sortOrder: 17,
     featureCode: 300,
     name: "permission:list",
     apiPath: "/api/permissions",
@@ -194,7 +194,7 @@ const permissionsData = [
     description: "查詢權限列表",
   },
   {
-    id: 302,
+    sortOrder: 18,
     featureCode: 300,
     name: "permission:create",
     apiPath: "/api/permissions",
@@ -204,7 +204,7 @@ const permissionsData = [
     description: "新增權限",
   },
   {
-    id: 303,
+    sortOrder: 19,
     featureCode: 300,
     name: "permission:detail",
     apiPath: "/api/permissions/:id",
@@ -214,7 +214,7 @@ const permissionsData = [
     description: "查詢權限詳細資訊",
   },
   {
-    id: 304,
+    sortOrder: 20,
     featureCode: 300,
     name: "permission:update",
     apiPath: "/api/permissions/:id",
@@ -224,10 +224,10 @@ const permissionsData = [
     description: "更新權限資訊",
   },
   {
-    id: 305,
+    sortOrder: 21,
     featureCode: 300,
-    name: "permission:delete",
-    apiPath: "/api/permissions/:id",
+    name: "permission:batch-delete",
+    apiPath: "/api/permissions/batch",
     actionType: 3, // DELETE
     isRequired: true,
     isActive: true,
@@ -236,7 +236,7 @@ const permissionsData = [
 
   // 400 - 招呼站管理
   {
-    id: 401,
+    sortOrder: 22,
     featureCode: 400,
     name: "stop:list",
     apiPath: "/api/stops",
@@ -246,7 +246,7 @@ const permissionsData = [
     description: "查詢招呼站列表",
   },
   {
-    id: 402,
+    sortOrder: 23,
     featureCode: 400,
     name: "stop:create",
     apiPath: "/api/stops",
@@ -256,7 +256,7 @@ const permissionsData = [
     description: "新增招呼站",
   },
   {
-    id: 403,
+    sortOrder: 24,
     featureCode: 400,
     name: "stop:detail",
     apiPath: "/api/stops/:id",
@@ -266,7 +266,7 @@ const permissionsData = [
     description: "查詢招呼站詳細資訊",
   },
   {
-    id: 404,
+    sortOrder: 25,
     featureCode: 400,
     name: "stop:update",
     apiPath: "/api/stops/:id",
@@ -276,7 +276,7 @@ const permissionsData = [
     description: "更新招呼站資訊",
   },
   {
-    id: 405,
+    sortOrder: 26,
     featureCode: 400,
     name: "stop:delete",
     apiPath: "/api/stops/:id",
@@ -298,7 +298,7 @@ async function main() {
   for (const permission of permissionsData) {
     await prisma.permission.upsert({
       where: {
-        id: permission.id,
+        name: permission.name,
       },
       update: permission,
       create: permission,

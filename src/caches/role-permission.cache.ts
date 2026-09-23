@@ -49,10 +49,23 @@ export const getRolePermissions = async (roleId: string): Promise<number[]> => {
 };
 
 /**
- * 清除角色權限 Redis 快取
+ * 清除指定角色權限 Redis 快取
  */
 export const invalidateRolePermissions = async (roleId: string): Promise<void> => {
   const key = getRolePermissionKey(roleId);
 
   await redisInstance.client.del(key);
+};
+
+/**
+ * 清除所有角色權限 Redis 快取
+ */
+export const invalidateAllRolePermissions = async (): Promise<void> => {
+  const keys = await redisInstance.client.keys("role:permissions:*");
+
+  if (keys.length === 0) {
+    return;
+  }
+
+  await redisInstance.client.del(...keys);
 };

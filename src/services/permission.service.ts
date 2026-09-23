@@ -2,7 +2,11 @@
 import { plainToInstance } from "class-transformer";
 import { IServiceContext } from "../types/service.context";
 import { PaginationRequestDto, PaginationResponseDto } from "../dtos/pagination.dto";
-import { CreatePermissionRequestDto, PermissionResponseDto } from "../dtos/permission.dto";
+import {
+  CreatePermissionRequestDto,
+  PermissionResponseDto,
+  UpdatePermissionRequestDto,
+} from "../dtos/permission.dto";
 import cacheInitService from "./cache-init.service";
 import { AppError } from "../errors/app.error";
 import { ErrorCode } from "../errors/error.codes";
@@ -14,13 +18,6 @@ export class PermissionService {
    * 建立權限
    */
   public async createPermission(data: CreatePermissionRequestDto): Promise<PermissionResponseDto> {
-    // 檢查 ID
-    const permissionById = await this.ctx.repos.permission.findById(data.id);
-
-    if (permissionById) {
-      throw new AppError(ErrorCode.DUPLICATE, "權限 ID 已存在");
-    }
-
     // 檢查名稱
     const permissionByName = await this.ctx.repos.permission.findByName(data.name);
 
@@ -87,12 +84,21 @@ export class PermissionService {
    */
   public async updatePermission(
     id: number,
-    data: Partial<CreatePermissionRequestDto>,
+    data: UpdatePermissionRequestDto,
   ): Promise<PermissionResponseDto> {
     const permission = await this.ctx.repos.permission.findById(id);
 
     if (!permission) {
       throw new AppError(ErrorCode.DATA_NOT_FOUND, "權限不存在");
+    }
+
+    // 排序有異動時，調整其他權限排序
+    if (data.sortOrder !== undefined && data.sortOrder !== permission.sortOrder) {
+      data.sortOrder = await this.ctx.repos.permission.adjustSortOrder(
+        id,
+        permission.sortOrder,
+        data.sortOrder,
+      );
     }
 
     const newPermission = await this.ctx.repos.permission.update(id, data);

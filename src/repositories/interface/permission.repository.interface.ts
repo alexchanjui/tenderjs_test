@@ -11,4 +11,5 @@ export interface IPermissionRepository {
   findAndCount(params: { skip?: number; take?: number }): Promise<[Permission[], number]>;
   update(id: number, data: UpdatePermissionRequestDto): Promise<void>;
   batchDelete(ids: number[]): Promise<void>;
+  adjustSortOrder(id: number, oldSortOrder: number, newSortOrder: number): Promise<number>;
 }
