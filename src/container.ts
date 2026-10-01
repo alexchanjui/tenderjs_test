@@ -9,6 +9,7 @@ import { UserPrismaRepository } from "./repositories/prisma/user.prisma.reposito
 import { RolePrismaRepository } from "./repositories/prisma/role.prisma.repository";
 import { PermissionPrismaRepository } from "./repositories/prisma/permission.prisma.repository";
 import { StopPrismaRepository } from "./repositories/prisma/stop.prisma.repository";
+import { FeaturePrismaRepository } from "./repositories/prisma/feature.prisma.repository";
 
 // Services
 import { HealthService } from "./services/health.service";
@@ -20,6 +21,7 @@ import { StopService } from "./services/stop.service";
 import { ImportService } from "./services/import.service";
 import { ExportService } from "./services/export.service";
 import { OptionsService } from "./services/options.service";
+import { FeatureService } from "./services/feature.service";
 
 // Controllers
 import type { IController } from "./controllers/interface/controller.interface";
@@ -32,6 +34,7 @@ import { StopController } from "./controllers/stop.controller";
 import { ImportController } from "./controllers/import.controller";
 import { ExportController } from "./controllers/export.controller";
 import { OptionsController } from "./controllers/options.controller";
+import { FeatureController } from "./controllers/feature.controller";
 
 // Types
 import type { IServiceContext } from "./types/service.context";
@@ -64,6 +67,7 @@ export class AppContainer {
     const roleRepo = new RolePrismaRepository(dbContext);
     const permissionRepo = new PermissionPrismaRepository(dbContext);
     const stopRepo = new StopPrismaRepository(dbContext);
+    const featureRepo = new FeaturePrismaRepository(dbContext);
 
     /**
      * 建立 Service 共用依賴
@@ -77,6 +81,7 @@ export class AppContainer {
         role: roleRepo,
         permission: permissionRepo,
         stop: stopRepo,
+        feature: featureRepo,
       },
       get currentUser() {
         return requestContextStorage.getStore();
@@ -95,6 +100,7 @@ export class AppContainer {
     const importService = new ImportService(ctx);
     const exportService = new ExportService(ctx);
     const optionsService = new OptionsService(ctx);
+    const featureService = new FeatureService(ctx);
 
     /**
      * 組裝 Controllers
@@ -109,6 +115,7 @@ export class AppContainer {
       new ImportController(importService),
       new ExportController(exportService),
       new OptionsController(optionsService),
+      new FeatureController(featureService),
     ];
   }
 }

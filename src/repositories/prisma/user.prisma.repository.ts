@@ -5,9 +5,6 @@ import type { CreateUserDto, UpdateUserRequestDto } from "../../dtos/user.dto";
 import type { IUserRepository } from "../interface/user.repository.interface";
 import type { IDbContext } from "../../types/db.context";
 
-/**
- * 使用 Prisma 實作 User Repository
- */
 export class UserPrismaRepository implements IUserRepository {
   constructor(private readonly ctx: IDbContext) {}
 
@@ -27,11 +24,7 @@ export class UserPrismaRepository implements IUserRepository {
       include: {
         role: {
           include: {
-            rolePermissions: {
-              include: {
-                permission: true,
-              },
-            },
+            roleFeatures: true,
           },
         },
       },
@@ -47,11 +40,7 @@ export class UserPrismaRepository implements IUserRepository {
       include: {
         role: {
           include: {
-            rolePermissions: {
-              include: {
-                permission: true,
-              },
-            },
+            roleFeatures: true,
           },
         },
       },
@@ -67,11 +56,7 @@ export class UserPrismaRepository implements IUserRepository {
       include: {
         role: {
           include: {
-            rolePermissions: {
-              include: {
-                permission: true,
-              },
-            },
+            roleFeatures: true,
           },
         },
       },
@@ -93,11 +78,7 @@ export class UserPrismaRepository implements IUserRepository {
         include: {
           role: {
             include: {
-              rolePermissions: {
-                include: {
-                  permission: true,
-                },
-              },
+              roleFeatures: true,
             },
           },
         },

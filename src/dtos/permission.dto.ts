@@ -1,6 +1,6 @@
 // src/dtos/permission.dto.ts
 import { Expose, Type } from "class-transformer";
-import { IsString, IsOptional, IsInt, Length, IsBoolean, Min } from "class-validator";
+import { IsString, IsOptional, IsInt, Length, IsBoolean } from "class-validator";
 
 /**
  * 建立權限 Request DTO
@@ -34,12 +34,6 @@ export class CreatePermissionRequestDto {
  * 更新權限 Request DTO
  */
 export class UpdatePermissionRequestDto {
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt({ message: "排序必須為整數" })
-  @Min(1, { message: "排序最小為 1" })
-  sortOrder?: number;
-
   @IsOptional()
   @Type(() => Number)
   @IsInt({ message: "功能代碼必須為整數" })
@@ -79,9 +73,6 @@ export class UpdatePermissionRequestDto {
 export class PermissionResponseDto {
   @Expose()
   id!: number;
-
-  @Expose()
-  sortOrder!: number;
 
   @Expose()
   featureCode!: number;

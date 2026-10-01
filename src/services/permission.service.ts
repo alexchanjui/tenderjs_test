@@ -18,6 +18,12 @@ export class PermissionService {
    * 建立權限
    */
   public async createPermission(data: CreatePermissionRequestDto): Promise<PermissionResponseDto> {
+    const feature = await this.ctx.repos.feature.findByCode(data.featureCode);
+
+    if (!feature) {
+      throw new AppError(ErrorCode.DATA_NOT_FOUND, "頁面功能不存在");
+    }
+
     // 檢查名稱
     const permissionByName = await this.ctx.repos.permission.findByName(data.name);
 
@@ -93,6 +99,9 @@ export class PermissionService {
   /**
    * 更新權限
    */
+  /**
+   * 更新權限
+   */
   public async updatePermission(
     id: number,
     data: UpdatePermissionRequestDto,
@@ -103,13 +112,13 @@ export class PermissionService {
       throw new AppError(ErrorCode.DATA_NOT_FOUND, "權限不存在");
     }
 
-    // 排序有異動時，調整其他權限排序
-    if (data.sortOrder !== undefined && data.sortOrder !== permission.sortOrder) {
-      data.sortOrder = await this.ctx.repos.permission.adjustSortOrder(
-        id,
-        permission.sortOrder,
-        data.sortOrder,
-      );
+    // 檢查頁面功能
+    if (data.featureCode !== undefined) {
+      const feature = await this.ctx.repos.feature.findByCode(data.featureCode);
+
+      if (!feature) {
+        throw new AppError(ErrorCode.DATA_NOT_FOUND, "頁面功能不存在");
+      }
     }
 
     const newPermission = await this.ctx.repos.permission.update(id, data);

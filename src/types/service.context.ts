@@ -1,10 +1,12 @@
 // src/types/service.context.ts
+
 import type { PrismaClient } from "@prisma/client";
 import type Redis from "ioredis";
 import type { LoggerService } from "../utils/logger";
 import { IUserRepository } from "../repositories/interface/user.repository.interface";
 import { IRoleRepository } from "../repositories/interface/role.repository.interface";
 import { IPermissionRepository } from "../repositories/interface/permission.repository.interface";
+import { IFeatureRepository } from "../repositories/interface/feature.repository.interface";
 import { IStopRepository } from "../repositories/interface/stop.repository.interface";
 
 /**
@@ -22,6 +24,7 @@ export interface IRepositoryContext {
   user: IUserRepository;
   role: IRoleRepository;
   permission: IPermissionRepository;
+  feature: IFeatureRepository;
   stop: IStopRepository;
 }
 

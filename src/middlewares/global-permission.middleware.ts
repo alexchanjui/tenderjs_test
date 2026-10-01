@@ -5,7 +5,7 @@ import { ErrorCode } from "../errors/error.codes";
 import { findRouteRule } from "../caches/permission.cache";
 import { verifyAuthToken } from "../utils/auth.helper";
 import { requestContextStorage } from "../utils/request-context";
-import { getRolePermissions } from "../caches/role-permission.cache";
+import { getRoleFeatures } from "../caches/role-feature.cache";
 
 /**
  * 全域權限驗證 Middleware
@@ -52,15 +52,29 @@ export const globalPermissionGuard = async (
       throw new AppError(ErrorCode.PERMISSION);
     }
 
-    // 7. 取得角色權限
-    const permissionIds = await getRolePermissions(currentUser.roleId);
+    // 7. 取得角色功能權限
+    const roleFeatures = await getRoleFeatures(currentUser.roleId);
 
-    // 8. 檢查角色是否擁有目前 API 權限
-    if (!permissionIds.includes(rule.id)) {
+    // 8. 取得目前 API 所屬功能權限
+    const roleFeature = roleFeatures.find(
+      (roleFeature) => roleFeature.featureCode === rule.featureCode,
+    );
+
+    if (!roleFeature) {
       throw new AppError(ErrorCode.PERMISSION);
     }
 
-    // 9. 建立 Request Context
+    // 9. GET 允許 VIEW / EDIT，其餘操作需要 EDIT
+    const hasPermission =
+      req.method === "GET"
+        ? roleFeature.accessLevel === "VIEW" || roleFeature.accessLevel === "EDIT"
+        : roleFeature.accessLevel === "EDIT";
+
+    if (!hasPermission) {
+      throw new AppError(ErrorCode.PERMISSION);
+    }
+
+    // 10. 建立 Request Context
     requestContextStorage.run(currentUser, () => {
       next();
     });

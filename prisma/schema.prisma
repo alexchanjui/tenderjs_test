@@ -76,10 +76,40 @@ model Role {
   /// 使用此角色的使用者
   users User[]
 
-  /// 角色擁有的權限
-  rolePermissions RolePermission[]
+  /// 角色擁有的功能權限
+  roleFeatures RoleFeature[]
 
   @@map("role")
+}
+
+/// 頁面功能
+/// 用途：管理系統頁面功能
+model Feature {
+  /// 功能代碼
+  featureCode Int @id @map("feature_code")
+
+  /// 頁面名稱
+  name String
+
+  /// 頁面路徑
+  routePath String? @map("route_path")
+
+  /// 管理排序
+  sortOrder Int @default(0) @map("sort_order")
+
+  /// 啟用狀態
+  isActive Boolean @default(true) @map("is_active")
+
+  /// 建立時間
+  createdAt DateTime @default(now()) @map("create_time")
+
+  /// 更新時間
+  updatedAt DateTime @updatedAt @map("update_time")
+
+  /// 使用此功能的角色
+  roleFeatures RoleFeature[]
+
+  @@map("feature")
 }
 
 /// 系統權限
@@ -88,10 +118,8 @@ model Permission {
   /// 權限 ID
   id Int @id @default(autoincrement())
 
-  /// 管理排序
-  sortOrder Int @default(0)
-
   /// 功能代碼
+  /// 0 代表不屬於頁面功能的系統 API
   featureCode Int @map("feature_code")
 
   /// 權限名稱
@@ -118,13 +146,12 @@ model Permission {
   /// 更新時間
   updatedAt DateTime @updatedAt @map("update_time")
 
-  /// 使用此權限的角色
-  rolePermissions RolePermission[]
-
   /// 同一個 API 路徑與操作類型不可重複
   @@unique([apiPath, actionType])
+
   /// 建立功能代碼索引查詢
   @@index([featureCode])
+
   @@map("permission")
 }
 
@@ -132,23 +159,31 @@ model Permission {
 // 關聯資料
 // ==========================================
 
-/// 角色與權限關聯
-model RolePermission {
+/// 角色功能權限
+/// 用途：管理角色對頁面功能的存取層級
+model RoleFeature {
   /// 角色 ID
   roleId String @map("role_id") @db.UniqueIdentifier
 
-  /// 權限 ID
-  permissionId Int @map("permission_id")
+  /// 功能代碼
+  featureCode Int @map("feature_code")
+
+  /// 存取層級
+  /// VIEW：檢視
+  /// EDIT：編輯
+  /// 無資料代表 NONE
+  accessLevel String @map("access_level")
 
   /// 角色
   role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
-  /// 權限
-  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  /// 頁面功能
+  feature Feature @relation(fields: [featureCode], references: [featureCode], onDelete: Cascade)
 
-  /// roleId + permissionId 作為複合主鍵
-  @@id([roleId, permissionId])
-  @@map("role_permission")
+  /// 同一角色與功能只能有一筆設定
+  @@id([roleId, featureCode])
+
+  @@map("role_feature")
 }
 
 // ==========================================

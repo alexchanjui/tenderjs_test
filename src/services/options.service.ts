@@ -15,4 +15,16 @@ export class OptionsService {
       value: role.id,
     }));
   }
+
+  /**
+   * 取得頁面功能選項
+   */
+  public async getFeatureOptions() {
+    const features = await this.ctx.repos.feature.findAll();
+
+    return features.map((feature) => ({
+      label: feature.name,
+      value: feature.featureCode,
+    }));
+  }
 }

@@ -132,13 +132,11 @@ export class UserService {
   /**
    * 取得當前使用者詳細資訊
    *
-   * 根據使用者所屬角色擁有的 API 權限，整理各功能的權限等級：
+   * 根據所有啟用中的頁面功能，以及使用者所屬角色的功能權限，
+   * 整理各功能的權限等級：
    * - NONE：沒有該功能的權限
-   * - VIEW：只有查詢（GET）權限
-   * - EDIT：擁有新增、修改或刪除等操作權限
-   *
-   * isRequired = false 為公開 API，
-   * 不需要登入及權限驗證，因此不參與使用者權限計算。
+   * - VIEW：具有檢視權限
+   * - EDIT：具有編輯權限
    */
   public async getMyUserInfo(): Promise<UserResponseDto> {
     const id = this.ctx.currentUser?.id || "";
@@ -149,42 +147,21 @@ export class UserService {
       throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);
     }
 
-    // 取得所有啟用中的 API 權限
-    const allPermissions = await this.ctx.repos.permission.findAll();
+    // 取得所有啟用中的頁面功能
+    const features = await this.ctx.repos.feature.findAll();
 
-    const permissionSettings: PermissionSetting[] = [];
+    // 整理使用者所屬角色在各功能下的權限等級
+    const permissionSettings: PermissionSetting[] = features.map((feature) => {
+      const roleFeature = user.role?.roleFeatures.find(
+        (roleFeature) => roleFeature.featureCode === feature.featureCode,
+      );
 
-    // 排除公開 API，取得所有需要權限驗證的功能代碼，並移除重複項目
-    const featureCodes = Array.from(
-      new Set(
-        allPermissions
-          .filter((permission) => permission.isRequired)
-          .map((permission) => permission.featureCode),
-      ),
-    );
-
-    // 計算使用者所屬角色在各功能下的權限等級
-    for (const featureCode of featureCodes) {
-      // 取得角色在此功能下擁有的非公開 API 權限
-      const ownedPermissions =
-        user.role?.rolePermissions.filter(
-          (rp) => rp.permission.isRequired && rp.permission.featureCode === featureCode,
-        ) ?? [];
-
-      let accessLevel = PermissionAccessLevel.NONE;
-
-      // 只要擁有非 GET 權限，即視為可編輯
-      if (ownedPermissions.length > 0) {
-        const hasEditPermission = ownedPermissions.some((rp) => rp.permission.actionType !== 0);
-
-        accessLevel = hasEditPermission ? PermissionAccessLevel.EDIT : PermissionAccessLevel.VIEW;
-      }
-
-      permissionSettings.push({
-        featureCode,
-        accessLevel,
-      });
-    }
+      return {
+        featureCode: feature.featureCode,
+        accessLevel: (roleFeature?.accessLevel ??
+          PermissionAccessLevel.NONE) as PermissionAccessLevel,
+      };
+    });
 
     return plainToInstance(
       UserResponseDto,

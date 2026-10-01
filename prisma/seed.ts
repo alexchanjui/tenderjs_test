@@ -10,12 +10,45 @@ const logger = {
 };
 
 // ==========================================
+// 頁面功能資料
+// ==========================================
+const featuresData = [
+  {
+    featureCode: 100,
+    name: "使用者管理",
+    routePath: "/users",
+    sortOrder: 1,
+    isActive: true,
+  },
+  {
+    featureCode: 200,
+    name: "角色管理",
+    routePath: "/roles",
+    sortOrder: 2,
+    isActive: true,
+  },
+  {
+    featureCode: 300,
+    name: "頁面功能管理",
+    routePath: "/features",
+    sortOrder: 3,
+    isActive: true,
+  },
+  {
+    featureCode: 400,
+    name: "招呼站管理",
+    routePath: "/stops",
+    sortOrder: 4,
+    isActive: true,
+  },
+];
+
+// ==========================================
 // 權限資料
 // ==========================================
 const permissionsData = [
   // 公開 API
   {
-    sortOrder: 1,
     featureCode: 0,
     name: "system:health",
     apiPath: "/api/health",
@@ -25,7 +58,6 @@ const permissionsData = [
     description: "健康檢測",
   },
   {
-    sortOrder: 2,
     featureCode: 0,
     name: "auth:login",
     apiPath: "/api/auth/login",
@@ -35,7 +67,6 @@ const permissionsData = [
     description: "使用者登入",
   },
   {
-    sortOrder: 3,
     featureCode: 0,
     name: "auth:captcha",
     apiPath: "/api/auth/captcha",
@@ -47,7 +78,6 @@ const permissionsData = [
   ...(process.env.NODE_ENV === "development"
     ? [
         {
-          sortOrder: 4,
           featureCode: 0,
           name: "auth:auto-login",
           apiPath: "/api/auth/auto-login",
@@ -58,9 +88,9 @@ const permissionsData = [
         },
       ]
     : []),
+
   // 100 - 使用者管理
   {
-    sortOrder: 5,
     featureCode: 100,
     name: "user:list",
     apiPath: "/api/users",
@@ -70,7 +100,6 @@ const permissionsData = [
     description: "查詢使用者列表",
   },
   {
-    sortOrder: 6,
     featureCode: 100,
     name: "user:create",
     apiPath: "/api/users",
@@ -80,7 +109,6 @@ const permissionsData = [
     description: "新增使用者",
   },
   {
-    sortOrder: 7,
     featureCode: 100,
     name: "user:detail",
     apiPath: "/api/users/:id",
@@ -90,7 +118,6 @@ const permissionsData = [
     description: "查詢使用者詳細資訊",
   },
   {
-    sortOrder: 8,
     featureCode: 100,
     name: "user:update",
     apiPath: "/api/users/:id",
@@ -100,7 +127,6 @@ const permissionsData = [
     description: "更新使用者資訊",
   },
   {
-    sortOrder: 9,
     featureCode: 100,
     name: "user:batch-delete",
     apiPath: "/api/users/batch",
@@ -109,20 +135,9 @@ const permissionsData = [
     isActive: true,
     description: "刪除使用者",
   },
-  {
-    sortOrder: 10,
-    featureCode: 100,
-    name: "user:me",
-    apiPath: "/api/users/me",
-    actionType: 0, // GET
-    isRequired: true,
-    isActive: true,
-    description: "取得當前使用者詳細資訊",
-  },
 
   // 200 - 角色管理
   {
-    sortOrder: 11,
     featureCode: 200,
     name: "role:list",
     apiPath: "/api/roles",
@@ -132,7 +147,6 @@ const permissionsData = [
     description: "查詢角色列表",
   },
   {
-    sortOrder: 12,
     featureCode: 200,
     name: "role:create",
     apiPath: "/api/roles",
@@ -142,7 +156,6 @@ const permissionsData = [
     description: "新增角色",
   },
   {
-    sortOrder: 13,
     featureCode: 200,
     name: "role:detail",
     apiPath: "/api/roles/:id",
@@ -152,7 +165,6 @@ const permissionsData = [
     description: "查詢角色詳細資訊",
   },
   {
-    sortOrder: 14,
     featureCode: 200,
     name: "role:update",
     apiPath: "/api/roles/:id",
@@ -162,7 +174,6 @@ const permissionsData = [
     description: "更新角色資訊",
   },
   {
-    sortOrder: 15,
     featureCode: 200,
     name: "role:delete",
     apiPath: "/api/roles/:id",
@@ -172,7 +183,6 @@ const permissionsData = [
     description: "刪除角色",
   },
   {
-    sortOrder: 16,
     featureCode: 200,
     name: "role/:id/permissions",
     apiPath: "/api/roles/:id/permissions",
@@ -182,61 +192,55 @@ const permissionsData = [
     description: "更新角色的權限",
   },
 
-  // 300 - 權限管理
+  // 300 - 頁面管理
   {
-    sortOrder: 17,
     featureCode: 300,
-    name: "permission:list",
-    apiPath: "/api/permissions",
+    name: "feature:list",
+    apiPath: "/api/features",
     actionType: 0, // GET
     isRequired: true,
     isActive: true,
-    description: "查詢權限列表",
+    description: "查詢頁面功能列表",
   },
   {
-    sortOrder: 18,
     featureCode: 300,
-    name: "permission:create",
-    apiPath: "/api/permissions",
+    name: "feature:create",
+    apiPath: "/api/features",
     actionType: 1, // POST
     isRequired: true,
     isActive: true,
-    description: "新增權限",
+    description: "新增頁面功能",
   },
   {
-    sortOrder: 19,
     featureCode: 300,
-    name: "permission:detail",
-    apiPath: "/api/permissions/:id",
+    name: "feature:detail",
+    apiPath: "/api/features/:featureCode",
     actionType: 0, // GET
     isRequired: true,
     isActive: true,
-    description: "查詢權限詳細資訊",
+    description: "查詢頁面功能詳細資訊",
   },
   {
-    sortOrder: 20,
     featureCode: 300,
-    name: "permission:update",
-    apiPath: "/api/permissions/:id",
+    name: "feature:update",
+    apiPath: "/api/features/:featureCode",
     actionType: 2, // PUT
     isRequired: true,
     isActive: true,
-    description: "更新權限資訊",
+    description: "更新頁面功能",
   },
   {
-    sortOrder: 21,
     featureCode: 300,
-    name: "permission:batch-delete",
-    apiPath: "/api/permissions/batch",
+    name: "feature:batch-delete",
+    apiPath: "/api/features/batch",
     actionType: 3, // DELETE
     isRequired: true,
     isActive: true,
-    description: "刪除權限",
+    description: "刪除頁面功能",
   },
 
   // 400 - 招呼站管理
   {
-    sortOrder: 22,
     featureCode: 400,
     name: "stop:list",
     apiPath: "/api/stops",
@@ -246,7 +250,6 @@ const permissionsData = [
     description: "查詢招呼站列表",
   },
   {
-    sortOrder: 23,
     featureCode: 400,
     name: "stop:create",
     apiPath: "/api/stops",
@@ -256,7 +259,6 @@ const permissionsData = [
     description: "新增招呼站",
   },
   {
-    sortOrder: 24,
     featureCode: 400,
     name: "stop:detail",
     apiPath: "/api/stops/:id",
@@ -266,7 +268,6 @@ const permissionsData = [
     description: "查詢招呼站詳細資訊",
   },
   {
-    sortOrder: 25,
     featureCode: 400,
     name: "stop:update",
     apiPath: "/api/stops/:id",
@@ -276,7 +277,6 @@ const permissionsData = [
     description: "更新招呼站資訊",
   },
   {
-    sortOrder: 26,
     featureCode: 400,
     name: "stop:delete",
     apiPath: "/api/stops/:id",
@@ -291,7 +291,24 @@ async function main() {
   logger.info("🌱 開始建立初始資料...");
 
   // ==========================================
-  // Step 1: 建立 Permissions
+  // Step 1: 建立 Features
+  // ==========================================
+  logger.info(`📋 同步 Features (${featuresData.length} 筆)...`);
+
+  for (const feature of featuresData) {
+    await prisma.feature.upsert({
+      where: {
+        featureCode: feature.featureCode,
+      },
+      update: feature,
+      create: feature,
+    });
+  }
+
+  logger.info("✅ Features 建立完成");
+
+  // ==========================================
+  // Step 2: 建立 Permissions
   // ==========================================
   logger.info(`📋 同步 Permissions (${permissionsData.length} 筆)...`);
 
@@ -308,7 +325,7 @@ async function main() {
   logger.info("✅ Permissions 建立完成");
 
   // ==========================================
-  // Step 2: 建立 superAdmin Role
+  // Step 3: 建立 superAdmin Role
   // ==========================================
   const superAdminRole = await prisma.role.upsert({
     where: {
@@ -326,37 +343,37 @@ async function main() {
   logger.info("✅ superAdmin Role 建立完成");
 
   // ==========================================
-  // Step 3: superAdmin 加入所有權限
+  // Step 4: superAdmin 加入所有功能權限
   // ==========================================
-  const permissions = await prisma.permission.findMany({
+  const features = await prisma.feature.findMany({
     where: {
       isActive: true,
-      isRequired: true,
     },
     select: {
-      id: true,
+      featureCode: true,
     },
   });
 
   await prisma.$transaction([
-    prisma.rolePermission.deleteMany({
+    prisma.roleFeature.deleteMany({
       where: {
         roleId: superAdminRole.id,
       },
     }),
 
-    prisma.rolePermission.createMany({
-      data: permissions.map((permission) => ({
+    prisma.roleFeature.createMany({
+      data: features.map((feature) => ({
         roleId: superAdminRole.id,
-        permissionId: permission.id,
+        featureCode: feature.featureCode,
+        accessLevel: "EDIT",
       })),
     }),
   ]);
 
-  logger.info(`✅ superAdmin 權限同步完成 (${permissions.length} 筆)`);
+  logger.info(`✅ superAdmin 功能權限同步完成 (${features.length} 筆)`);
 
   // ==========================================
-  // Step 4: 建立 admin User
+  // Step 5: 建立 admin User
   // ==========================================
   const password = await bcrypt.hash("password123", 10);
 

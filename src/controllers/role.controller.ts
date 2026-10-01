@@ -4,7 +4,7 @@ import { Router } from "express";
 import type { Request, Response } from "express";
 import {
   CreateRoleRequestDto,
-  UpdateRolePermissionsRequestDto,
+  UpdateRoleFeaturesRequestDto,
   UpdateRoleRequestDto,
 } from "../dtos/role.dto";
 import { PaginationRequestDto } from "../dtos/pagination.dto";
@@ -37,8 +37,8 @@ export class RoleController implements IController {
     );
     this.router.put(
       "/:id/permissions",
-      validationMiddleware(UpdateRolePermissionsRequestDto),
-      this.updateRolePermissions,
+      validationMiddleware(UpdateRoleFeaturesRequestDto),
+      this.updateRoleFeatures,
     );
   }
 
@@ -98,13 +98,13 @@ export class RoleController implements IController {
   /**
    * 更新角色權限
    */
-  private updateRolePermissions = async (
+  private updateRoleFeatures = async (
     req: Request<{ id: string }>,
     res: Response,
   ): Promise<void> => {
-    const dto = plainToInstance(UpdateRolePermissionsRequestDto, req.body);
+    const dto = plainToInstance(UpdateRoleFeaturesRequestDto, req.body);
 
-    await this.roleService.updateRolePermissions(req.params.id, dto);
+    await this.roleService.updateRoleFeatures(req.params.id, dto);
 
     R.success(res);
   };

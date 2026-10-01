@@ -114,7 +114,7 @@ export class PermissionSetting {
 /**
  * 更新角色權限 Request DTO
  */
-export class UpdateRolePermissionsRequestDto {
+export class UpdateRoleFeaturesRequestDto {
   @IsArray({ message: "設定必須為陣列" })
   @ArrayMinSize(1, { message: "至少需要設定一個功能" })
   @ValidateNested({ each: true })

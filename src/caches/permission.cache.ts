@@ -7,7 +7,7 @@ import logger from "../utils/logger";
  * 快取的 API 權限規則
  */
 export interface ICachedRule {
-  id: number;
+  featureCode: number;
   method: string;
   regex: RegExp;
   isRequired: boolean;
@@ -41,7 +41,7 @@ export const reloadRules = (permissions: Permission[]): void => {
       const { regexp } = pathToRegexp(permission.apiPath);
 
       cachedRules.push({
-        id: permission.id,
+        featureCode: permission.featureCode,
         method,
         regex: regexp,
         isRequired: permission.isRequired,

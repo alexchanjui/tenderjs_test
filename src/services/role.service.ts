@@ -3,16 +3,15 @@ import { plainToInstance } from "class-transformer";
 import {
   CreateRoleRequestDto,
   PermissionAccessLevel,
-  PermissionActionType,
   RoleResponseDto,
-  UpdateRolePermissionsRequestDto,
+  UpdateRoleFeaturesRequestDto,
   UpdateRoleRequestDto,
 } from "../dtos/role.dto";
 import type { PaginationRequestDto, PaginationResponseDto } from "../dtos/pagination.dto";
 import { AppError } from "../errors/app.error";
 import { ErrorCode } from "../errors/error.codes";
 import type { IServiceContext } from "../types/service.context";
-import { invalidateRolePermissions } from "../caches/role-permission.cache";
+import { invalidateRoleFeatures } from "../caches/role-feature.cache";
 
 export class RoleService {
   constructor(private readonly ctx: IServiceContext) {}
@@ -49,20 +48,15 @@ export class RoleService {
       take: limit,
     });
 
-    const allPermissions = await this.ctx.repos.permission.findAll();
-
-    const featureCodes = [
-      ...new Set(
-        allPermissions
-          .filter((permission) => permission.isRequired)
-          .map((permission) => permission.featureCode),
-      ),
-    ];
+    const features = await this.ctx.repos.feature.findAll();
 
     const data = roles.map((role) => ({
       ...role,
       userCount: role._count.users,
-      permissionSettings: this.getPermissionSettings(role.rolePermissions, featureCodes),
+      permissionSettings: this.getPermissionSettings(
+        role.roleFeatures,
+        features.map((feature) => feature.featureCode),
+      ),
     }));
 
     return {
@@ -88,22 +82,17 @@ export class RoleService {
       throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
     }
 
-    const allPermissions = await this.ctx.repos.permission.findAll();
-
-    const featureCodes = [
-      ...new Set(
-        allPermissions
-          .filter((permission) => permission.isRequired)
-          .map((permission) => permission.featureCode),
-      ),
-    ];
+    const features = await this.ctx.repos.feature.findAll();
 
     return plainToInstance(
       RoleResponseDto,
       {
         ...role,
         userCount: role._count.users,
-        permissionSettings: this.getPermissionSettings(role.rolePermissions, featureCodes),
+        permissionSettings: this.getPermissionSettings(
+          role.roleFeatures,
+          features.map((feature) => feature.featureCode),
+        ),
       },
       {
         excludeExtraneousValues: true,
@@ -148,9 +137,9 @@ export class RoleService {
   /**
    * 更新角色權限
    */
-  public async updateRolePermissions(
+  public async updateRoleFeatures(
     roleId: string,
-    dto: UpdateRolePermissionsRequestDto,
+    dto: UpdateRoleFeaturesRequestDto,
   ): Promise<void> {
     const role = await this.ctx.repos.role.findById(roleId);
 
@@ -158,66 +147,48 @@ export class RoleService {
       throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
     }
 
-    const permissionIds = new Set<number>();
+    const features = await this.ctx.repos.feature.findAll();
+    const featureCodes = new Set(features.map((feature) => feature.featureCode));
 
-    for (const setting of dto.settings) {
-      const permissions = await this.ctx.repos.permission.findByFeatureCode(setting.featureCode);
+    // 只允許設定存在且啟用的功能
+    const invalidSetting = dto.settings.find((setting) => !featureCodes.has(setting.featureCode));
 
-      switch (setting.accessLevel) {
-        case PermissionAccessLevel.NONE:
-          break;
-
-        case PermissionAccessLevel.VIEW:
-          permissions
-            .filter((permission) => permission.actionType === PermissionActionType.GET)
-            .forEach((permission) => {
-              permissionIds.add(permission.id);
-            });
-          break;
-
-        case PermissionAccessLevel.EDIT:
-          permissions.forEach((permission) => {
-            permissionIds.add(permission.id);
-          });
-          break;
-      }
+    if (invalidSetting) {
+      throw new AppError(ErrorCode.DATA_NOT_FOUND, "頁面功能不存在");
     }
 
-    await this.ctx.repos.role.updatePermissions(roleId, Array.from(permissionIds));
+    // NONE 不需要寫入 RoleFeature
+    const roleFeatures = dto.settings
+      .filter((setting) => setting.accessLevel !== PermissionAccessLevel.NONE)
+      .map((setting) => ({
+        featureCode: setting.featureCode,
+        accessLevel: setting.accessLevel,
+      }));
+
+    await this.ctx.repos.role.updateFeatures(roleId, roleFeatures);
 
     // 清除角色權限 Redis 快取
-    await invalidateRolePermissions(roleId);
+    await invalidateRoleFeatures(roleId);
   }
 
   /**
    * 計算角色權限設定
    */
   private getPermissionSettings(
-    rolePermissions: {
-      permission: {
-        featureCode: number;
-        actionType: number;
-        isRequired: boolean;
-      };
+    roleFeatures: {
+      featureCode: number;
+      accessLevel: string;
     }[],
     featureCodes: number[],
   ) {
     return featureCodes.map((featureCode) => {
-      const permissions = rolePermissions
-        .map((rolePermission) => rolePermission.permission)
-        .filter((permission) => permission.isRequired && permission.featureCode === featureCode);
-
-      let accessLevel = PermissionAccessLevel.NONE;
-
-      if (permissions.some((permission) => permission.actionType !== PermissionActionType.GET)) {
-        accessLevel = PermissionAccessLevel.EDIT;
-      } else if (permissions.length > 0) {
-        accessLevel = PermissionAccessLevel.VIEW;
-      }
+      const roleFeature = roleFeatures.find(
+        (roleFeature) => roleFeature.featureCode === featureCode,
+      );
 
       return {
         featureCode,
-        accessLevel,
+        accessLevel: roleFeature?.accessLevel ?? PermissionAccessLevel.NONE,
       };
     });
   }

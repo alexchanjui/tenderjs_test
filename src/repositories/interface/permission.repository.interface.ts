@@ -1,6 +1,9 @@
 // src/repositories/interface/permission.repository.interface.ts
 import type { Permission } from "@prisma/client";
-import { CreatePermissionRequestDto, UpdatePermissionRequestDto } from "../../dtos/permission.dto";
+import type {
+  CreatePermissionRequestDto,
+  UpdatePermissionRequestDto,
+} from "../../dtos/permission.dto";
 
 export interface IPermissionRepository {
   create(data: CreatePermissionRequestDto): Promise<Permission>;
@@ -11,5 +14,4 @@ export interface IPermissionRepository {
   findAndCount(params: { skip?: number; take?: number }): Promise<[Permission[], number]>;
   update(id: number, data: UpdatePermissionRequestDto): Promise<void>;
   batchDelete(ids: number[]): Promise<void>;
-  adjustSortOrder(id: number, oldSortOrder: number, newSortOrder: number): Promise<number>;
 }

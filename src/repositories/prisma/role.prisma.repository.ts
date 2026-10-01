@@ -1,6 +1,6 @@
 // src/repositories/prisma/role.prisma.repository.ts
 import type { Role } from "@prisma/client";
-import type { IRoleRepository, RoleWithPermissions } from "../interface/role.repository.interface";
+import type { IRoleRepository, RoleWithFeatures } from "../interface/role.repository.interface";
 import type { CreateRoleRequestDto, UpdateRoleRequestDto } from "../../dtos/role.dto";
 import { IDbContext } from "../../types/db.context";
 
@@ -31,15 +31,11 @@ export class RolePrismaRepository implements IRoleRepository {
   /**
    * 根據 ID 查找角色
    */
-  public async findById(id: string): Promise<RoleWithPermissions | null> {
+  public async findById(id: string): Promise<RoleWithFeatures | null> {
     return this.ctx.prisma.role.findUnique({
       where: { id },
       include: {
-        rolePermissions: {
-          include: {
-            permission: true,
-          },
-        },
+        roleFeatures: true,
         _count: {
           select: {
             users: true,
@@ -64,18 +60,14 @@ export class RolePrismaRepository implements IRoleRepository {
   public async findAndCount(params: {
     skip?: number;
     take?: number;
-  }): Promise<[RoleWithPermissions[], number]> {
+  }): Promise<[RoleWithFeatures[], number]> {
     return this.ctx.prisma.$transaction([
       this.ctx.prisma.role.findMany({
         skip: params.skip,
         take: params.take,
         orderBy: { createdAt: "desc" },
         include: {
-          rolePermissions: {
-            include: {
-              permission: true,
-            },
-          },
+          roleFeatures: true,
           _count: {
             select: {
               users: true,
@@ -124,23 +116,27 @@ export class RolePrismaRepository implements IRoleRepository {
   }
 
   /**
-   * 更新角色的權限
+   * 更新角色的功能權限
    */
-  public async updatePermissions(roleId: string, permissionIds: number[]): Promise<void> {
+  public async updateFeatures(
+    roleId: string,
+    features: { featureCode: number; accessLevel: string }[],
+  ): Promise<void> {
     await this.ctx.prisma.$transaction(async (tx) => {
-      // 先清除原本權限
-      await tx.rolePermission.deleteMany({
+      // 先清除原本功能權限
+      await tx.roleFeature.deleteMany({
         where: {
           roleId,
         },
       });
 
-      // 再重新建立新的權限
-      if (permissionIds.length > 0) {
-        await tx.rolePermission.createMany({
-          data: permissionIds.map((permissionId) => ({
+      // 再重新建立新的功能權限
+      if (features.length > 0) {
+        await tx.roleFeature.createMany({
+          data: features.map((feature) => ({
             roleId,
-            permissionId,
+            featureCode: feature.featureCode,
+            accessLevel: feature.accessLevel,
           })),
         });
       }

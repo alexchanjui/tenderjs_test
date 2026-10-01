@@ -1,8 +1,11 @@
 // src/repositories/prisma/permission.prisma.repository.ts
-import { Permission } from "@prisma/client";
-import { IPermissionRepository } from "../interface/permission.repository.interface";
-import { IDbContext } from "../../types/db.context";
-import { CreatePermissionRequestDto, UpdatePermissionRequestDto } from "../../dtos/permission.dto";
+import type { Permission } from "@prisma/client";
+import type { IPermissionRepository } from "../interface/permission.repository.interface";
+import type { IDbContext } from "../../types/db.context";
+import type {
+  CreatePermissionRequestDto,
+  UpdatePermissionRequestDto,
+} from "../../dtos/permission.dto";
 
 export class PermissionPrismaRepository implements IPermissionRepository {
   constructor(private readonly ctx: IDbContext) {}
@@ -26,7 +29,7 @@ export class PermissionPrismaRepository implements IPermissionRepository {
         },
       },
       orderBy: {
-        sortOrder: "asc",
+        createdAt: "asc",
       },
     });
   }
@@ -54,7 +57,10 @@ export class PermissionPrismaRepository implements IPermissionRepository {
    */
   public async findByFeatureCode(featureCode: number): Promise<Permission[]> {
     return this.ctx.prisma.permission.findMany({
-      where: { featureCode, isActive: true },
+      where: {
+        featureCode,
+        isActive: true,
+      },
     });
   }
 
@@ -69,11 +75,14 @@ export class PermissionPrismaRepository implements IPermissionRepository {
       this.ctx.prisma.permission.findMany({
         skip: params.skip,
         take: params.take,
-        orderBy: { sortOrder: "asc" },
+        orderBy: {
+          createdAt: "desc",
+        },
       }),
       this.ctx.prisma.permission.count(),
     ]);
   }
+
   /**
    * 更新權限資料
    */
@@ -95,58 +104,5 @@ export class PermissionPrismaRepository implements IPermissionRepository {
         },
       },
     });
-  }
-
-  /**
-   * 調整權限排序
-   */
-  public async adjustSortOrder(
-    id: number,
-    oldSortOrder: number,
-    newSortOrder: number,
-  ): Promise<number> {
-    const total = await this.ctx.prisma.permission.count();
-
-    // 限制排序範圍 1 ~ 總筆數
-    const sortOrder = Math.min(Math.max(newSortOrder, 1), total);
-
-    await this.ctx.prisma.$transaction(async (tx) => {
-      if (sortOrder < oldSortOrder) {
-        await tx.permission.updateMany({
-          where: {
-            sortOrder: {
-              gte: sortOrder,
-              lt: oldSortOrder,
-            },
-          },
-          data: {
-            sortOrder: {
-              increment: 1,
-            },
-          },
-        });
-      } else {
-        await tx.permission.updateMany({
-          where: {
-            sortOrder: {
-              gt: oldSortOrder,
-              lte: sortOrder,
-            },
-          },
-          data: {
-            sortOrder: {
-              decrement: 1,
-            },
-          },
-        });
-      }
-
-      await tx.permission.update({
-        where: { id },
-        data: { sortOrder },
-      });
-    });
-
-    return sortOrder;
   }
 }
