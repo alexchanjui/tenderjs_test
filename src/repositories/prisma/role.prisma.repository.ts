@@ -15,6 +15,20 @@ export class RolePrismaRepository implements IRoleRepository {
   }
 
   /**
+   * 取得所有角色
+   */
+  public async findAll(): Promise<Role[]> {
+    return this.ctx.prisma.role.findMany({
+      where: {
+        isActive: true,
+      },
+      orderBy: {
+        createdAt: "asc",
+      },
+    });
+  }
+
+  /**
    * 根據 ID 查找角色
    */
   public async findById(id: string): Promise<RoleWithPermissions | null> {

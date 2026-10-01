@@ -27,6 +27,10 @@ export class CreateUserDto {
     message: "密碼長度需介於 8~16 字元",
   })
   password!: string;
+
+  @IsOptional()
+  @IsUUID("4", { message: "角色 ID 格式錯誤" })
+  roleId?: string;
 }
 
 /**

@@ -16,6 +16,7 @@ export type RoleWithPermissions = Role & {
 
 export interface IRoleRepository {
   create(data: CreateRoleRequestDto): Promise<Role>;
+  findAll(): Promise<Role[]>;
   findById(id: string): Promise<RoleWithPermissions | null>;
   findByName(name: string): Promise<Role | null>;
   findAndCount(params: { skip?: number; take?: number }): Promise<[RoleWithPermissions[], number]>;

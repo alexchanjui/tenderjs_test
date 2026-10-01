@@ -19,6 +19,7 @@ import { PermissionService } from "./services/permission.service";
 import { StopService } from "./services/stop.service";
 import { ImportService } from "./services/import.service";
 import { ExportService } from "./services/export.service";
+import { OptionsService } from "./services/options.service";
 
 // Controllers
 import type { IController } from "./controllers/interface/controller.interface";
@@ -30,6 +31,7 @@ import { PermissionController } from "./controllers/permission.controller";
 import { StopController } from "./controllers/stop.controller";
 import { ImportController } from "./controllers/import.controller";
 import { ExportController } from "./controllers/export.controller";
+import { OptionsController } from "./controllers/options.controller";
 
 // Types
 import type { IServiceContext } from "./types/service.context";
@@ -92,6 +94,7 @@ export class AppContainer {
     const stopService = new StopService(ctx);
     const importService = new ImportService(ctx);
     const exportService = new ExportService(ctx);
+    const optionsService = new OptionsService(ctx);
 
     /**
      * 組裝 Controllers
@@ -105,6 +108,7 @@ export class AppContainer {
       new StopController(stopService),
       new ImportController(importService),
       new ExportController(exportService),
+      new OptionsController(optionsService),
     ];
   }
 }
