@@ -1,11 +1,11 @@
-// src/docs/role.swagger.ts
+// src/docs/feature.swagger.ts
 
 /**
  * @openapi
- * /roles:
+ * /features:
  *   get:
- *     tags: [Roles]
- *     summary: 取得角色列表
+ *     tags: [Features]
+ *     summary: 取得頁面功能列表
  *     security:
  *       - BearerAuth: []
  *     parameters:
@@ -29,8 +29,8 @@
  *         description: 成功
  *
  *   post:
- *     tags: [Roles]
- *     summary: 建立角色
+ *     tags: [Features]
+ *     summary: 建立頁面功能
  *     security:
  *       - BearerAuth: []
  *     requestBody:
@@ -40,69 +40,24 @@
  *           schema:
  *             type: object
  *             required:
+ *               - featureCode
  *               - name
  *             properties:
+ *               featureCode:
+ *                 type: integer
+ *                 example: 500
  *               name:
  *                 type: string
  *                 minLength: 2
  *                 maxLength: 50
- *                 example: Admin
- *               description:
+ *                 example: 報表管理
+ *               routePath:
  *                 type: string
- *                 maxLength: 200
- *                 example: 系統管理員
- *     responses:
- *       200:
- *         description: 成功
- */
-
-/**
- * @openapi
- * /roles/{id}:
- *   get:
- *     tags: [Roles]
- *     summary: 取得角色詳細資訊
- *     security:
- *       - BearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *           format: uuid
- *     responses:
- *       200:
- *         description: 成功
- *
- *   put:
- *     tags: [Roles]
- *     summary: 更新角色
- *     security:
- *       - BearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *           format: uuid
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *                 minLength: 2
- *                 maxLength: 50
- *                 example: Manager
- *               description:
- *                 type: string
- *                 maxLength: 200
- *                 example: 管理者
+ *                 example: /reports
+ *               sortOrder:
+ *                 type: integer
+ *                 minimum: 0
+ *                 example: 5
  *               isActive:
  *                 type: boolean
  *                 example: true
@@ -113,10 +68,68 @@
 
 /**
  * @openapi
- * /roles/batch:
+ * /features/{featureCode}:
+ *   get:
+ *     tags: [Features]
+ *     summary: 取得頁面功能詳細資訊
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: featureCode
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         example: 100
+ *     responses:
+ *       200:
+ *         description: 成功
+ *
+ *   put:
+ *     tags: [Features]
+ *     summary: 更新頁面功能
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: featureCode
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         example: 100
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 minLength: 2
+ *                 maxLength: 50
+ *                 example: 使用者管理
+ *               routePath:
+ *                 type: string
+ *                 example: /users
+ *               sortOrder:
+ *                 type: integer
+ *                 minimum: 0
+ *                 example: 1
+ *               isActive:
+ *                 type: boolean
+ *                 example: true
+ *     responses:
+ *       200:
+ *         description: 成功
+ */
+
+/**
+ * @openapi
+ * /features/batch:
  *   delete:
- *     tags: [Roles]
- *     summary: 批次刪除角色
+ *     tags: [Features]
+ *     summary: 批次刪除頁面功能
  *     security:
  *       - BearerAuth: []
  *     requestBody:
@@ -132,54 +145,8 @@
  *                 type: array
  *                 minItems: 1
  *                 items:
- *                   type: string
- *                   format: uuid
- *     responses:
- *       200:
- *         description: 成功
- */
-
-/**
- * @openapi
- * /roles/{id}/permissions:
- *   put:
- *     tags: [Roles]
- *     summary: 更新角色權限
- *     security:
- *       - BearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *           format: uuid
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - settings
- *             properties:
- *               settings:
- *                 type: array
- *                 minItems: 1
- *                 items:
- *                   type: object
- *                   required:
- *                     - featureCode
- *                     - accessLevel
- *                   properties:
- *                     featureCode:
- *                       type: integer
- *                       example: 100
- *                     accessLevel:
- *                       type: string
- *                       description: NONE=無權限、VIEW=檢視、EDIT=編輯
- *                       enum: [NONE, VIEW, EDIT]
- *                       example: EDIT
+ *                   type: integer
+ *                 example: [300, 400]
  *     responses:
  *       200:
  *         description: 成功

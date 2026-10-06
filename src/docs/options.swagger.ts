@@ -13,3 +13,17 @@
  *       200:
  *         description: 查詢成功
  */
+
+/**
+ * @openapi
+ * /options/features:
+ *   get:
+ *     tags:
+ *       - Options
+ *     summary: 取得頁面功能選項
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: 查詢成功
+ */

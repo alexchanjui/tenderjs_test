@@ -14,9 +14,8 @@ export class CreateFeatureRequestDto {
   @Length(2, 50, { message: "頁面名稱長度需介於 2~50 字元" })
   name!: string;
 
-  @IsOptional()
   @IsString({ message: "頁面路徑必須為字串" })
-  routePath?: string;
+  routePath!: string;
 
   @IsOptional()
   @Type(() => Number)
@@ -64,7 +63,7 @@ export class FeatureResponseDto {
   name!: string;
 
   @Expose()
-  routePath!: string | null;
+  routePath!: string;
 
   @Expose()
   sortOrder!: number;

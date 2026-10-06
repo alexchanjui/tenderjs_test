@@ -72,4 +72,3 @@
  *       200:
  *         description: 成功
  */
-export {};
