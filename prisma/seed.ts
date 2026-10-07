@@ -214,7 +214,7 @@ const permissionsData = [
   {
     pageCode: 300,
     name: "page:detail",
-    apiPath: "/api/pages/:pageCode",
+    apiPath: "/api/pages/:id",
     actionType: 0, // GET
     isRequired: true,
     isActive: true,
@@ -223,7 +223,7 @@ const permissionsData = [
   {
     pageCode: 300,
     name: "page:update",
-    apiPath: "/api/pages/:pageCode",
+    apiPath: "/api/pages/:id",
     actionType: 2, // PUT
     isRequired: true,
     isActive: true,
@@ -295,14 +295,23 @@ async function main() {
   // ==========================================
   logger.info(`📋 同步 Pages (${pagesData.length} 筆)...`);
 
+  const pageIdByCode = new Map<number, number>();
   for (const page of pagesData) {
-    await prisma.page.upsert({
-      where: {
-        pageCode: page.pageCode,
-      },
-      update: page,
-      create: page,
-    });
+    const ruleName = permissionsData.find((rule) => rule.pageCode === page.pageCode)?.name;
+    const rule = ruleName
+      ? await prisma.permission.findUnique({ where: { name: ruleName } })
+      : null;
+    const existing =
+      rule?.pageId != null
+        ? await prisma.page.findUnique({ where: { id: rule.pageId } })
+        : await prisma.page.findFirst({
+            where: { OR: [{ pageCode: page.pageCode }, { routePath: page.routePath }] },
+          });
+    const { pageCode, ...metadata } = page;
+    const saved = existing
+      ? await prisma.page.update({ where: { id: existing.id }, data: metadata })
+      : await prisma.page.create({ data: page });
+    pageIdByCode.set(pageCode, saved.id);
   }
 
   logger.info("✅ Pages 建立完成");
@@ -312,13 +321,16 @@ async function main() {
   // ==========================================
   logger.info(`📋 同步 Permissions (${permissionsData.length} 筆)...`);
 
-  for (const permission of permissionsData) {
+  for (const { pageCode, ...permission } of permissionsData) {
+    const pageId = pageCode === 0 ? null : pageIdByCode.get(pageCode);
+    if (pageId === undefined) throw new Error(`頁面代碼 ${pageCode} 不存在`);
+    const data = { ...permission, pageId };
     await prisma.permission.upsert({
       where: {
         name: permission.name,
       },
-      update: permission,
-      create: permission,
+      update: data,
+      create: data,
     });
   }
 
@@ -350,7 +362,7 @@ async function main() {
       isActive: true,
     },
     select: {
-      pageCode: true,
+      id: true,
     },
   });
 
@@ -364,7 +376,7 @@ async function main() {
     prisma.rolePage.createMany({
       data: pages.map((page) => ({
         roleId: superAdminRole.id,
-        pageCode: page.pageCode,
+        pageId: page.id,
         accessLevel: "EDIT",
       })),
     }),

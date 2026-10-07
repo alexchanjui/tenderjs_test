@@ -1,4 +1,6 @@
 // src/repositories/prisma/page.prisma.repository.ts
+import { AppError } from "../../errors/app.error";
+import { ErrorCode } from "../../errors/error.codes";
 import type { Page } from "@prisma/client";
 import type { CreatePageRequestDto, UpdatePageRequestDto } from "../../dtos/page.dto";
 import type { IDbContext } from "../../types/db.context";
@@ -33,6 +35,10 @@ export class PagePrismaRepository implements IPageRepository {
   /**
    * 根據頁面代碼查找頁面
    */
+  public async findById(id: number): Promise<Page | null> {
+    return this.ctx.prisma.page.findUnique({ where: { id } });
+  }
+
   public async findByCode(pageCode: number): Promise<Page | null> {
     return this.ctx.prisma.page.findUnique({
       where: {
@@ -60,10 +66,10 @@ export class PagePrismaRepository implements IPageRepository {
   /**
    * 更新頁面
    */
-  public async update(pageCode: number, data: UpdatePageRequestDto): Promise<void> {
+  public async update(id: number, data: UpdatePageRequestDto): Promise<void> {
     await this.ctx.prisma.page.update({
       where: {
-        pageCode,
+        id,
       },
       data,
     });
@@ -72,13 +78,13 @@ export class PagePrismaRepository implements IPageRepository {
   /**
    * 批次刪除頁面
    */
-  public async batchDelete(pageCodes: number[]): Promise<void> {
-    await this.ctx.prisma.page.deleteMany({
-      where: {
-        pageCode: {
-          in: pageCodes,
-        },
-      },
+  public async batchDelete(ids: number[]): Promise<void> {
+    await this.ctx.prisma.$transaction(async (tx) => {
+      const permissionCount = await tx.permission.count({ where: { pageId: { in: ids } } });
+      if (permissionCount > 0) {
+        throw new AppError(ErrorCode.REQUEST_DATA, "頁面仍有 API 權限設定，請先刪除或移轉權限");
+      }
+      await tx.page.deleteMany({ where: { id: { in: ids } } });
     });
   }
 }

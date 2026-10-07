@@ -18,9 +18,7 @@ export class PermissionService {
    * 建立權限
    */
   public async createPermission(data: CreatePermissionRequestDto): Promise<PermissionResponseDto> {
-    const page = await this.ctx.repos.page.findByCode(data.pageCode);
-
-    if (!page) {
+    if (data.pageId != null && !(await this.ctx.repos.page.findById(data.pageId))) {
       throw new AppError(ErrorCode.DATA_NOT_FOUND, "頁面不存在");
     }
 
@@ -107,8 +105,8 @@ export class PermissionService {
     }
 
     // 檢查頁面
-    if (data.pageCode !== undefined) {
-      const page = await this.ctx.repos.page.findByCode(data.pageCode);
+    if (data.pageId != null) {
+      const page = await this.ctx.repos.page.findById(data.pageId);
 
       if (!page) {
         throw new AppError(ErrorCode.DATA_NOT_FOUND, "頁面不存在");

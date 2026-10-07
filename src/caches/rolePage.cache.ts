@@ -6,7 +6,7 @@ import redisInstance from "../utils/redis";
  * 角色頁面權限
  */
 export interface ICachedRolePage {
-  pageCode: number;
+  pageId: number;
   accessLevel: string;
 }
 
@@ -14,7 +14,7 @@ export interface ICachedRolePage {
  * 取得角色頁面權限 Redis Key
  */
 const getRolePageKey = (roleId: string): string => {
-  return `role:pages:${roleId.toLowerCase()}`;
+  return `role:pages:v2:${roleId.toLowerCase()}`;
 };
 
 /**
@@ -49,7 +49,7 @@ export const getRolePages = async (roleId: string): Promise<ICachedRolePage[]> =
 
   // 3. 取得角色擁有的頁面權限
   const rolePages = role.rolePages.map((rolePage) => ({
-    pageCode: rolePage.pageCode,
+    pageId: rolePage.pageId,
     accessLevel: rolePage.accessLevel,
   }));
 
@@ -72,7 +72,7 @@ export const invalidateRolePages = async (roleId: string): Promise<void> => {
  * 清除所有角色頁面權限 Redis 快取
  */
 export const invalidateAllRolePages = async (): Promise<void> => {
-  const keys = await redisInstance.client.keys("role:pages:*");
+  const keys = await redisInstance.client.keys("role:pages:v2:*");
 
   if (keys.length === 0) {
     return;

@@ -85,8 +85,11 @@ model Role {
 /// 頁面
 /// 用途：管理系統頁面
 model Page {
-  /// 頁面代碼
-  pageCode Int @id @map("page_code")
+  /// 固定頁面 ID
+  id Int @id @default(autoincrement())
+
+  /// 可修改的唯一頁面代碼
+  pageCode Int @unique @map("page_code")
 
   /// 頁面名稱
   name String
@@ -108,6 +111,7 @@ model Page {
 
   /// 使用此頁面的角色
   rolePages RolePage[]
+  permissions Permission[]
 
   @@map("page")
 }
@@ -118,9 +122,10 @@ model Permission {
   /// 權限 ID
   id Int @id @default(autoincrement())
 
-  /// 頁面代碼
-  /// 0 代表不屬於頁面的系統 API
-  pageCode Int @map("page_code")
+  /// 頁面 ID
+  /// null 代表不屬於頁面的系統 API
+  pageId Int? @map("page_id")
+  page Page? @relation(fields: [pageId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   /// 權限名稱
   name String @unique
@@ -148,8 +153,8 @@ model Permission {
 
   /// 同一個 API 路徑與操作類型不可重複
   @@unique([apiPath, actionType])
-  /// 建立頁面代碼索引查詢
-  @@index([pageCode])
+  /// 建立頁面 ID 索引查詢
+  @@index([pageId])
   @@map("permission")
 }
 
@@ -163,8 +168,8 @@ model RolePage {
   /// 角色 ID
   roleId String @map("role_id") @db.UniqueIdentifier
 
-  /// 頁面代碼
-  pageCode Int @map("page_code")
+  /// 頁面 ID
+  pageId Int @map("page_id")
 
   /// 存取層級
   /// VIEW：檢視
@@ -176,10 +181,10 @@ model RolePage {
   role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
   /// 頁面
-  page Page @relation(fields: [pageCode], references: [pageCode], onDelete: Cascade)
+  page Page @relation(fields: [pageId], references: [id], onDelete: Cascade)
 
   /// 同一角色與頁面只能有一筆設定
-  @@id([roleId, pageCode])
+  @@id([roleId, pageId])
   @@map("role_page")
 }
 

@@ -120,9 +120,9 @@ export class RolePrismaRepository implements IRoleRepository {
   /**
    * 更新角色的頁面權限
    */
-  public async updatePages(
+  public async updatePermissions(
     roleId: string,
-    pages: { pageCode: number; accessLevel: string }[],
+    pages: { pageId: number; accessLevel: string }[],
   ): Promise<void> {
     await this.ctx.prisma.$transaction(async (tx) => {
       // 先清除原本頁面權限
@@ -137,7 +137,7 @@ export class RolePrismaRepository implements IRoleRepository {
         await tx.rolePage.createMany({
           data: pages.map((page) => ({
             roleId,
-            pageCode: page.pageCode,
+            pageId: page.pageId,
             accessLevel: page.accessLevel,
           })),
         });

@@ -68,7 +68,7 @@
 
 /**
  * @openapi
- * /pages/{pageCode}:
+ * /pages/{id}:
  *   get:
  *     tags: [Pages]
  *     summary: 取得頁面詳細資訊
@@ -76,7 +76,7 @@
  *       - BearerAuth: []
  *     parameters:
  *       - in: path
- *         name: pageCode
+ *         name: id
  *         required: true
  *         schema:
  *           type: integer
@@ -92,7 +92,7 @@
  *       - BearerAuth: []
  *     parameters:
  *       - in: path
- *         name: pageCode
+ *         name: id
  *         required: true
  *         schema:
  *           type: integer
@@ -104,6 +104,9 @@
  *           schema:
  *             type: object
  *             properties:
+ *               pageCode:
+ *                 type: integer
+ *                 example: 300
  *               name:
  *                 type: string
  *                 minLength: 2

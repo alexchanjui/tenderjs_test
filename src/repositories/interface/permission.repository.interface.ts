@@ -10,7 +10,7 @@ export interface IPermissionRepository {
   findAll(): Promise<Permission[]>;
   findById(id: number): Promise<Permission | null>;
   findByName(name: string): Promise<Permission | null>;
-  findByPageCode(pageCode: number): Promise<Permission[]>;
+  findByPageId(pageId: number): Promise<Permission[]>;
   findAndCount(params: { skip?: number; take?: number }): Promise<[Permission[], number]>;
   update(id: number, data: UpdatePermissionRequestDto): Promise<void>;
   batchDelete(ids: number[]): Promise<void>;

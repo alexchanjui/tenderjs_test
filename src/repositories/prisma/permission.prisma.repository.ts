@@ -24,8 +24,8 @@ export class PermissionPrismaRepository implements IPermissionRepository {
     return this.ctx.prisma.permission.findMany({
       where: {
         isActive: true,
-        pageCode: {
-          not: 0,
+        pageId: {
+          not: null,
         },
       },
       orderBy: {
@@ -53,12 +53,12 @@ export class PermissionPrismaRepository implements IPermissionRepository {
   }
 
   /**
-   * 根據頁面代碼查找權限
+   * 根據頁面 ID查找權限
    */
-  public async findByPageCode(pageCode: number): Promise<Permission[]> {
+  public async findByPageId(pageId: number): Promise<Permission[]> {
     return this.ctx.prisma.permission.findMany({
       where: {
-        pageCode,
+        pageId,
         isActive: true,
       },
     });

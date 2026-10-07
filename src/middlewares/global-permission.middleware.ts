@@ -39,7 +39,7 @@ export const globalPermissionGuard = async (
     const currentUser = await verifyAuthToken(token);
 
     // 5. 未設定權限規則，只驗證登入身分
-    if (!rule) {
+    if (!rule || rule.pageId === null) {
       requestContextStorage.run(currentUser, () => {
         next();
       });
@@ -56,7 +56,7 @@ export const globalPermissionGuard = async (
     const rolePages = await getRolePages(currentUser.roleId);
 
     // 8. 取得目前 API 所屬頁面權限
-    const rolePage = rolePages.find((rolePage) => rolePage.pageCode === rule.pageCode);
+    const rolePage = rolePages.find((rolePage) => rolePage.pageId === rule.pageId);
 
     if (!rolePage) {
       throw new AppError(ErrorCode.PERMISSION);

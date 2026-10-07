@@ -24,7 +24,8 @@ export class OptionsService {
 
     return pages.map((page) => ({
       label: page.name,
-      value: page.pageCode,
+      value: page.id,
+      pageCode: page.pageCode,
     }));
   }
 }

@@ -57,8 +57,8 @@ export class PageService {
   /**
    * 取得頁面詳細資訊
    */
-  public async getPageByCode(pageCode: number): Promise<PageResponseDto> {
-    const page = await this.ctx.repos.page.findByCode(pageCode);
+  public async getPageById(id: number): Promise<PageResponseDto> {
+    const page = await this.ctx.repos.page.findById(id);
 
     if (!page) {
       throw new AppError(ErrorCode.DATA_NOT_FOUND, "頁面不存在");
@@ -72,28 +72,32 @@ export class PageService {
   /**
    * 更新頁面
    */
-  public async updatePage(pageCode: number, data: UpdatePageRequestDto): Promise<void> {
-    const page = await this.ctx.repos.page.findByCode(pageCode);
+  public async updatePage(id: number, data: UpdatePageRequestDto): Promise<void> {
+    const page = await this.ctx.repos.page.findById(id);
 
     if (!page) {
       throw new AppError(ErrorCode.DATA_NOT_FOUND, "頁面不存在");
     }
 
-    await this.ctx.repos.page.update(pageCode, data);
+    if (data.pageCode !== undefined && data.pageCode !== page.pageCode) {
+      const existing = await this.ctx.repos.page.findByCode(data.pageCode);
+      if (existing) throw new AppError(ErrorCode.DUPLICATE, "頁面代碼已存在");
+    }
+    await this.ctx.repos.page.update(id, data);
   }
 
   /**
    * 批次刪除頁面
    */
-  public async batchDeletePage(pageCodes: number[]): Promise<void> {
-    for (const pageCode of pageCodes) {
-      const page = await this.ctx.repos.page.findByCode(pageCode);
+  public async batchDeletePage(ids: number[]): Promise<void> {
+    for (const id of ids) {
+      const page = await this.ctx.repos.page.findById(id);
 
       if (!page) {
         throw new AppError(ErrorCode.DATA_NOT_FOUND, "頁面不存在");
       }
     }
 
-    await this.ctx.repos.page.batchDelete(pageCodes);
+    await this.ctx.repos.page.batchDelete(ids);
   }
 }

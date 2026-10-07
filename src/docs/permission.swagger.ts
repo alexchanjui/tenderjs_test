@@ -40,14 +40,14 @@
  *           schema:
  *             type: object
  *             required:
- *               - pageCode
  *               - name
  *               - apiPath
  *               - actionType
  *             properties:
- *               pageCode:
+ *               pageId:
  *                 type: integer
- *                 description: 頁面代碼
+ *                 nullable: true
+ *                 description: 頁面描述
  *                 example: 100
  *               name:
  *                 type: string
@@ -123,9 +123,10 @@
  *           schema:
  *             type: object
  *             properties:
- *               pageCode:
+ *               pageId:
  *                 type: integer
- *                 description: 頁面代碼
+ *                 nullable: true
+ *                 description: 頁面描述
  *                 example: 100
  *               name:
  *                 type: string

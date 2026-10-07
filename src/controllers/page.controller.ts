@@ -22,13 +22,9 @@ export class PageController implements IController {
    */
   private initializeRoutes(): void {
     this.router.get("/", validationMiddleware(PaginationRequestDto, "query"), this.getPages);
-
-    this.router.get("/:pageCode", this.getPageByCode);
-
+    this.router.get("/:id", this.getPageById);
     this.router.post("/", validationMiddleware(CreatePageRequestDto), this.createPage);
-
-    this.router.put("/:pageCode", validationMiddleware(UpdatePageRequestDto), this.updatePage);
-
+    this.router.put("/:id", validationMiddleware(UpdatePageRequestDto), this.updatePage);
     this.router.delete(
       "/batch",
       validationMiddleware(BatchDeleteNumberIdsDto),
@@ -61,10 +57,10 @@ export class PageController implements IController {
   /**
    * 取得頁面詳細資訊
    */
-  private getPageByCode = async (req: Request, res: Response): Promise<void> => {
-    const { pageCode } = req.params;
+  private getPageById = async (req: Request, res: Response): Promise<void> => {
+    const { id } = req.params;
 
-    const result = await this.pageService.getPageByCode(Number(pageCode));
+    const result = await this.pageService.getPageById(Number(id));
 
     R.success(res, result);
   };
@@ -75,7 +71,7 @@ export class PageController implements IController {
   private updatePage = async (req: Request, res: Response): Promise<void> => {
     const dto = plainToInstance(UpdatePageRequestDto, req.body);
 
-    await this.pageService.updatePage(Number(req.params.pageCode), dto);
+    await this.pageService.updatePage(Number(req.params.id), dto);
 
     R.success(res);
   };

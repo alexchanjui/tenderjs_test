@@ -65,7 +65,7 @@ export class RoleResponseDto {
   userCount!: number;
 
   @Expose()
-  permissionSettings!: PermissionSetting[];
+  permissionSettings!: PermissionSettingResponse[];
 }
 
 // ==========================================
@@ -101,8 +101,8 @@ export enum PermissionActionType {
  */
 export class PermissionSetting {
   @Type(() => Number)
-  @IsInt({ message: "頁面代碼必須為整數" })
-  pageCode!: number;
+  @IsInt({ message: "頁面 ID必須為整數" })
+  pageId!: number;
 
   @IsEnum(PermissionAccessLevel, {
     message: "權限層級格式錯誤",
@@ -110,9 +110,23 @@ export class PermissionSetting {
   accessLevel!: PermissionAccessLevel;
 }
 /**
+ * 頁面權限 Response DTO
+ */
+export class PermissionSettingResponse {
+  @Expose()
+  pageId!: number;
+
+  @Expose()
+  pageCode!: number;
+
+  @Expose()
+  accessLevel!: PermissionAccessLevel;
+}
+
+/**
  * 更新角色權限 Request DTO
  */
-export class UpdateRolePagesRequestDto {
+export class UpdateRolePermissionsRequestDto {
   @IsArray({ message: "設定必須為陣列" })
   @ArrayMinSize(1, { message: "至少需要設定一個功能" })
   @ValidateNested({ each: true })

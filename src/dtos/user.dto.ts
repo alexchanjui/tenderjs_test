@@ -1,7 +1,7 @@
 // src/dtos/user.dto.ts
 import { Expose, Type } from "class-transformer";
 import { IsEmail, IsString, Length, IsOptional, IsUUID, IsBoolean } from "class-validator";
-import { PermissionSetting } from "./role.dto";
+import { PermissionSettingResponse } from "./role.dto";
 
 /**
  * 建立使用者 Request DTO
@@ -102,8 +102,8 @@ export class UserResponseDto {
   role!: UserRoleDto | null;
 
   @Expose()
-  @Type(() => PermissionSetting)
-  permissionSettings!: PermissionSetting[];
+  @Type(() => PermissionSettingResponse)
+  permissionSettings!: PermissionSettingResponse[];
 
   @Expose()
   createdAt!: Date;

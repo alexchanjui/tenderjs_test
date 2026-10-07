@@ -16,11 +16,11 @@
 
 /**
  * @openapi
- * /options/features:
+ * /options/pages:
  *   get:
  *     tags:
  *       - Options
- *     summary: 取得頁面功能選項
+ *     summary: 取得頁面選項
  *     security:
  *       - BearerAuth: []
  *     responses:

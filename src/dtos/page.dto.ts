@@ -1,6 +1,6 @@
 // src/dtos/page.dto.ts
 import { Expose, Type } from "class-transformer";
-import { IsBoolean, IsInt, IsOptional, IsString, Length } from "class-validator";
+import { IsBoolean, IsInt, IsOptional, IsString, Length, ValidateIf } from "class-validator";
 
 /**
  * 建立頁面 Request DTO
@@ -30,6 +30,11 @@ export class CreatePageRequestDto {
  * 更新頁面 Request DTO
  */
 export class UpdatePageRequestDto {
+  @ValidateIf((_object, value) => value !== undefined)
+  @Type(() => Number)
+  @IsInt({ message: "頁面代碼必須為整數" })
+  pageCode?: number;
+
   @IsOptional()
   @IsString({ message: "頁面名稱必須為字串" })
   @Length(2, 50, { message: "頁面名稱長度需介於 2~50 字元" })
@@ -52,6 +57,9 @@ export class UpdatePageRequestDto {
  * 頁面 Response DTO
  */
 export class PageResponseDto {
+  @Expose()
+  id!: number;
+
   @Expose()
   pageCode!: number;
 
