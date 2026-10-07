@@ -16,28 +16,28 @@ const pagesData = [
   {
     pageCode: 100,
     name: "使用者管理",
-    description: "管理系統使用者",
+    description: "管理使用者",
     routePath: "/users",
     isActive: true,
   },
   {
     pageCode: 200,
     name: "角色管理",
-    description: "管理系統角色與角色權限",
+    description: "管理角色",
     routePath: "/roles",
     isActive: true,
   },
   {
     pageCode: 300,
     name: "頁面管理",
-    description: "管理系統頁面",
+    description: "管理頁面",
     routePath: "/pages",
     isActive: true,
   },
   {
     pageCode: 400,
     name: "招呼站管理",
-    description: "管理招呼站基本資料",
+    description: "管理招呼站",
     routePath: "/stops",
     isActive: true,
   },
@@ -88,6 +88,15 @@ const permissionsData = [
         },
       ]
     : []),
+  {
+    pageCode: 0,
+    name: "user:me",
+    apiPath: "/api/users/me",
+    actionType: 0, // GET
+    isRequired: true,
+    isActive: true,
+    description: "取得當前登入使用者資訊",
+  },
 
   // 100 - 使用者管理
   {

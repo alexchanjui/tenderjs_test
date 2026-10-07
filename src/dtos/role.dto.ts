@@ -101,8 +101,8 @@ export enum PermissionActionType {
  */
 export class PermissionSetting {
   @Type(() => Number)
-  @IsInt({ message: "頁面 ID必須為整數" })
-  pageId!: number;
+  @IsInt({ message: "頁面代碼必須為整數" })
+  pageCode!: number;
 
   @IsEnum(PermissionAccessLevel, {
     message: "權限層級格式錯誤",

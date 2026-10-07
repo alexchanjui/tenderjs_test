@@ -142,16 +142,16 @@ export class RoleService {
     }
 
     const pages = await this.ctx.repos.page.findAll();
-    const pageIds = new Set(pages.map((page) => page.id));
+    const pageIdByCode = new Map(pages.map((page) => [page.pageCode, page.id]));
 
     // 只允許設定存在且啟用的頁面
-    const invalidSetting = dto.settings.find((setting) => !pageIds.has(setting.pageId));
+    const invalidSetting = dto.settings.find((setting) => !pageIdByCode.has(setting.pageCode));
 
     if (invalidSetting) {
       throw new AppError(ErrorCode.DATA_NOT_FOUND, "頁面不存在");
     }
 
-    if (new Set(dto.settings.map((setting) => setting.pageId)).size !== dto.settings.length) {
+    if (new Set(dto.settings.map((setting) => setting.pageCode)).size !== dto.settings.length) {
       throw new AppError(ErrorCode.REQUEST_DATA, "頁面權限不可重複設定");
     }
 
@@ -159,7 +159,7 @@ export class RoleService {
     const rolePages = dto.settings
       .filter((setting) => setting.accessLevel !== PermissionAccessLevel.NONE)
       .map((setting) => ({
-        pageId: setting.pageId,
+        pageId: pageIdByCode.get(setting.pageCode)!,
         accessLevel: setting.accessLevel,
       }));
 
