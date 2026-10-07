@@ -1,15 +1,15 @@
 // src/services/permission.service.ts
 import { plainToInstance } from "class-transformer";
-import { IServiceContext } from "../types/service.context";
-import { PaginationRequestDto, PaginationResponseDto } from "../dtos/pagination.dto";
 import {
   CreatePermissionRequestDto,
   PermissionResponseDto,
   UpdatePermissionRequestDto,
 } from "../dtos/permission.dto";
-import cacheInitService from "./cache-init.service";
+import type { PaginationRequestDto, PaginationResponseDto } from "../dtos/pagination.dto";
 import { AppError } from "../errors/app.error";
 import { ErrorCode } from "../errors/error.codes";
+import type { IServiceContext } from "../types/service.context";
+import cacheInitService from "./cache-init.service";
 
 export class PermissionService {
   constructor(private readonly ctx: IServiceContext) {}
@@ -18,10 +18,10 @@ export class PermissionService {
    * 建立權限
    */
   public async createPermission(data: CreatePermissionRequestDto): Promise<PermissionResponseDto> {
-    const feature = await this.ctx.repos.feature.findByCode(data.featureCode);
+    const pageGroup = await this.ctx.repos.pageGroup.findByCode(data.pageGroupCode);
 
-    if (!feature) {
-      throw new AppError(ErrorCode.DATA_NOT_FOUND, "頁面功能不存在");
+    if (!pageGroup) {
+      throw new AppError(ErrorCode.DATA_NOT_FOUND, "頁面群組不存在");
     }
 
     // 檢查名稱
@@ -43,7 +43,7 @@ export class PermissionService {
   }
 
   /**
-   * 取得權限列表 (分頁)
+   * 取得權限列表（分頁）
    */
   public async getPermissions(
     dto: PaginationRequestDto,
@@ -99,36 +99,26 @@ export class PermissionService {
   /**
    * 更新權限
    */
-  /**
-   * 更新權限
-   */
-  public async updatePermission(
-    id: number,
-    data: UpdatePermissionRequestDto,
-  ): Promise<PermissionResponseDto> {
+  public async updatePermission(id: number, data: UpdatePermissionRequestDto): Promise<void> {
     const permission = await this.ctx.repos.permission.findById(id);
 
     if (!permission) {
       throw new AppError(ErrorCode.DATA_NOT_FOUND, "權限不存在");
     }
 
-    // 檢查頁面功能
-    if (data.featureCode !== undefined) {
-      const feature = await this.ctx.repos.feature.findByCode(data.featureCode);
+    // 檢查頁面群組
+    if (data.pageGroupCode !== undefined) {
+      const pageGroup = await this.ctx.repos.pageGroup.findByCode(data.pageGroupCode);
 
-      if (!feature) {
-        throw new AppError(ErrorCode.DATA_NOT_FOUND, "頁面功能不存在");
+      if (!pageGroup) {
+        throw new AppError(ErrorCode.DATA_NOT_FOUND, "頁面群組不存在");
       }
     }
 
-    const newPermission = await this.ctx.repos.permission.update(id, data);
+    await this.ctx.repos.permission.update(id, data);
 
     // 重新載入權限快取
     await cacheInitService.reloadPermissionRules();
-
-    return plainToInstance(PermissionResponseDto, newPermission, {
-      excludeExtraneousValues: true,
-    });
   }
 
   /**

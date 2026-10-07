@@ -169,10 +169,10 @@
  *                 items:
  *                   type: object
  *                   required:
- *                     - featureCode
+ *                     - pageGroupCode
  *                     - accessLevel
  *                   properties:
- *                     featureCode:
+ *                     pageGroupCode:
  *                       type: integer
  *                       example: 100
  *                     accessLevel:

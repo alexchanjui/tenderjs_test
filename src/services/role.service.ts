@@ -1,17 +1,17 @@
 // src/services/role.service.ts
 import { plainToInstance } from "class-transformer";
+import { invalidateRolePageGroups } from "../caches/rolePageGroup.cache";
+import type { PaginationRequestDto, PaginationResponseDto } from "../dtos/pagination.dto";
 import {
   CreateRoleRequestDto,
   PermissionAccessLevel,
   RoleResponseDto,
-  UpdateRoleFeaturesRequestDto,
+  UpdateRolePageGroupsRequestDto,
   UpdateRoleRequestDto,
 } from "../dtos/role.dto";
-import type { PaginationRequestDto, PaginationResponseDto } from "../dtos/pagination.dto";
 import { AppError } from "../errors/app.error";
 import { ErrorCode } from "../errors/error.codes";
 import type { IServiceContext } from "../types/service.context";
-import { invalidateRoleFeatures } from "../caches/role-feature.cache";
 
 export class RoleService {
   constructor(private readonly ctx: IServiceContext) {}
@@ -34,7 +34,7 @@ export class RoleService {
   }
 
   /**
-   * 取得角色列表 (分頁)
+   * 取得角色列表（分頁）
    */
   public async getRoles(
     dto: PaginationRequestDto,
@@ -48,14 +48,14 @@ export class RoleService {
       take: limit,
     });
 
-    const features = await this.ctx.repos.feature.findAll();
+    const pageGroups = await this.ctx.repos.pageGroup.findAll();
 
     const data = roles.map((role) => ({
       ...role,
       userCount: role._count.users,
       permissionSettings: this.getPermissionSettings(
-        role.roleFeatures,
-        features.map((feature) => feature.featureCode),
+        role.rolePageGroups,
+        pageGroups.map((pageGroup) => pageGroup.pageGroupCode),
       ),
     }));
 
@@ -82,7 +82,7 @@ export class RoleService {
       throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
     }
 
-    const features = await this.ctx.repos.feature.findAll();
+    const pageGroups = await this.ctx.repos.pageGroup.findAll();
 
     return plainToInstance(
       RoleResponseDto,
@@ -90,8 +90,8 @@ export class RoleService {
         ...role,
         userCount: role._count.users,
         permissionSettings: this.getPermissionSettings(
-          role.roleFeatures,
-          features.map((feature) => feature.featureCode),
+          role.rolePageGroups,
+          pageGroups.map((pageGroup) => pageGroup.pageGroupCode),
         ),
       },
       {
@@ -135,11 +135,11 @@ export class RoleService {
   }
 
   /**
-   * 更新角色權限
+   * 更新角色頁面群組權限
    */
-  public async updateRoleFeatures(
+  public async updateRolePageGroups(
     roleId: string,
-    dto: UpdateRoleFeaturesRequestDto,
+    dto: UpdateRolePageGroupsRequestDto,
   ): Promise<void> {
     const role = await this.ctx.repos.role.findById(roleId);
 
@@ -147,48 +147,50 @@ export class RoleService {
       throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
     }
 
-    const features = await this.ctx.repos.feature.findAll();
-    const featureCodes = new Set(features.map((feature) => feature.featureCode));
+    const pageGroups = await this.ctx.repos.pageGroup.findAll();
+    const pageGroupCodes = new Set(pageGroups.map((pageGroup) => pageGroup.pageGroupCode));
 
-    // 只允許設定存在且啟用的功能
-    const invalidSetting = dto.settings.find((setting) => !featureCodes.has(setting.featureCode));
+    // 只允許設定存在且啟用的頁面群組
+    const invalidSetting = dto.settings.find(
+      (setting) => !pageGroupCodes.has(setting.pageGroupCode),
+    );
 
     if (invalidSetting) {
-      throw new AppError(ErrorCode.DATA_NOT_FOUND, "頁面功能不存在");
+      throw new AppError(ErrorCode.DATA_NOT_FOUND, "頁面群組不存在");
     }
 
-    // NONE 不需要寫入 RoleFeature
-    const roleFeatures = dto.settings
+    // NONE 不需要寫入 RolePageGroup
+    const rolePageGroups = dto.settings
       .filter((setting) => setting.accessLevel !== PermissionAccessLevel.NONE)
       .map((setting) => ({
-        featureCode: setting.featureCode,
+        pageGroupCode: setting.pageGroupCode,
         accessLevel: setting.accessLevel,
       }));
 
-    await this.ctx.repos.role.updateFeatures(roleId, roleFeatures);
+    await this.ctx.repos.role.updatePageGroups(roleId, rolePageGroups);
 
-    // 清除角色權限 Redis 快取
-    await invalidateRoleFeatures(roleId);
+    // 清除角色頁面群組權限 Redis 快取
+    await invalidateRolePageGroups(roleId);
   }
 
   /**
    * 計算角色權限設定
    */
   private getPermissionSettings(
-    roleFeatures: {
-      featureCode: number;
+    rolePageGroups: {
+      pageGroupCode: number;
       accessLevel: string;
     }[],
-    featureCodes: number[],
+    pageGroupCodes: number[],
   ) {
-    return featureCodes.map((featureCode) => {
-      const roleFeature = roleFeatures.find(
-        (roleFeature) => roleFeature.featureCode === featureCode,
+    return pageGroupCodes.map((pageGroupCode) => {
+      const rolePageGroup = rolePageGroups.find(
+        (rolePageGroup) => rolePageGroup.pageGroupCode === pageGroupCode,
       );
 
       return {
-        featureCode,
-        accessLevel: roleFeature?.accessLevel ?? PermissionAccessLevel.NONE,
+        pageGroupCode,
+        accessLevel: rolePageGroup?.accessLevel ?? PermissionAccessLevel.NONE,
       };
     });
   }

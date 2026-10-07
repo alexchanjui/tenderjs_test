@@ -1,18 +1,22 @@
-// src/dtos/feature.dto.ts
+// src/dtos/pageGroup.dto.ts
 import { Expose, Type } from "class-transformer";
 import { IsBoolean, IsInt, IsOptional, IsString, Length, Min } from "class-validator";
 
 /**
- * 建立頁面功能 Request DTO
+ * 建立頁面群組 Request DTO
  */
-export class CreateFeatureRequestDto {
+export class CreatePageGroupRequestDto {
   @Type(() => Number)
-  @IsInt({ message: "功能代碼必須為整數" })
-  featureCode!: number;
+  @IsInt({ message: "頁面群組代碼必須為整數" })
+  pageGroupCode!: number;
 
-  @IsString({ message: "頁面名稱必須為字串" })
-  @Length(2, 50, { message: "頁面名稱長度需介於 2~50 字元" })
+  @IsString({ message: "頁面群組名稱必須為字串" })
+  @Length(2, 50, { message: "頁面群組名稱長度需介於 2~50 字元" })
   name!: string;
+
+  @IsOptional()
+  @IsString({ message: "頁面群組描述必須為字串" })
+  description?: string;
 
   @IsString({ message: "頁面路徑必須為字串" })
   routePath!: string;
@@ -29,13 +33,17 @@ export class CreateFeatureRequestDto {
 }
 
 /**
- * 更新頁面功能 Request DTO
+ * 更新頁面群組 Request DTO
  */
-export class UpdateFeatureRequestDto {
+export class UpdatePageGroupRequestDto {
   @IsOptional()
-  @IsString({ message: "頁面名稱必須為字串" })
-  @Length(2, 50, { message: "頁面名稱長度需介於 2~50 字元" })
+  @IsString({ message: "頁面群組名稱必須為字串" })
+  @Length(2, 50, { message: "頁面群組名稱長度需介於 2~50 字元" })
   name?: string;
+
+  @IsOptional()
+  @IsString({ message: "頁面群組描述必須為字串" })
+  description?: string;
 
   @IsOptional()
   @IsString({ message: "頁面路徑必須為字串" })
@@ -53,17 +61,20 @@ export class UpdateFeatureRequestDto {
 }
 
 /**
- * 頁面功能 Response DTO
+ * 頁面群組 Response DTO
  */
-export class FeatureResponseDto {
+export class PageGroupResponseDto {
   @Expose()
-  featureCode!: number;
+  pageGroupCode!: number;
 
   @Expose()
   name!: string;
 
   @Expose()
-  routePath!: string;
+  description!: string | null;
+
+  @Expose()
+  routePath!: string | null;
 
   @Expose()
   sortOrder!: number;

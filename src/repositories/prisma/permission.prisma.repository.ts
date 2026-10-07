@@ -1,11 +1,11 @@
 // src/repositories/prisma/permission.prisma.repository.ts
 import type { Permission } from "@prisma/client";
-import type { IPermissionRepository } from "../interface/permission.repository.interface";
-import type { IDbContext } from "../../types/db.context";
 import type {
   CreatePermissionRequestDto,
   UpdatePermissionRequestDto,
 } from "../../dtos/permission.dto";
+import type { IDbContext } from "../../types/db.context";
+import type { IPermissionRepository } from "../interface/permission.repository.interface";
 
 export class PermissionPrismaRepository implements IPermissionRepository {
   constructor(private readonly ctx: IDbContext) {}
@@ -24,7 +24,7 @@ export class PermissionPrismaRepository implements IPermissionRepository {
     return this.ctx.prisma.permission.findMany({
       where: {
         isActive: true,
-        featureCode: {
+        pageGroupCode: {
           not: 0,
         },
       },
@@ -53,19 +53,19 @@ export class PermissionPrismaRepository implements IPermissionRepository {
   }
 
   /**
-   * 根據 featureCode 查找權限
+   * 根據頁面群組代碼查找權限
    */
-  public async findByFeatureCode(featureCode: number): Promise<Permission[]> {
+  public async findByPageGroupCode(pageGroupCode: number): Promise<Permission[]> {
     return this.ctx.prisma.permission.findMany({
       where: {
-        featureCode,
+        pageGroupCode,
         isActive: true,
       },
     });
   }
 
   /**
-   * 取得權限列表 (分頁)
+   * 取得權限列表（分頁）
    */
   public async findAndCount(params: {
     skip?: number;

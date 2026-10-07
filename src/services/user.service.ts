@@ -1,19 +1,23 @@
 // src/services/user.service.ts
 import bcrypt from "bcrypt";
 import { plainToInstance } from "class-transformer";
-import { UserResponseDto, type CreateUserDto, type UpdateUserRequestDto } from "../dtos/user.dto";
 import type { PaginationRequestDto, PaginationResponseDto } from "../dtos/pagination.dto";
-import type { IServiceContext } from "../types/service.context";
-import { ErrorCode } from "../errors/error.codes";
+import { PermissionAccessLevel, PermissionSetting } from "../dtos/role.dto";
+import { UserResponseDto, type CreateUserDto, type UpdateUserRequestDto } from "../dtos/user.dto";
 import { AppError } from "../errors/app.error";
-import { PermissionSetting, PermissionAccessLevel } from "../dtos/role.dto";
+import { ErrorCode } from "../errors/error.codes";
+import type { IServiceContext } from "../types/service.context";
 
 export class UserService {
   constructor(private readonly ctx: IServiceContext) {}
 
   private getCurrentUser() {
     const currentUser = this.ctx.currentUser;
-    if (!currentUser) throw new AppError(ErrorCode.UNAUTH, "使用者未登入");
+
+    if (!currentUser) {
+      throw new AppError(ErrorCode.UNAUTH, "使用者未登入");
+    }
+
     return currentUser;
   }
 
@@ -63,7 +67,7 @@ export class UserService {
   }
 
   /**
-   * 取得使用者列表 (分頁)
+   * 取得使用者列表（分頁）
    */
   public async getUsers(
     dto: PaginationRequestDto,
@@ -132,9 +136,9 @@ export class UserService {
   /**
    * 取得當前使用者詳細資訊
    *
-   * 根據所有啟用中的頁面功能，以及使用者所屬角色的功能權限，
-   * 整理各功能的權限等級：
-   * - NONE：沒有該功能的權限
+   * 根據所有啟用中的頁面群組，以及使用者所屬角色的頁面群組權限，
+   * 整理各頁面群組的權限等級：
+   * - NONE：沒有該頁面群組的權限
    * - VIEW：具有檢視權限
    * - EDIT：具有編輯權限
    */
@@ -147,18 +151,18 @@ export class UserService {
       throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);
     }
 
-    // 取得所有啟用中的頁面功能
-    const features = await this.ctx.repos.feature.findAll();
+    // 取得所有啟用中的頁面群組
+    const pageGroups = await this.ctx.repos.pageGroup.findAll();
 
-    // 整理使用者所屬角色在各功能下的權限等級
-    const permissionSettings: PermissionSetting[] = features.map((feature) => {
-      const roleFeature = user.role?.roleFeatures.find(
-        (roleFeature) => roleFeature.featureCode === feature.featureCode,
+    // 整理使用者所屬角色在各頁面群組下的權限等級
+    const permissionSettings: PermissionSetting[] = pageGroups.map((pageGroup) => {
+      const rolePageGroup = user.role?.rolePageGroups.find(
+        (rolePageGroup) => rolePageGroup.pageGroupCode === pageGroup.pageGroupCode,
       );
 
       return {
-        featureCode: feature.featureCode,
-        accessLevel: (roleFeature?.accessLevel ??
+        pageGroupCode: pageGroup.pageGroupCode,
+        accessLevel: (rolePageGroup?.accessLevel ??
           PermissionAccessLevel.NONE) as PermissionAccessLevel,
       };
     });

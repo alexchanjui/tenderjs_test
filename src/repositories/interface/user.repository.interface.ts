@@ -1,5 +1,5 @@
 // src/repositories/interface/user.repository.interface.ts
-import type { Role, RoleFeature, User } from "@prisma/client";
+import type { Role, RolePageGroup, User } from "@prisma/client";
 import type { CreateUserDto, UpdateUserRequestDto } from "../../dtos/user.dto";
 
 /**
@@ -8,7 +8,7 @@ import type { CreateUserDto, UpdateUserRequestDto } from "../../dtos/user.dto";
 export type UserWithRole = User & {
   role:
     | (Role & {
-        roleFeatures: RoleFeature[];
+        rolePageGroups: RolePageGroup[];
       })
     | null;
 };

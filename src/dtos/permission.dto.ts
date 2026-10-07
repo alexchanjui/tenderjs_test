@@ -1,13 +1,14 @@
 // src/dtos/permission.dto.ts
 import { Expose, Type } from "class-transformer";
-import { IsString, IsOptional, IsInt, Length, IsBoolean } from "class-validator";
+import { IsBoolean, IsInt, IsOptional, IsString, Length } from "class-validator";
 
 /**
  * 建立權限 Request DTO
  */
 export class CreatePermissionRequestDto {
-  @IsInt({ message: "功能代碼必須為整數" })
-  featureCode!: number;
+  @Type(() => Number)
+  @IsInt({ message: "頁面群組代碼必須為整數" })
+  pageGroupCode!: number;
 
   @IsString({ message: "權限名稱必須為字串" })
   @Length(2, 50, { message: "權限名稱長度需介於 2~50 字元" })
@@ -36,8 +37,8 @@ export class CreatePermissionRequestDto {
 export class UpdatePermissionRequestDto {
   @IsOptional()
   @Type(() => Number)
-  @IsInt({ message: "功能代碼必須為整數" })
-  featureCode?: number;
+  @IsInt({ message: "頁面群組代碼必須為整數" })
+  pageGroupCode?: number;
 
   @IsOptional()
   @IsString({ message: "權限名稱必須為字串" })
@@ -75,7 +76,7 @@ export class PermissionResponseDto {
   id!: number;
 
   @Expose()
-  featureCode!: number;
+  pageGroupCode!: number;
 
   @Expose()
   name!: string;
@@ -88,6 +89,9 @@ export class PermissionResponseDto {
 
   @Expose()
   isActive!: boolean;
+
+  @Expose()
+  isRequired!: boolean;
 
   @Expose()
   description!: string | null;

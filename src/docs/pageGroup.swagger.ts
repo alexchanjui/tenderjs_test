@@ -1,11 +1,11 @@
-// src/docs/feature.swagger.ts
+// src/docs/pageGroup.swagger.ts
 
 /**
  * @openapi
- * /features:
+ * /page-groups:
  *   get:
- *     tags: [Features]
- *     summary: 取得頁面功能列表
+ *     tags: [PageGroups]
+ *     summary: 取得頁面群組列表
  *     security:
  *       - BearerAuth: []
  *     parameters:
@@ -29,8 +29,8 @@
  *         description: 成功
  *
  *   post:
- *     tags: [Features]
- *     summary: 建立頁面功能
+ *     tags: [PageGroups]
+ *     summary: 建立頁面群組
  *     security:
  *       - BearerAuth: []
  *     requestBody:
@@ -40,10 +40,11 @@
  *           schema:
  *             type: object
  *             required:
- *               - featureCode
+ *               - pageGroupCode
  *               - name
+ *               - routePath
  *             properties:
- *               featureCode:
+ *               pageGroupCode:
  *                 type: integer
  *                 example: 500
  *               name:
@@ -51,6 +52,9 @@
  *                 minLength: 2
  *                 maxLength: 50
  *                 example: 報表管理
+ *               description:
+ *                 type: string
+ *                 example: 報表相關頁面群組
  *               routePath:
  *                 type: string
  *                 example: /reports
@@ -68,15 +72,15 @@
 
 /**
  * @openapi
- * /features/{featureCode}:
+ * /page-groups/{pageGroupCode}:
  *   get:
- *     tags: [Features]
- *     summary: 取得頁面功能詳細資訊
+ *     tags: [PageGroups]
+ *     summary: 取得頁面群組詳細資訊
  *     security:
  *       - BearerAuth: []
  *     parameters:
  *       - in: path
- *         name: featureCode
+ *         name: pageGroupCode
  *         required: true
  *         schema:
  *           type: integer
@@ -86,13 +90,13 @@
  *         description: 成功
  *
  *   put:
- *     tags: [Features]
- *     summary: 更新頁面功能
+ *     tags: [PageGroups]
+ *     summary: 更新頁面群組
  *     security:
  *       - BearerAuth: []
  *     parameters:
  *       - in: path
- *         name: featureCode
+ *         name: pageGroupCode
  *         required: true
  *         schema:
  *           type: integer
@@ -109,6 +113,9 @@
  *                 minLength: 2
  *                 maxLength: 50
  *                 example: 使用者管理
+ *               description:
+ *                 type: string
+ *                 example: 使用者管理相關頁面群組
  *               routePath:
  *                 type: string
  *                 example: /users
@@ -126,10 +133,10 @@
 
 /**
  * @openapi
- * /features/batch:
+ * /page-groups/batch:
  *   delete:
- *     tags: [Features]
- *     summary: 批次刪除頁面功能
+ *     tags: [PageGroups]
+ *     summary: 批次刪除頁面群組
  *     security:
  *       - BearerAuth: []
  *     requestBody:

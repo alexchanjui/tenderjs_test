@@ -1,8 +1,8 @@
 // src/repositories/prisma/role.prisma.repository.ts
 import type { Role } from "@prisma/client";
-import type { IRoleRepository, RoleWithFeatures } from "../interface/role.repository.interface";
 import type { CreateRoleRequestDto, UpdateRoleRequestDto } from "../../dtos/role.dto";
-import { IDbContext } from "../../types/db.context";
+import type { IDbContext } from "../../types/db.context";
+import type { IRoleRepository, RoleWithPageGroups } from "../interface/role.repository.interface";
 
 export class RolePrismaRepository implements IRoleRepository {
   constructor(private readonly ctx: IDbContext) {}
@@ -31,11 +31,11 @@ export class RolePrismaRepository implements IRoleRepository {
   /**
    * 根據 ID 查找角色
    */
-  public async findById(id: string): Promise<RoleWithFeatures | null> {
+  public async findById(id: string): Promise<RoleWithPageGroups | null> {
     return this.ctx.prisma.role.findUnique({
       where: { id },
       include: {
-        roleFeatures: true,
+        rolePageGroups: true,
         _count: {
           select: {
             users: true,
@@ -55,19 +55,21 @@ export class RolePrismaRepository implements IRoleRepository {
   }
 
   /**
-   * 取得角色列表 (分頁)
+   * 取得角色列表（分頁）
    */
   public async findAndCount(params: {
     skip?: number;
     take?: number;
-  }): Promise<[RoleWithFeatures[], number]> {
+  }): Promise<[RoleWithPageGroups[], number]> {
     return this.ctx.prisma.$transaction([
       this.ctx.prisma.role.findMany({
         skip: params.skip,
         take: params.take,
-        orderBy: { createdAt: "desc" },
+        orderBy: {
+          createdAt: "desc",
+        },
         include: {
-          roleFeatures: true,
+          rolePageGroups: true,
           _count: {
             select: {
               users: true,
@@ -116,27 +118,27 @@ export class RolePrismaRepository implements IRoleRepository {
   }
 
   /**
-   * 更新角色的功能權限
+   * 更新角色的頁面群組權限
    */
-  public async updateFeatures(
+  public async updatePageGroups(
     roleId: string,
-    features: { featureCode: number; accessLevel: string }[],
+    pageGroups: { pageGroupCode: number; accessLevel: string }[],
   ): Promise<void> {
     await this.ctx.prisma.$transaction(async (tx) => {
-      // 先清除原本功能權限
-      await tx.roleFeature.deleteMany({
+      // 先清除原本頁面群組權限
+      await tx.rolePageGroup.deleteMany({
         where: {
           roleId,
         },
       });
 
-      // 再重新建立新的功能權限
-      if (features.length > 0) {
-        await tx.roleFeature.createMany({
-          data: features.map((feature) => ({
+      // 再重新建立新的頁面群組權限
+      if (pageGroups.length > 0) {
+        await tx.rolePageGroup.createMany({
+          data: pageGroups.map((pageGroup) => ({
             roleId,
-            featureCode: feature.featureCode,
-            accessLevel: feature.accessLevel,
+            pageGroupCode: pageGroup.pageGroupCode,
+            accessLevel: pageGroup.accessLevel,
           })),
         });
       }

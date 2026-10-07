@@ -100,21 +100,19 @@ export enum PermissionActionType {
  * 功能權限設定
  */
 export class PermissionSetting {
-  @Expose()
-  @IsInt({ message: "功能代碼必須為整數" })
-  featureCode!: number;
+  @Type(() => Number)
+  @IsInt({ message: "頁面群組代碼必須為整數" })
+  pageGroupCode!: number;
 
-  @Expose()
   @IsEnum(PermissionAccessLevel, {
-    message: "權限等級必須為 NONE、VIEW 或 EDIT",
+    message: "權限層級格式錯誤",
   })
   accessLevel!: PermissionAccessLevel;
 }
-
 /**
  * 更新角色權限 Request DTO
  */
-export class UpdateRoleFeaturesRequestDto {
+export class UpdateRolePageGroupsRequestDto {
   @IsArray({ message: "設定必須為陣列" })
   @ArrayMinSize(1, { message: "至少需要設定一個功能" })
   @ValidateNested({ each: true })
