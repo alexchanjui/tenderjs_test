@@ -73,16 +73,16 @@ export class PageService {
    * 更新頁面
    */
   public async updatePage(id: number, data: UpdatePageRequestDto): Promise<void> {
+    if ("pageCode" in data) {
+      throw new AppError(ErrorCode.REQUEST_DATA, "頁面代碼建立後不可修改");
+    }
+
     const page = await this.ctx.repos.page.findById(id);
 
     if (!page) {
       throw new AppError(ErrorCode.DATA_NOT_FOUND, "頁面不存在");
     }
 
-    if (data.pageCode !== undefined && data.pageCode !== page.pageCode) {
-      const existing = await this.ctx.repos.page.findByCode(data.pageCode);
-      if (existing) throw new AppError(ErrorCode.DUPLICATE, "頁面代碼已存在");
-    }
     await this.ctx.repos.page.update(id, data);
   }
 

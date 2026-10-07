@@ -104,9 +104,6 @@
  *           schema:
  *             type: object
  *             properties:
- *               pageCode:
- *                 type: integer
- *                 example: 300
  *               name:
  *                 type: string
  *                 minLength: 2
