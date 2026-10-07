@@ -2,7 +2,7 @@
 import type { Role } from "@prisma/client";
 import type { CreateRoleRequestDto, UpdateRoleRequestDto } from "../../dtos/role.dto";
 import type { IDbContext } from "../../types/db.context";
-import type { IRoleRepository, RoleWithPageGroups } from "../interface/role.repository.interface";
+import type { IRoleRepository, RoleWithPages } from "../interface/role.repository.interface";
 
 export class RolePrismaRepository implements IRoleRepository {
   constructor(private readonly ctx: IDbContext) {}
@@ -31,11 +31,11 @@ export class RolePrismaRepository implements IRoleRepository {
   /**
    * 根據 ID 查找角色
    */
-  public async findById(id: string): Promise<RoleWithPageGroups | null> {
+  public async findById(id: string): Promise<RoleWithPages | null> {
     return this.ctx.prisma.role.findUnique({
       where: { id },
       include: {
-        rolePageGroups: true,
+        rolePages: true,
         _count: {
           select: {
             users: true,
@@ -60,7 +60,7 @@ export class RolePrismaRepository implements IRoleRepository {
   public async findAndCount(params: {
     skip?: number;
     take?: number;
-  }): Promise<[RoleWithPageGroups[], number]> {
+  }): Promise<[RoleWithPages[], number]> {
     return this.ctx.prisma.$transaction([
       this.ctx.prisma.role.findMany({
         skip: params.skip,
@@ -69,7 +69,7 @@ export class RolePrismaRepository implements IRoleRepository {
           createdAt: "desc",
         },
         include: {
-          rolePageGroups: true,
+          rolePages: true,
           _count: {
             select: {
               users: true,
@@ -118,27 +118,27 @@ export class RolePrismaRepository implements IRoleRepository {
   }
 
   /**
-   * 更新角色的頁面群組權限
+   * 更新角色的頁面權限
    */
-  public async updatePageGroups(
+  public async updatePages(
     roleId: string,
-    pageGroups: { pageGroupCode: number; accessLevel: string }[],
+    pages: { pageCode: number; accessLevel: string }[],
   ): Promise<void> {
     await this.ctx.prisma.$transaction(async (tx) => {
-      // 先清除原本頁面群組權限
-      await tx.rolePageGroup.deleteMany({
+      // 先清除原本頁面權限
+      await tx.rolePage.deleteMany({
         where: {
           roleId,
         },
       });
 
-      // 再重新建立新的頁面群組權限
-      if (pageGroups.length > 0) {
-        await tx.rolePageGroup.createMany({
-          data: pageGroups.map((pageGroup) => ({
+      // 再重新建立新的頁面權限
+      if (pages.length > 0) {
+        await tx.rolePage.createMany({
+          data: pages.map((page) => ({
             roleId,
-            pageGroupCode: pageGroup.pageGroupCode,
-            accessLevel: pageGroup.accessLevel,
+            pageCode: page.pageCode,
+            accessLevel: page.accessLevel,
           })),
         });
       }

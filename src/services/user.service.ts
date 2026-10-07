@@ -136,9 +136,9 @@ export class UserService {
   /**
    * 取得當前使用者詳細資訊
    *
-   * 根據所有啟用中的頁面群組，以及使用者所屬角色的頁面群組權限，
-   * 整理各頁面群組的權限等級：
-   * - NONE：沒有該頁面群組的權限
+   * 根據所有啟用中的頁面，以及使用者所屬角色的頁面權限，
+   * 整理各頁面的權限等級：
+   * - NONE：沒有該頁面的權限
    * - VIEW：具有檢視權限
    * - EDIT：具有編輯權限
    */
@@ -151,19 +151,16 @@ export class UserService {
       throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);
     }
 
-    // 取得所有啟用中的頁面群組
-    const pageGroups = await this.ctx.repos.pageGroup.findAll();
+    // 取得所有啟用中的頁面
+    const pages = await this.ctx.repos.page.findAll();
 
-    // 整理使用者所屬角色在各頁面群組下的權限等級
-    const permissionSettings: PermissionSetting[] = pageGroups.map((pageGroup) => {
-      const rolePageGroup = user.role?.rolePageGroups.find(
-        (rolePageGroup) => rolePageGroup.pageGroupCode === pageGroup.pageGroupCode,
-      );
+    // 整理使用者所屬角色在各頁面下的權限等級
+    const permissionSettings: PermissionSetting[] = pages.map((page) => {
+      const rolePage = user.role?.rolePages.find((rolePage) => rolePage.pageCode === page.pageCode);
 
       return {
-        pageGroupCode: pageGroup.pageGroupCode,
-        accessLevel: (rolePageGroup?.accessLevel ??
-          PermissionAccessLevel.NONE) as PermissionAccessLevel,
+        pageCode: page.pageCode,
+        accessLevel: (rolePage?.accessLevel ?? PermissionAccessLevel.NONE) as PermissionAccessLevel,
       };
     });
 

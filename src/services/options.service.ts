@@ -17,14 +17,14 @@ export class OptionsService {
   }
 
   /**
-   * 取得頁面群組選項
+   * 取得頁面選項
    */
-  public async getPageGroupOptions() {
-    const pageGroups = await this.ctx.repos.pageGroup.findAll();
+  public async getPageOptions() {
+    const pages = await this.ctx.repos.page.findAll();
 
-    return pageGroups.map((pageGroup) => ({
-      label: pageGroup.name,
-      value: pageGroup.pageGroupCode,
+    return pages.map((page) => ({
+      label: page.name,
+      value: page.pageCode,
     }));
   }
 }

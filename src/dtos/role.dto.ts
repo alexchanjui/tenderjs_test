@@ -101,8 +101,8 @@ export enum PermissionActionType {
  */
 export class PermissionSetting {
   @Type(() => Number)
-  @IsInt({ message: "頁面群組代碼必須為整數" })
-  pageGroupCode!: number;
+  @IsInt({ message: "頁面代碼必須為整數" })
+  pageCode!: number;
 
   @IsEnum(PermissionAccessLevel, {
     message: "權限層級格式錯誤",
@@ -112,7 +112,7 @@ export class PermissionSetting {
 /**
  * 更新角色權限 Request DTO
  */
-export class UpdateRolePageGroupsRequestDto {
+export class UpdateRolePagesRequestDto {
   @IsArray({ message: "設定必須為陣列" })
   @ArrayMinSize(1, { message: "至少需要設定一個功能" })
   @ValidateNested({ each: true })

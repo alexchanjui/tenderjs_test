@@ -18,7 +18,7 @@ export class OptionsController implements IController {
    */
   private initializeRoutes(): void {
     this.router.get("/roles", this.getRoleOptions);
-    this.router.get("/page-groups", this.getPageGroupOptions);
+    this.router.get("/pages", this.getPageOptions);
   }
 
   /**
@@ -31,10 +31,10 @@ export class OptionsController implements IController {
   };
 
   /**
-   * 取得頁面群組選項
+   * 取得頁面選項
    */
-  private getPageGroupOptions = async (_req: Request, res: Response): Promise<void> => {
-    const result = await this.optionsService.getPageGroupOptions();
+  private getPageOptions = async (_req: Request, res: Response): Promise<void> => {
+    const result = await this.optionsService.getPageOptions();
 
     R.success(res, result);
   };

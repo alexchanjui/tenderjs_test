@@ -1,12 +1,12 @@
 // src/services/role.service.ts
 import { plainToInstance } from "class-transformer";
-import { invalidateRolePageGroups } from "../caches/rolePageGroup.cache";
+import { invalidateRolePages } from "../caches/rolePage.cache";
 import type { PaginationRequestDto, PaginationResponseDto } from "../dtos/pagination.dto";
 import {
   CreateRoleRequestDto,
   PermissionAccessLevel,
   RoleResponseDto,
-  UpdateRolePageGroupsRequestDto,
+  UpdateRolePagesRequestDto,
   UpdateRoleRequestDto,
 } from "../dtos/role.dto";
 import { AppError } from "../errors/app.error";
@@ -48,14 +48,14 @@ export class RoleService {
       take: limit,
     });
 
-    const pageGroups = await this.ctx.repos.pageGroup.findAll();
+    const pages = await this.ctx.repos.page.findAll();
 
     const data = roles.map((role) => ({
       ...role,
       userCount: role._count.users,
       permissionSettings: this.getPermissionSettings(
-        role.rolePageGroups,
-        pageGroups.map((pageGroup) => pageGroup.pageGroupCode),
+        role.rolePages,
+        pages.map((page) => page.pageCode),
       ),
     }));
 
@@ -82,7 +82,7 @@ export class RoleService {
       throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
     }
 
-    const pageGroups = await this.ctx.repos.pageGroup.findAll();
+    const pages = await this.ctx.repos.page.findAll();
 
     return plainToInstance(
       RoleResponseDto,
@@ -90,8 +90,8 @@ export class RoleService {
         ...role,
         userCount: role._count.users,
         permissionSettings: this.getPermissionSettings(
-          role.rolePageGroups,
-          pageGroups.map((pageGroup) => pageGroup.pageGroupCode),
+          role.rolePages,
+          pages.map((page) => page.pageCode),
         ),
       },
       {
@@ -135,62 +135,55 @@ export class RoleService {
   }
 
   /**
-   * 更新角色頁面群組權限
+   * 更新角色頁面權限
    */
-  public async updateRolePageGroups(
-    roleId: string,
-    dto: UpdateRolePageGroupsRequestDto,
-  ): Promise<void> {
+  public async updateRolePages(roleId: string, dto: UpdateRolePagesRequestDto): Promise<void> {
     const role = await this.ctx.repos.role.findById(roleId);
 
     if (!role) {
       throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
     }
 
-    const pageGroups = await this.ctx.repos.pageGroup.findAll();
-    const pageGroupCodes = new Set(pageGroups.map((pageGroup) => pageGroup.pageGroupCode));
+    const pages = await this.ctx.repos.page.findAll();
+    const pageCodes = new Set(pages.map((page) => page.pageCode));
 
-    // 只允許設定存在且啟用的頁面群組
-    const invalidSetting = dto.settings.find(
-      (setting) => !pageGroupCodes.has(setting.pageGroupCode),
-    );
+    // 只允許設定存在且啟用的頁面
+    const invalidSetting = dto.settings.find((setting) => !pageCodes.has(setting.pageCode));
 
     if (invalidSetting) {
-      throw new AppError(ErrorCode.DATA_NOT_FOUND, "頁面群組不存在");
+      throw new AppError(ErrorCode.DATA_NOT_FOUND, "頁面不存在");
     }
 
-    // NONE 不需要寫入 RolePageGroup
-    const rolePageGroups = dto.settings
+    // NONE 不需要寫入 RolePage
+    const rolePages = dto.settings
       .filter((setting) => setting.accessLevel !== PermissionAccessLevel.NONE)
       .map((setting) => ({
-        pageGroupCode: setting.pageGroupCode,
+        pageCode: setting.pageCode,
         accessLevel: setting.accessLevel,
       }));
 
-    await this.ctx.repos.role.updatePageGroups(roleId, rolePageGroups);
+    await this.ctx.repos.role.updatePages(roleId, rolePages);
 
-    // 清除角色頁面群組權限 Redis 快取
-    await invalidateRolePageGroups(roleId);
+    // 清除角色頁面權限 Redis 快取
+    await invalidateRolePages(roleId);
   }
 
   /**
    * 計算角色權限設定
    */
   private getPermissionSettings(
-    rolePageGroups: {
-      pageGroupCode: number;
+    rolePages: {
+      pageCode: number;
       accessLevel: string;
     }[],
-    pageGroupCodes: number[],
+    pageCodes: number[],
   ) {
-    return pageGroupCodes.map((pageGroupCode) => {
-      const rolePageGroup = rolePageGroups.find(
-        (rolePageGroup) => rolePageGroup.pageGroupCode === pageGroupCode,
-      );
+    return pageCodes.map((pageCode) => {
+      const rolePage = rolePages.find((rolePage) => rolePage.pageCode === pageCode);
 
       return {
-        pageGroupCode,
-        accessLevel: rolePageGroup?.accessLevel ?? PermissionAccessLevel.NONE,
+        pageCode,
+        accessLevel: rolePage?.accessLevel ?? PermissionAccessLevel.NONE,
       };
     });
   }

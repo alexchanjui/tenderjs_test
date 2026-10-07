@@ -76,29 +76,26 @@ model Role {
   /// 使用此角色的使用者
   users User[]
 
-  /// 角色擁有的頁面群組權限
-  rolePageGroups RolePageGroup[]
+  /// 角色擁有的頁面權限
+  rolePages RolePage[]
 
   @@map("role")
 }
 
-/// 頁面群組
-/// 用途：管理系統頁面與選單群組
-model PageGroup {
-  /// 頁面群組代碼
-  pageGroupCode Int @id @map("page_group_code")
+/// 頁面
+/// 用途：管理系統頁面
+model Page {
+  /// 頁面代碼
+  pageCode Int @id @map("page_code")
 
-  /// 頁面群組名稱
+  /// 頁面名稱
   name String
 
-  /// 頁面群組描述
+  /// 頁面描述
   description String?
 
   /// 頁面路徑
   routePath String? @map("route_path")
-
-  /// 顯示排序
-  sortOrder Int @default(0) @map("sort_order")
 
   /// 啟用狀態
   isActive Boolean @default(true) @map("is_active")
@@ -109,10 +106,10 @@ model PageGroup {
   /// 更新時間
   updatedAt DateTime @updatedAt @map("update_time")
 
-  /// 使用此頁面群組的角色
-  rolePageGroups RolePageGroup[]
+  /// 使用此頁面的角色
+  rolePages RolePage[]
 
-  @@map("page_group")
+  @@map("page")
 }
 
 /// 系統權限
@@ -121,9 +118,9 @@ model Permission {
   /// 權限 ID
   id Int @id @default(autoincrement())
 
-  /// 頁面群組代碼
-  /// 0 代表不屬於頁面群組的系統 API
-  pageGroupCode Int @map("page_group_code")
+  /// 頁面代碼
+  /// 0 代表不屬於頁面的系統 API
+  pageCode Int @map("page_code")
 
   /// 權限名稱
   name String @unique
@@ -151,8 +148,8 @@ model Permission {
 
   /// 同一個 API 路徑與操作類型不可重複
   @@unique([apiPath, actionType])
-  /// 建立頁面群組代碼索引查詢
-  @@index([pageGroupCode])
+  /// 建立頁面代碼索引查詢
+  @@index([pageCode])
   @@map("permission")
 }
 
@@ -160,14 +157,14 @@ model Permission {
 // 關聯資料
 // ==========================================
 
-/// 角色頁面群組權限
-/// 用途：管理角色對頁面群組的存取層級
-model RolePageGroup {
+/// 角色頁面權限
+/// 用途：管理角色對頁面的存取層級
+model RolePage {
   /// 角色 ID
   roleId String @map("role_id") @db.UniqueIdentifier
 
-  /// 頁面群組代碼
-  pageGroupCode Int @map("page_group_code")
+  /// 頁面代碼
+  pageCode Int @map("page_code")
 
   /// 存取層級
   /// VIEW：檢視
@@ -178,12 +175,12 @@ model RolePageGroup {
   /// 角色
   role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
-  /// 頁面群組
-  pageGroup PageGroup @relation(fields: [pageGroupCode], references: [pageGroupCode], onDelete: Cascade)
+  /// 頁面
+  page Page @relation(fields: [pageCode], references: [pageCode], onDelete: Cascade)
 
-  /// 同一角色與頁面群組只能有一筆設定
-  @@id([roleId, pageGroupCode])
-  @@map("role_page_group")
+  /// 同一角色與頁面只能有一筆設定
+  @@id([roleId, pageCode])
+  @@map("role_page")
 }
 
 // ==========================================

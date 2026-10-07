@@ -1,11 +1,11 @@
-// src/docs/pageGroup.swagger.ts
+// src/docs/page.swagger.ts
 
 /**
  * @openapi
- * /page-groups:
+ * /pages:
  *   get:
- *     tags: [PageGroups]
- *     summary: 取得頁面群組列表
+ *     tags: [Pages]
+ *     summary: 取得頁面列表
  *     security:
  *       - BearerAuth: []
  *     parameters:
@@ -29,8 +29,8 @@
  *         description: 成功
  *
  *   post:
- *     tags: [PageGroups]
- *     summary: 建立頁面群組
+ *     tags: [Pages]
+ *     summary: 建立頁面
  *     security:
  *       - BearerAuth: []
  *     requestBody:
@@ -40,11 +40,11 @@
  *           schema:
  *             type: object
  *             required:
- *               - pageGroupCode
+ *               - pageCode
  *               - name
  *               - routePath
  *             properties:
- *               pageGroupCode:
+ *               pageCode:
  *                 type: integer
  *                 example: 500
  *               name:
@@ -54,14 +54,10 @@
  *                 example: 報表管理
  *               description:
  *                 type: string
- *                 example: 報表相關頁面群組
+ *                 example: 報表相關頁面
  *               routePath:
  *                 type: string
  *                 example: /reports
- *               sortOrder:
- *                 type: integer
- *                 minimum: 0
- *                 example: 5
  *               isActive:
  *                 type: boolean
  *                 example: true
@@ -72,15 +68,15 @@
 
 /**
  * @openapi
- * /page-groups/{pageGroupCode}:
+ * /pages/{pageCode}:
  *   get:
- *     tags: [PageGroups]
- *     summary: 取得頁面群組詳細資訊
+ *     tags: [Pages]
+ *     summary: 取得頁面詳細資訊
  *     security:
  *       - BearerAuth: []
  *     parameters:
  *       - in: path
- *         name: pageGroupCode
+ *         name: pageCode
  *         required: true
  *         schema:
  *           type: integer
@@ -90,13 +86,13 @@
  *         description: 成功
  *
  *   put:
- *     tags: [PageGroups]
- *     summary: 更新頁面群組
+ *     tags: [Pages]
+ *     summary: 更新頁面
  *     security:
  *       - BearerAuth: []
  *     parameters:
  *       - in: path
- *         name: pageGroupCode
+ *         name: pageCode
  *         required: true
  *         schema:
  *           type: integer
@@ -115,14 +111,10 @@
  *                 example: 使用者管理
  *               description:
  *                 type: string
- *                 example: 使用者管理相關頁面群組
+ *                 example: 使用者管理相關頁面
  *               routePath:
  *                 type: string
  *                 example: /users
- *               sortOrder:
- *                 type: integer
- *                 minimum: 0
- *                 example: 1
  *               isActive:
  *                 type: boolean
  *                 example: true
@@ -133,10 +125,10 @@
 
 /**
  * @openapi
- * /page-groups/batch:
+ * /pages/batch:
  *   delete:
- *     tags: [PageGroups]
- *     summary: 批次刪除頁面群組
+ *     tags: [Pages]
+ *     summary: 批次刪除頁面
  *     security:
  *       - BearerAuth: []
  *     requestBody:

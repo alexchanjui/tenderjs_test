@@ -1,7 +1,7 @@
 // src/middlewares/global-permission.middleware.ts
 import type { NextFunction, Request, Response } from "express";
 import { findRouteRule } from "../caches/permission.cache";
-import { getRolePageGroups } from "../caches/rolePageGroup.cache";
+import { getRolePages } from "../caches/rolePage.cache";
 import { AppError } from "../errors/app.error";
 import { ErrorCode } from "../errors/error.codes";
 import { verifyAuthToken } from "../utils/auth.helper";
@@ -52,23 +52,21 @@ export const globalPermissionGuard = async (
       throw new AppError(ErrorCode.PERMISSION);
     }
 
-    // 7. 取得角色頁面群組權限
-    const rolePageGroups = await getRolePageGroups(currentUser.roleId);
+    // 7. 取得角色頁面權限
+    const rolePages = await getRolePages(currentUser.roleId);
 
-    // 8. 取得目前 API 所屬頁面群組權限
-    const rolePageGroup = rolePageGroups.find(
-      (rolePageGroup) => rolePageGroup.pageGroupCode === rule.pageGroupCode,
-    );
+    // 8. 取得目前 API 所屬頁面權限
+    const rolePage = rolePages.find((rolePage) => rolePage.pageCode === rule.pageCode);
 
-    if (!rolePageGroup) {
+    if (!rolePage) {
       throw new AppError(ErrorCode.PERMISSION);
     }
 
     // 9. GET 允許 VIEW / EDIT，其餘操作需要 EDIT
     const hasPermission =
       req.method === "GET"
-        ? rolePageGroup.accessLevel === "VIEW" || rolePageGroup.accessLevel === "EDIT"
-        : rolePageGroup.accessLevel === "EDIT";
+        ? rolePage.accessLevel === "VIEW" || rolePage.accessLevel === "EDIT"
+        : rolePage.accessLevel === "EDIT";
 
     if (!hasPermission) {
       throw new AppError(ErrorCode.PERMISSION);

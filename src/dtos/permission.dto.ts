@@ -7,8 +7,8 @@ import { IsBoolean, IsInt, IsOptional, IsString, Length } from "class-validator"
  */
 export class CreatePermissionRequestDto {
   @Type(() => Number)
-  @IsInt({ message: "頁面群組代碼必須為整數" })
-  pageGroupCode!: number;
+  @IsInt({ message: "頁面代碼必須為整數" })
+  pageCode!: number;
 
   @IsString({ message: "權限名稱必須為字串" })
   @Length(2, 50, { message: "權限名稱長度需介於 2~50 字元" })
@@ -37,8 +37,8 @@ export class CreatePermissionRequestDto {
 export class UpdatePermissionRequestDto {
   @IsOptional()
   @Type(() => Number)
-  @IsInt({ message: "頁面群組代碼必須為整數" })
-  pageGroupCode?: number;
+  @IsInt({ message: "頁面代碼必須為整數" })
+  pageCode?: number;
 
   @IsOptional()
   @IsString({ message: "權限名稱必須為字串" })
@@ -76,7 +76,7 @@ export class PermissionResponseDto {
   id!: number;
 
   @Expose()
-  pageGroupCode!: number;
+  pageCode!: number;
 
   @Expose()
   name!: string;

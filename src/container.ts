@@ -9,7 +9,7 @@ import { UserPrismaRepository } from "./repositories/prisma/user.prisma.reposito
 import { RolePrismaRepository } from "./repositories/prisma/role.prisma.repository";
 import { PermissionPrismaRepository } from "./repositories/prisma/permission.prisma.repository";
 import { StopPrismaRepository } from "./repositories/prisma/stop.prisma.repository";
-import { PageGroupPrismaRepository } from "./repositories/prisma/pageGroup.prisma.repository";
+import { PagePrismaRepository } from "./repositories/prisma/page.prisma.repository";
 
 // Services
 import { HealthService } from "./services/health.service";
@@ -21,7 +21,7 @@ import { StopService } from "./services/stop.service";
 import { ImportService } from "./services/import.service";
 import { ExportService } from "./services/export.service";
 import { OptionsService } from "./services/options.service";
-import { PageGroupService } from "./services/pageGroup.service";
+import { PageService } from "./services/page.service";
 
 // Controllers
 import type { IController } from "./controllers/interface/controller.interface";
@@ -34,7 +34,7 @@ import { StopController } from "./controllers/stop.controller";
 import { ImportController } from "./controllers/import.controller";
 import { ExportController } from "./controllers/export.controller";
 import { OptionsController } from "./controllers/options.controller";
-import { PageGroupController } from "./controllers/pageGroup.controller";
+import { PageController } from "./controllers/page.controller";
 
 // Types
 import type { IServiceContext } from "./types/service.context";
@@ -67,7 +67,7 @@ export class AppContainer {
     const roleRepo = new RolePrismaRepository(dbContext);
     const permissionRepo = new PermissionPrismaRepository(dbContext);
     const stopRepo = new StopPrismaRepository(dbContext);
-    const pageGroupRepo = new PageGroupPrismaRepository(dbContext);
+    const pageRepo = new PagePrismaRepository(dbContext);
 
     /**
      * 建立 Service 共用依賴
@@ -81,7 +81,7 @@ export class AppContainer {
         role: roleRepo,
         permission: permissionRepo,
         stop: stopRepo,
-        pageGroup: pageGroupRepo,
+        page: pageRepo,
       },
       get currentUser() {
         return requestContextStorage.getStore();
@@ -100,7 +100,7 @@ export class AppContainer {
     const importService = new ImportService(ctx);
     const exportService = new ExportService(ctx);
     const optionsService = new OptionsService(ctx);
-    const pageGroupService = new PageGroupService(ctx);
+    const pageService = new PageService(ctx);
 
     /**
      * 組裝 Controllers
@@ -115,7 +115,7 @@ export class AppContainer {
       new ImportController(importService),
       new ExportController(exportService),
       new OptionsController(optionsService),
-      new PageGroupController(pageGroupService),
+      new PageController(pageService),
     ];
   }
 }

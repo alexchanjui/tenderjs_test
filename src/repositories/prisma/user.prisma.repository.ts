@@ -24,7 +24,7 @@ export class UserPrismaRepository implements IUserRepository {
       include: {
         role: {
           include: {
-            rolePageGroups: true,
+            rolePages: true,
           },
         },
       },
@@ -40,7 +40,7 @@ export class UserPrismaRepository implements IUserRepository {
       include: {
         role: {
           include: {
-            rolePageGroups: true,
+            rolePages: true,
           },
         },
       },
@@ -56,7 +56,7 @@ export class UserPrismaRepository implements IUserRepository {
       include: {
         role: {
           include: {
-            rolePageGroups: true,
+            rolePages: true,
           },
         },
       },
@@ -78,7 +78,7 @@ export class UserPrismaRepository implements IUserRepository {
         include: {
           role: {
             include: {
-              rolePageGroups: true,
+              rolePages: true,
             },
           },
         },

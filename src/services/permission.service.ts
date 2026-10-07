@@ -18,10 +18,10 @@ export class PermissionService {
    * 建立權限
    */
   public async createPermission(data: CreatePermissionRequestDto): Promise<PermissionResponseDto> {
-    const pageGroup = await this.ctx.repos.pageGroup.findByCode(data.pageGroupCode);
+    const page = await this.ctx.repos.page.findByCode(data.pageCode);
 
-    if (!pageGroup) {
-      throw new AppError(ErrorCode.DATA_NOT_FOUND, "頁面群組不存在");
+    if (!page) {
+      throw new AppError(ErrorCode.DATA_NOT_FOUND, "頁面不存在");
     }
 
     // 檢查名稱
@@ -106,12 +106,12 @@ export class PermissionService {
       throw new AppError(ErrorCode.DATA_NOT_FOUND, "權限不存在");
     }
 
-    // 檢查頁面群組
-    if (data.pageGroupCode !== undefined) {
-      const pageGroup = await this.ctx.repos.pageGroup.findByCode(data.pageGroupCode);
+    // 檢查頁面
+    if (data.pageCode !== undefined) {
+      const page = await this.ctx.repos.page.findByCode(data.pageCode);
 
-      if (!pageGroup) {
-        throw new AppError(ErrorCode.DATA_NOT_FOUND, "頁面群組不存在");
+      if (!page) {
+        throw new AppError(ErrorCode.DATA_NOT_FOUND, "頁面不存在");
       }
     }
 
