@@ -2,6 +2,13 @@
 
 /**
  * @openapi
+ * tags:
+ *   - name: Pages
+ *     description: 系統頁面管理，提供角色頁面權限設定使用。
+ */
+
+/**
+ * @openapi
  * /pages:
  *   get:
  *     tags: [Pages]

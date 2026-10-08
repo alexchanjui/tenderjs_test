@@ -68,19 +68,6 @@ const permissionsData = [
     isActive: true,
     description: "取得當前登入使用者資訊",
   },
-  ...(process.env.NODE_ENV === "development"
-    ? [
-        {
-          pageCode: 0,
-          name: "auth:auto-login",
-          apiPath: "/api/auth/auto-login",
-          actionType: 1,
-          isRequired: false,
-          isActive: true,
-          description: "開發環境自動登入",
-        },
-      ]
-    : []),
   {
     pageCode: 100,
     name: "user:list",

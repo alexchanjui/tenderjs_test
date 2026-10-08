@@ -16,25 +16,30 @@ export const globalPermissionGuard = async (
 ): Promise<void> => {
   try {
     const requestPath = req.originalUrl.split("?")[0];
-    const authHeader = req.headers.authorization;
     const rule = findRouteRule(req.method, requestPath);
 
-    if (rule && !rule.isRequired) {
+    // 沒有設定權限規則，交給後續 Router 處理
+    if (!rule) {
       next();
       return;
     }
+
+    // 公開 API
+    if (!rule.isRequired) {
+      next();
+      return;
+    }
+
+    // 受保護 API 才開始驗證 Token
+    const authHeader = req.headers.authorization;
 
     if (!authHeader) {
       throw new AppError(ErrorCode.UNAUTH);
     }
 
     const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : authHeader;
-    const currentUser = await verifyAuthToken(token);
 
-    if (!rule) {
-      requestContextStorage.run(currentUser, () => next());
-      return;
-    }
+    const currentUser = await verifyAuthToken(token);
 
     if (!currentUser.roleId) {
       throw new AppError(ErrorCode.PERMISSION);

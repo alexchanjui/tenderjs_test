@@ -2,6 +2,13 @@
 
 /**
  * @openapi
+ * tags:
+ *   - name: Users
+ *     description: 使用者帳號管理。
+ */
+
+/**
+ * @openapi
  * /users:
  *   get:
  *     tags: [Users]

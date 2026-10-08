@@ -12,6 +12,7 @@ export type VendorWithPermissions = Vendor & {
 
 export interface IVendorRepository {
   create(data: CreateVendorRequestDto): Promise<Vendor>;
+  findAll(): Promise<VendorWithPermissions[]>;
   findById(id: string): Promise<VendorWithPermissions | null>;
   findByCode(code: string): Promise<Vendor | null>;
   findAndCount(params: {

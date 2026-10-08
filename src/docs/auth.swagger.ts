@@ -2,6 +2,13 @@
 
 /**
  * @openapi
+ * tags:
+ *   - name: Auth
+ *     description: 身分驗證。
+ */
+
+/**
+ * @openapi
  * /auth/login:
  *   post:
  *     tags: [Auth]

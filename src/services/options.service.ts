@@ -28,4 +28,17 @@ export class OptionsService {
       pageCode: page.pageCode,
     }));
   }
+
+  /**
+   * 取得業者選項
+   */
+  public async getVendorOptions() {
+    const vendors = await this.ctx.repos.vendor.findAll();
+
+    return vendors.map((vendor) => ({
+      label: vendor.name,
+      value: vendor.id,
+      code: vendor.code,
+    }));
+  }
 }

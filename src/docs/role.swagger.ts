@@ -2,6 +2,13 @@
 
 /**
  * @openapi
+ * tags:
+ *   - name: Roles
+ *     description: 角色管理。
+ */
+
+/**
+ * @openapi
  * /roles:
  *   get:
  *     tags: [Roles]

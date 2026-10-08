@@ -14,6 +14,20 @@ export class VendorPrismaRepository implements IVendorRepository {
     return this.ctx.prisma.vendor.create({ data });
   }
 
+  public async findAll(): Promise<VendorWithPermissions[]> {
+    return this.ctx.prisma.vendor.findMany({
+      include: {
+        vendorPermissions: true,
+        _count: {
+          select: {
+            users: true,
+            roles: true,
+          },
+        },
+      },
+    });
+  }
+
   public async findById(id: string): Promise<VendorWithPermissions | null> {
     return this.ctx.prisma.vendor.findUnique({
       where: { id },

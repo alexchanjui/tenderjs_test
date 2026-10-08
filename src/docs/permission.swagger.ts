@@ -2,6 +2,13 @@
 
 /**
  * @openapi
+ * tags:
+ *   - name: Permissions
+ *     description: API 權限管理，提供業者與角色權限設定使用。
+ */
+
+/**
+ * @openapi
  * /permissions:
  *   post:
  *     tags: [Permissions]

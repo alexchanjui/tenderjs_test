@@ -2,11 +2,17 @@
 
 /**
  * @openapi
+ * tags:
+ *   - name: Vendors
+ *     description: 業者管理，包含業者資料與權限範圍設定。
+ */
+
+/**
+ * @openapi
  * /vendors:
  *   get:
  *     tags: [Vendors]
  *     summary: 取得業者列表
- *     description: 僅 PLATFORM 帳號可操作。
  *     security:
  *       - BearerAuth: []
  *     parameters:
@@ -27,7 +33,6 @@
  *   post:
  *     tags: [Vendors]
  *     summary: 建立業者
- *     description: 僅 PLATFORM 帳號可操作。
  *     security:
  *       - BearerAuth: []
  *     requestBody:
@@ -148,7 +153,7 @@
  *   put:
  *     tags: [Vendors]
  *     summary: 更新業者可用 API 權限
- *     description: VendorPermission 是該業者角色可取得的 API 權限上限。
+ *     description: 設定 VendorPermission，作為該業者角色可取得的 API 權限上限。
  *     security:
  *       - BearerAuth: []
  *     parameters:
