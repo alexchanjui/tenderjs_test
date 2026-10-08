@@ -3,11 +3,11 @@ import type { NextFunction, Request, Response } from "express";
 import { findRouteRule } from "../caches/permission.cache";
 import { getRolePages } from "../caches/rolePage.cache";
 import { getRolePermissionIds } from "../caches/rolePermission.cache";
+import { getVendorPermissionIds } from "../caches/vendorPermission.cache";
 import { AppError } from "../errors/app.error";
 import { ErrorCode } from "../errors/error.codes";
 import { verifyAuthToken } from "../utils/auth.helper";
 import { requestContextStorage } from "../utils/request-context";
-import prismaInstance from "../utils/prisma";
 
 export const globalPermissionGuard = async (
   req: Request,
@@ -57,16 +57,9 @@ export const globalPermissionGuard = async (
         throw new AppError(ErrorCode.PERMISSION);
       }
 
-      const vendorPermission = await prismaInstance.client.vendorPermission.findUnique({
-        where: {
-          vendorId_permissionId: {
-            vendorId: currentUser.vendorId,
-            permissionId: rule.permissionId,
-          },
-        },
-      });
+      const vendorPermissionIds = await getVendorPermissionIds(currentUser.vendorId);
 
-      if (!vendorPermission) {
+      if (!vendorPermissionIds.includes(rule.permissionId)) {
         throw new AppError(ErrorCode.PERMISSION);
       }
     }

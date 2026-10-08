@@ -5,7 +5,6 @@ import {
   PermissionResponseDto,
   UpdatePermissionRequestDto,
 } from "../dtos/permission.dto";
-import type { PaginationRequestDto, PaginationResponseDto } from "../dtos/pagination.dto";
 import { AppError } from "../errors/app.error";
 import { ErrorCode } from "../errors/error.codes";
 import type { IServiceContext } from "../types/service.context";
@@ -38,34 +37,6 @@ export class PermissionService {
     return plainToInstance(PermissionResponseDto, newPermission, {
       excludeExtraneousValues: true,
     });
-  }
-
-  /**
-   * 取得權限列表（分頁）
-   */
-  public async getPermissions(
-    dto: PaginationRequestDto,
-  ): Promise<PaginationResponseDto<PermissionResponseDto>> {
-    const { page, limit } = dto;
-
-    const skip = (page - 1) * limit;
-
-    const [permissions, total] = await this.ctx.repos.permission.findAndCount({
-      skip,
-      take: limit,
-    });
-
-    return {
-      data: plainToInstance(PermissionResponseDto, permissions, {
-        excludeExtraneousValues: true,
-      }),
-      meta: {
-        total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit),
-      },
-    };
   }
 
   /**

@@ -3,31 +3,6 @@
 /**
  * @openapi
  * /permissions:
- *   get:
- *     tags: [Permissions]
- *     summary: 取得權限列表
- *     security:
- *       - BearerAuth: []
- *     parameters:
- *       - in: query
- *         name: page
- *         schema:
- *           type: integer
- *           minimum: 1
- *           default: 1
- *         example: 1
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *           minimum: 1
- *           maximum: 100
- *           default: 20
- *         example: 20
- *     responses:
- *       200:
- *         description: 成功
- *
  *   post:
  *     tags: [Permissions]
  *     summary: 建立權限

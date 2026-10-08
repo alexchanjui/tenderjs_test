@@ -65,25 +65,6 @@ export class PermissionPrismaRepository implements IPermissionRepository {
   }
 
   /**
-   * 取得權限列表（分頁）
-   */
-  public async findAndCount(params: {
-    skip?: number;
-    take?: number;
-  }): Promise<[Permission[], number]> {
-    return this.ctx.prisma.$transaction([
-      this.ctx.prisma.permission.findMany({
-        skip: params.skip,
-        take: params.take,
-        orderBy: {
-          createdAt: "desc",
-        },
-      }),
-      this.ctx.prisma.permission.count(),
-    ]);
-  }
-
-  /**
    * 更新權限資料
    */
   public async update(id: number, data: UpdatePermissionRequestDto): Promise<void> {
