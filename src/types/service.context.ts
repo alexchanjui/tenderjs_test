@@ -6,6 +6,7 @@ import type { IUserRepository } from "../repositories/interface/user.repository.
 import type { IRoleRepository } from "../repositories/interface/role.repository.interface";
 import type { IPermissionRepository } from "../repositories/interface/permission.repository.interface";
 import type { IPageRepository } from "../repositories/interface/page.repository.interface";
+import type { IVendorRepository } from "../repositories/interface/vendor.repository.interface";
 import type { UserType } from "./account-scope";
 
 export interface CurrentUser {
@@ -20,6 +21,7 @@ export interface IRepositoryContext {
   role: IRoleRepository;
   permission: IPermissionRepository;
   page: IPageRepository;
+  vendor: IVendorRepository;
 }
 
 export interface IServiceContext {

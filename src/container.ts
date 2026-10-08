@@ -8,6 +8,7 @@ import { UserPrismaRepository } from "./repositories/prisma/user.prisma.reposito
 import { RolePrismaRepository } from "./repositories/prisma/role.prisma.repository";
 import { PermissionPrismaRepository } from "./repositories/prisma/permission.prisma.repository";
 import { PagePrismaRepository } from "./repositories/prisma/page.prisma.repository";
+import { VendorPrismaRepository } from "./repositories/prisma/vendor.prisma.repository";
 
 import { HealthService } from "./services/health.service";
 import { UserService } from "./services/user.service";
@@ -16,6 +17,7 @@ import { RoleService } from "./services/role.service";
 import { PermissionService } from "./services/permission.service";
 import { OptionsService } from "./services/options.service";
 import { PageService } from "./services/page.service";
+import { VendorService } from "./services/vendor.service";
 
 import type { IController } from "./controllers/interface/controller.interface";
 import { HealthController } from "./controllers/health.controller";
@@ -25,6 +27,7 @@ import { RoleController } from "./controllers/role.controller";
 import { PermissionController } from "./controllers/permission.controller";
 import { OptionsController } from "./controllers/options.controller";
 import { PageController } from "./controllers/page.controller";
+import { VendorController } from "./controllers/vendor.controller";
 
 import type { IServiceContext } from "./types/service.context";
 import type { IDbContext } from "./types/db.context";
@@ -40,6 +43,7 @@ export class AppContainer {
     const roleRepo = new RolePrismaRepository(dbContext);
     const permissionRepo = new PermissionPrismaRepository(dbContext);
     const pageRepo = new PagePrismaRepository(dbContext);
+    const vendorRepo = new VendorPrismaRepository(dbContext);
 
     const ctx: IServiceContext = {
       logger: loggerInstance,
@@ -50,6 +54,7 @@ export class AppContainer {
         role: roleRepo,
         permission: permissionRepo,
         page: pageRepo,
+        vendor: vendorRepo,
       },
       get currentUser() {
         return requestContextStorage.getStore();
@@ -64,6 +69,7 @@ export class AppContainer {
       new PermissionController(new PermissionService(ctx)),
       new OptionsController(new OptionsService(ctx)),
       new PageController(new PageService(ctx)),
+      new VendorController(new VendorService(ctx)),
     ];
   }
 }
