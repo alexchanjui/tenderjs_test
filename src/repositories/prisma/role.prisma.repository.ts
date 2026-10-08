@@ -1,147 +1,110 @@
-// src/repositories/prisma/role.prisma.repository.ts
 import type { Role } from "@prisma/client";
-import type { IRoleRepository, RoleWithPermissions } from "../interface/role.repository.interface";
 import type { CreateRoleRequestDto, UpdateRoleRequestDto } from "../../dtos/role.dto";
-import { IDbContext } from "../../types/db.context";
+import type { IDbContext } from "../../types/db.context";
+import type { IRoleRepository, RoleWithPermissions } from "../interface/role.repository.interface";
 
 export class RolePrismaRepository implements IRoleRepository {
   constructor(private readonly ctx: IDbContext) {}
 
-  /**
-   * 建立新角色
-   */
   public async create(data: CreateRoleRequestDto): Promise<Role> {
-    return this.ctx.prisma.role.create({ data });
-  }
-
-  /**
-   * 取得所有角色
-   */
-  public async findAll(): Promise<Role[]> {
-    return this.ctx.prisma.role.findMany({
-      where: {
-        isActive: true,
-      },
-      orderBy: {
-        createdAt: "asc",
+    return this.ctx.prisma.role.create({
+      data: {
+        name: data.name,
+        description: data.description,
+        scope: data.scope,
+        vendorId: data.scope === "VENDOR" ? data.vendorId : null,
       },
     });
   }
 
-  /**
-   * 根據 ID 查找角色
-   */
+  public async findAll(): Promise<Role[]> {
+    return this.ctx.prisma.role.findMany({
+      where: { isActive: true },
+      orderBy: { createdAt: "asc" },
+    });
+  }
+
   public async findById(id: string): Promise<RoleWithPermissions | null> {
     return this.ctx.prisma.role.findUnique({
       where: { id },
       include: {
-        rolePermissions: {
-          include: {
-            permission: true,
-          },
-        },
-        _count: {
-          select: {
-            users: true,
-          },
-        },
+        rolePages: true,
+        rolePermissions: true,
+        _count: { select: { users: true } },
       },
     });
   }
 
-  /**
-   * 根據角色名稱查找角色
-   */
-  public async findByName(name: string): Promise<Role | null> {
-    return this.ctx.prisma.role.findUnique({
-      where: { name },
+  public async findByName(
+    name: string,
+    scope: string,
+    vendorId: string | null,
+  ): Promise<Role | null> {
+    return this.ctx.prisma.role.findFirst({
+      where: { name, scope, vendorId },
     });
   }
 
-  /**
-   * 取得角色列表 (分頁)
-   */
   public async findAndCount(params: {
     skip?: number;
     take?: number;
+    scope?: string;
+    vendorId?: string | null;
   }): Promise<[RoleWithPermissions[], number]> {
+    const where = {
+      ...(params.scope ? { scope: params.scope } : {}),
+      ...(params.vendorId !== undefined ? { vendorId: params.vendorId } : {}),
+    };
+
     return this.ctx.prisma.$transaction([
       this.ctx.prisma.role.findMany({
+        where,
         skip: params.skip,
         take: params.take,
         orderBy: { createdAt: "desc" },
         include: {
-          rolePermissions: {
-            include: {
-              permission: true,
-            },
-          },
-          _count: {
-            select: {
-              users: true,
-            },
-          },
+          rolePages: true,
+          rolePermissions: true,
+          _count: { select: { users: true } },
         },
       }),
-      this.ctx.prisma.role.count(),
+      this.ctx.prisma.role.count({ where }),
     ]);
   }
 
-  /**
-   * 更新角色資料
-   */
   public async update(id: string, data: UpdateRoleRequestDto): Promise<void> {
-    await this.ctx.prisma.role.update({
-      where: { id },
-      data,
-    });
+    await this.ctx.prisma.role.update({ where: { id }, data });
   }
 
-  /**
-   * 計算角色使用人數
-   */
   public async countUsersByRoleIds(ids: string[]): Promise<number> {
-    return this.ctx.prisma.user.count({
-      where: {
-        roleId: {
-          in: ids,
-        },
-      },
-    });
+    return this.ctx.prisma.user.count({ where: { roleId: { in: ids } } });
   }
 
-  /**
-   * 批次刪除角色
-   */
   public async batchDelete(ids: string[]): Promise<void> {
     await this.ctx.prisma.role.deleteMany({
-      where: {
-        id: {
-          in: ids,
-        },
-      },
+      where: { id: { in: ids }, isSystem: false },
     });
   }
 
-  /**
-   * 更新角色的權限
-   */
+  public async updatePages(roleId: string, pageIds: number[]): Promise<void> {
+    await this.ctx.prisma.$transaction(async (tx) => {
+      await tx.rolePage.deleteMany({ where: { roleId } });
+
+      if (pageIds.length > 0) {
+        await tx.rolePage.createMany({
+          data: pageIds.map((pageId) => ({ roleId, pageId })),
+        });
+      }
+    });
+  }
+
   public async updatePermissions(roleId: string, permissionIds: number[]): Promise<void> {
     await this.ctx.prisma.$transaction(async (tx) => {
-      // 先清除原本權限
-      await tx.rolePermission.deleteMany({
-        where: {
-          roleId,
-        },
-      });
+      await tx.rolePermission.deleteMany({ where: { roleId } });
 
-      // 再重新建立新的權限
       if (permissionIds.length > 0) {
         await tx.rolePermission.createMany({
-          data: permissionIds.map((permissionId) => ({
-            roleId,
-            permissionId,
-          })),
+          data: permissionIds.map((permissionId) => ({ roleId, permissionId })),
         });
       }
     });

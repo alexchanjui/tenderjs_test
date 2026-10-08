@@ -1,15 +1,14 @@
 // src/services/permission.service.ts
 import { plainToInstance } from "class-transformer";
-import { IServiceContext } from "../types/service.context";
-import { PaginationRequestDto, PaginationResponseDto } from "../dtos/pagination.dto";
 import {
   CreatePermissionRequestDto,
   PermissionResponseDto,
   UpdatePermissionRequestDto,
 } from "../dtos/permission.dto";
-import cacheInitService from "./cache-init.service";
 import { AppError } from "../errors/app.error";
 import { ErrorCode } from "../errors/error.codes";
+import type { IServiceContext } from "../types/service.context";
+import cacheInitService from "./cache-init.service";
 
 export class PermissionService {
   constructor(private readonly ctx: IServiceContext) {}
@@ -18,6 +17,10 @@ export class PermissionService {
    * 建立權限
    */
   public async createPermission(data: CreatePermissionRequestDto): Promise<PermissionResponseDto> {
+    if (data.pageId != null && !(await this.ctx.repos.page.findById(data.pageId))) {
+      throw new AppError(ErrorCode.DATA_NOT_FOUND, "頁面不存在");
+    }
+
     // 檢查名稱
     const permissionByName = await this.ctx.repos.permission.findByName(data.name);
 
@@ -34,34 +37,6 @@ export class PermissionService {
     return plainToInstance(PermissionResponseDto, newPermission, {
       excludeExtraneousValues: true,
     });
-  }
-
-  /**
-   * 取得權限列表 (分頁)
-   */
-  public async getPermissions(
-    dto: PaginationRequestDto,
-  ): Promise<PaginationResponseDto<PermissionResponseDto>> {
-    const { page, limit } = dto;
-
-    const skip = (page - 1) * limit;
-
-    const [permissions, total] = await this.ctx.repos.permission.findAndCount({
-      skip,
-      take: limit,
-    });
-
-    return {
-      data: plainToInstance(PermissionResponseDto, permissions, {
-        excludeExtraneousValues: true,
-      }),
-      meta: {
-        total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit),
-      },
-    };
   }
 
   /**
@@ -93,33 +68,26 @@ export class PermissionService {
   /**
    * 更新權限
    */
-  public async updatePermission(
-    id: number,
-    data: UpdatePermissionRequestDto,
-  ): Promise<PermissionResponseDto> {
+  public async updatePermission(id: number, data: UpdatePermissionRequestDto): Promise<void> {
     const permission = await this.ctx.repos.permission.findById(id);
 
     if (!permission) {
       throw new AppError(ErrorCode.DATA_NOT_FOUND, "權限不存在");
     }
 
-    // 排序有異動時，調整其他權限排序
-    if (data.sortOrder !== undefined && data.sortOrder !== permission.sortOrder) {
-      data.sortOrder = await this.ctx.repos.permission.adjustSortOrder(
-        id,
-        permission.sortOrder,
-        data.sortOrder,
-      );
+    // 檢查頁面
+    if (data.pageId != null) {
+      const page = await this.ctx.repos.page.findById(data.pageId);
+
+      if (!page) {
+        throw new AppError(ErrorCode.DATA_NOT_FOUND, "頁面不存在");
+      }
     }
 
-    const newPermission = await this.ctx.repos.permission.update(id, data);
+    await this.ctx.repos.permission.update(id, data);
 
     // 重新載入權限快取
     await cacheInitService.reloadPermissionRules();
-
-    return plainToInstance(PermissionResponseDto, newPermission, {
-      excludeExtraneousValues: true,
-    });
   }
 
   /**

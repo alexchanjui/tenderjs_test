@@ -1,15 +1,14 @@
 // src/middlewares/global-permission.middleware.ts
 import type { NextFunction, Request, Response } from "express";
+import { findRouteRule } from "../caches/permission.cache";
+import { getRolePages } from "../caches/rolePage.cache";
+import { getRolePermissionIds } from "../caches/rolePermission.cache";
+import { getVendorPermissionIds } from "../caches/vendorPermission.cache";
 import { AppError } from "../errors/app.error";
 import { ErrorCode } from "../errors/error.codes";
-import { findRouteRule } from "../caches/permission.cache";
 import { verifyAuthToken } from "../utils/auth.helper";
 import { requestContextStorage } from "../utils/request-context";
-import { getRolePermissions } from "../caches/role-permission.cache";
 
-/**
- * 全域權限驗證 Middleware
- */
 export const globalPermissionGuard = async (
   req: Request,
   _res: Response,
@@ -17,53 +16,60 @@ export const globalPermissionGuard = async (
 ): Promise<void> => {
   try {
     const requestPath = req.originalUrl.split("?")[0];
-    const authHeader = req.headers.authorization;
-
-    // 1. 找出目前 API 對應的權限規則
     const rule = findRouteRule(req.method, requestPath);
 
-    // 2. 公開 API 不需要登入及權限驗證
-    if (rule && !rule.isRequired) {
+    // 沒有設定權限規則，交給後續 Router 處理
+    if (!rule) {
       next();
       return;
     }
 
-    // 3. 非公開 API 必須登入
+    // 公開 API
+    if (!rule.isRequired) {
+      next();
+      return;
+    }
+
+    // 受保護 API 才開始驗證 Token
+    const authHeader = req.headers.authorization;
+
     if (!authHeader) {
       throw new AppError(ErrorCode.UNAUTH);
     }
 
     const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : authHeader;
 
-    // 4. 驗證 Token 並取得登入者
     const currentUser = await verifyAuthToken(token);
 
-    // 5. 未設定權限規則，只驗證登入身分
-    if (!rule) {
-      requestContextStorage.run(currentUser, () => {
-        next();
-      });
-
-      return;
-    }
-
-    // 6. 沒有角色代表沒有權限
     if (!currentUser.roleId) {
       throw new AppError(ErrorCode.PERMISSION);
     }
 
-    // 7. 取得角色權限
-    const permissionIds = await getRolePermissions(currentUser.roleId);
+    if (rule.pageId !== null) {
+      const rolePages = await getRolePages(currentUser.roleId);
+      if (!rolePages.some((item) => item.pageId === rule.pageId)) {
+        throw new AppError(ErrorCode.PERMISSION);
+      }
+    }
 
-    // 8. 檢查角色是否擁有目前 API 權限
-    if (!permissionIds.includes(rule.id)) {
+    const rolePermissionIds = await getRolePermissionIds(currentUser.roleId);
+    if (!rolePermissionIds.includes(rule.permissionId)) {
       throw new AppError(ErrorCode.PERMISSION);
     }
 
-    // 9. 建立 Request Context
-    requestContextStorage.run(currentUser, () => {
-      next();
-    });
+    if (currentUser.userType === "VENDOR") {
+      if (!currentUser.vendorId) {
+        throw new AppError(ErrorCode.PERMISSION);
+      }
+
+      const vendorPermissionIds = await getVendorPermissionIds(currentUser.vendorId);
+
+      if (!vendorPermissionIds.includes(rule.permissionId)) {
+        throw new AppError(ErrorCode.PERMISSION);
+      }
+    }
+
+    requestContextStorage.run(currentUser, () => next());
   } catch (error) {
     next(error);
   }

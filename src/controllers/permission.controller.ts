@@ -2,7 +2,6 @@
 import { Request, Response, Router } from "express";
 import { validationMiddleware } from "../middlewares/validation.middleware";
 import { plainToInstance } from "class-transformer";
-import { PaginationRequestDto } from "../dtos/pagination.dto";
 import { PermissionService } from "../services/permission.service";
 import { CreatePermissionRequestDto, UpdatePermissionRequestDto } from "../dtos/permission.dto";
 import { BatchDeleteNumberIdsDto } from "../dtos/common.dto";
@@ -22,7 +21,6 @@ export class PermissionController implements IController {
    */
   private initializeRoutes(): void {
     this.router.get("/all", this.getAllPermissions);
-    this.router.get("/", validationMiddleware(PaginationRequestDto, "query"), this.getPermissions);
     this.router.get("/:id", this.getPermissionById);
     this.router.post("/", validationMiddleware(CreatePermissionRequestDto), this.createPermission);
     this.router.put(
@@ -44,17 +42,6 @@ export class PermissionController implements IController {
     const dto = plainToInstance(CreatePermissionRequestDto, req.body);
 
     const result = await this.permissionService.createPermission(dto);
-
-    R.success(res, result);
-  };
-
-  /**
-   * 取得權限列表
-   */
-  private getPermissions = async (req: Request, res: Response): Promise<void> => {
-    const dto = plainToInstance(PaginationRequestDto, req.query);
-
-    const result = await this.permissionService.getPermissions(dto);
 
     R.success(res, result);
   };

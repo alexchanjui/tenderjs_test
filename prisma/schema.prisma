@@ -13,34 +13,83 @@ datasource db {
 // 核心系統
 // ==========================================
 
+/// 業者
+/// 用途：管理業者
+model Vendor {
+  /// 業者 ID
+  id String @id @default(dbgenerated("newid()")) @db.UniqueIdentifier
+
+  /// 業者名稱
+  name String
+
+  /// 業者代碼
+  code String @unique
+
+  /// 啟用狀態
+  isActive Boolean @default(true) @map("is_active")
+
+  /// 業者使用者
+  users User[]
+
+  /// 業者角色
+  roles Role[]
+
+  /// 業者可使用的權限
+  vendorPermissions VendorPermission[]
+
+  /// 建立時間
+  createdAt DateTime @default(now()) @map("create_time")
+
+  /// 更新時間
+  updatedAt DateTime @updatedAt @map("update_time")
+
+  @@map("vendor")
+}
+
 /// 系統使用者
-/// 用途：管理使用者帳號與登入資訊
+/// 用途：管理營運方與業者使用者資訊
 model User {
   /// 使用者 ID
   id String @id @default(dbgenerated("newid()")) @db.UniqueIdentifier
 
   /// 使用者帳號
+  /// 全平台唯一
   username String @unique
 
   /// 使用者暱稱
   nickname String
 
   /// 使用者 Email
+  /// 全平台唯一
   email String @unique
 
   /// 使用者密碼（Bcrypt Hash）
   password String
 
-  /// 啟用狀態
-  isActive Boolean @default(true) @map("is_active")
+  /// 使用者類型
+  /// PLATFORM：營運方
+  /// VENDOR：業者
+  userType String @map("user_type")
+
+  /// 所屬業者 ID
+  /// PLATFORM：null
+  /// VENDOR：所屬業者 ID
+  vendorId String? @map("vendor_id") @db.UniqueIdentifier
+
+  /// 所屬業者
+  vendor Vendor? @relation(fields: [vendorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   /// 所屬角色 ID
+  /// 一個使用者對應一個角色
   roleId String? @map("role_id") @db.UniqueIdentifier
 
   /// 所屬角色
-  role Role? @relation(fields: [roleId], references: [id])
+  role Role? @relation(fields: [roleId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
-  /// 使用者的 API 稽核日誌
+  /// 啟用狀態
+  isActive Boolean @default(true) @map("is_active")
+
+  /// 使用者 API 稽核日誌
   auditLogs AuditLog[]
 
   /// 建立時間
@@ -49,23 +98,51 @@ model User {
   /// 更新時間
   updatedAt DateTime @updatedAt @map("update_time")
 
+  @@index([vendorId])
+  @@index([roleId])
   @@map("user")
 }
 
 /// 系統角色
-/// 用途：管理系統角色
+/// 用途：管理營運方與業者角色
 model Role {
   /// 角色 ID
   id String @id @default(dbgenerated("newid()")) @db.UniqueIdentifier
 
   /// 角色名稱
-  name String @unique
+  name String
 
   /// 角色說明
   description String?
 
+  /// 角色範圍
+  /// PLATFORM：營運方角色
+  /// VENDOR：業者角色
+  scope String
+
+  /// 所屬業者 ID
+  /// PLATFORM：null
+  /// VENDOR：所屬業者 ID
+  vendorId String? @map("vendor_id") @db.UniqueIdentifier
+
+  /// 所屬業者
+  vendor Vendor? @relation(fields: [vendorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  /// 是否為系統角色
+  /// 例如：VENDOR_ADMIN
+  isSystem Boolean @default(false) @map("is_system")
+
   /// 啟用狀態
   isActive Boolean @default(true) @map("is_active")
+
+  /// 使用此角色的使用者
+  users User[]
+
+  /// 頁面權限
+  rolePages RolePage[]
+
+  /// API 權限
+  rolePermissions RolePermission[]
 
   /// 建立時間
   createdAt DateTime @default(now()) @map("create_time")
@@ -73,13 +150,45 @@ model Role {
   /// 更新時間
   updatedAt DateTime @updatedAt @map("update_time")
 
-  /// 使用此角色的使用者
-  users User[]
-
-  /// 角色擁有的權限
-  rolePermissions RolePermission[]
-
+  @@index([vendorId, name])
+  @@index([scope])
   @@map("role")
+}
+
+/// 頁面
+/// 用途：管理系統頁面
+model Page {
+  /// 頁面 ID
+  id Int @id @default(autoincrement())
+
+  /// 頁面代碼
+  pageCode Int @unique @map("page_code")
+
+  /// 頁面名稱
+  name String
+
+  /// 頁面描述
+  description String?
+
+  /// 頁面路徑
+  routePath String? @map("route_path")
+
+  /// 啟用狀態
+  isActive Boolean @default(true) @map("is_active")
+
+  /// 角色頁面權限
+  rolePages RolePage[]
+
+  /// 頁面 API 權限
+  permissions Permission[]
+
+  /// 建立時間
+  createdAt DateTime @default(now()) @map("create_time")
+
+  /// 更新時間
+  updatedAt DateTime @updatedAt @map("update_time")
+
+  @@map("page")
 }
 
 /// 系統權限
@@ -88,19 +197,25 @@ model Permission {
   /// 權限 ID
   id Int @id @default(autoincrement())
 
-  /// 管理排序
-  sortOrder Int @default(0)
+  /// 所屬頁面 ID
+  /// null 代表不屬於特定頁面的系統 API
+  pageId Int? @map("page_id")
 
-  /// 功能代碼
-  featureCode Int @map("feature_code")
+  /// 所屬頁面
+  page Page? @relation(fields: [pageId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   /// 權限名稱
   name String @unique
 
-  /// API 路徑 (例如: "/api/users")
+  /// API 路徑
+  /// 例如：/api/users
   apiPath String @map("api_path")
 
-  /// API 操作類型 （0: GET, 1: POST, 2: PUT, 3: DELETE）
+  /// API 操作類型
+  /// 0：GET
+  /// 1：POST
+  /// 2：PUT
+  /// 3：DELETE
   actionType Int @map("action_type")
 
   /// 啟用狀態
@@ -112,27 +227,50 @@ model Permission {
   /// 權限說明
   description String?
 
+  /// 角色權限
+  rolePermissions RolePermission[]
+
+  /// 業者權限
+  vendorPermissions VendorPermission[]
+
   /// 建立時間
   createdAt DateTime @default(now()) @map("create_time")
 
   /// 更新時間
   updatedAt DateTime @updatedAt @map("update_time")
 
-  /// 使用此權限的角色
-  rolePermissions RolePermission[]
-
-  /// 同一個 API 路徑與操作類型不可重複
+  /// 同一 API + HTTP Method 不可重複
   @@unique([apiPath, actionType])
-  /// 建立功能代碼索引查詢
-  @@index([featureCode])
+  @@index([pageId])
   @@map("permission")
 }
 
 // ==========================================
-// 關聯資料
+// 權限關聯
 // ==========================================
 
-/// 角色與權限關聯
+/// 業者權限
+/// 用途：定義業者最多可以使用哪些權限
+model VendorPermission {
+  /// 業者 ID
+  vendorId String @map("vendor_id") @db.UniqueIdentifier
+
+  /// 權限 ID
+  permissionId Int @map("permission_id")
+
+  /// 業者
+  vendor Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  /// 權限
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([vendorId, permissionId])
+  @@index([permissionId])
+  @@map("vendor_permission")
+}
+
+/// 角色 API 權限
+/// 用途：定義角色可以使用哪些 API
 model RolePermission {
   /// 角色 ID
   roleId String @map("role_id") @db.UniqueIdentifier
@@ -146,22 +284,41 @@ model RolePermission {
   /// 權限
   permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
 
-  /// roleId + permissionId 作為複合主鍵
   @@id([roleId, permissionId])
+  @@index([permissionId])
   @@map("role_permission")
+}
+
+/// 角色頁面權限
+/// 用途：管理角色可以存取哪些頁面
+model RolePage {
+  /// 角色 ID
+  roleId String @map("role_id") @db.UniqueIdentifier
+
+  /// 頁面 ID
+  pageId Int @map("page_id")
+
+  /// 角色
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  /// 頁面
+  page Page @relation(fields: [pageId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, pageId])
+  @@map("role_page")
 }
 
 // ==========================================
 // 系統日誌
-// 用途: API 稽核日誌
 // ==========================================
 
+/// API 稽核日誌
 model AuditLog {
   /// 稽核日誌 ID
   id BigInt @id @default(autoincrement())
 
   /// 操作使用者 ID
-  /// 未登入的 API 可為 null
+  /// 未登入 API 可為 null
   userId String? @map("user_id") @db.UniqueIdentifier
 
   /// API 操作
@@ -202,56 +359,4 @@ model AuditLog {
   @@index([createdAt])
   @@index([statusCode])
   @@map("audit_log")
-}
-
-// ==========================================
-// 基礎資料
-// ==========================================
-
-/// 招呼站主檔
-/// 用途：管理招呼站基本資料
-model Stop {
-  /// 招呼站 ID
-  id Int @id @default(autoincrement()) @map("stop_id")
-
-  /// 票機招呼站代碼
-  bvStopCode String @map("bv_stop_code") @db.NVarChar(10)
-
-  /// 業者招呼站代碼
-  opStopCode String @map("op_stop_code") @db.NVarChar(10)
-
-  /// 招呼站全名
-  fullName String @map("stop_full_name") @db.NVarChar(50)
-
-  /// 招呼站名稱
-  name String @map("stop_name") @db.NVarChar(50)
-
-  /// 緯度 1
-  gpsX String @map("gps1_x") @db.NVarChar(10)
-
-  /// 經度 1
-  gpsY String @map("gps1_y") @db.NVarChar(10)
-
-  /// 緯度 2
-  gps2X String @map("gps2_x") @db.NVarChar(10)
-
-  /// 經度 2
-  gps2Y String @map("gps2_y") @db.NVarChar(10)
-
-  /// GPS 備註
-  gpsMemo String @map("gps_memo") @db.NVarChar(255)
-
-  /// 免費公車區碼
-  freeBusAreaCode String @map("free_bus_area_code") @db.NVarChar(20)
-
-  /// 啟用狀態
-  isActive Boolean @default(true) @map("is_active")
-
-  /// 更新時間
-  updatedAt DateTime @updatedAt @map("update_time")
-
-  /// 更新者 ID
-  updateUserId String @map("update_user_id") @db.UniqueIdentifier
-
-  @@map("sys_stop")
 }

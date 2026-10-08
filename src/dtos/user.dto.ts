@@ -1,83 +1,78 @@
 // src/dtos/user.dto.ts
 import { Expose, Type } from "class-transformer";
-import { IsEmail, IsString, Length, IsOptional, IsUUID, IsBoolean } from "class-validator";
-import { PermissionSetting } from "./role.dto";
+import { IsBoolean, IsEmail, IsIn, IsOptional, IsString, IsUUID, Length } from "class-validator";
 
-/**
- * 建立使用者 Request DTO
- */
 export class CreateUserDto {
-  @IsString({ message: "使用者名稱必須為字串" })
-  @Length(2, 20, {
-    message: "使用者名稱長度需介於 2~20 字元",
-  })
+  @IsString()
+  @Length(2, 20)
   username!: string;
 
-  @IsString({ message: "暱稱必須為字串" })
-  @Length(2, 20, {
-    message: "暱稱長度需介於 2~20 字元",
-  })
+  @IsString()
+  @Length(2, 20)
   nickname!: string;
 
-  @IsEmail({}, { message: "Email 格式錯誤" })
+  @IsEmail()
   email!: string;
 
-  @IsString({ message: "密碼必須為字串" })
-  @Length(8, 16, {
-    message: "密碼長度需介於 8~16 字元",
-  })
+  @IsString()
+  @Length(8, 16)
   password!: string;
 
+  @IsIn(["PLATFORM", "VENDOR"])
+  userType!: string;
+
   @IsOptional()
-  @IsUUID("4", { message: "角色 ID 格式錯誤" })
+  @IsUUID("4")
+  vendorId?: string;
+
+  @IsOptional()
+  @IsUUID("4")
   roleId?: string;
 }
 
-/**
- * 更新使用者 Request DTO
- */
 export class UpdateUserRequestDto {
   @IsOptional()
-  @IsString({ message: "使用者名稱必須為字串" })
-  @Length(2, 20, {
-    message: "使用者名稱長度需介於 2~20 字元",
-  })
-  username!: string;
+  @IsString()
+  @Length(2, 20)
+  username?: string;
 
   @IsOptional()
-  @IsString({ message: "暱稱必須為字串" })
-  @Length(2, 20, {
-    message: "暱稱長度需介於 2~20 字元",
-  })
-  nickname!: string;
+  @IsString()
+  @Length(2, 20)
+  nickname?: string;
 
   @IsOptional()
-  @IsEmail({}, { message: "Email 格式錯誤" })
-  email!: string;
+  @IsEmail()
+  email?: string;
 
   @IsOptional()
-  @IsUUID("4", { message: "角色 ID 格式錯誤" })
+  @IsUUID("4")
   roleId?: string;
 
   @IsOptional()
-  @IsBoolean({ message: "啟用狀態必須為布林值" })
+  @IsBoolean()
   isActive?: boolean;
 }
 
-/**
- * 使用者角色 DTO
- */
 class UserRoleDto {
+  @Expose()
+  id!: string;
+
   @Expose()
   name!: string;
 
   @Expose()
-  description!: string;
+  scope!: string;
 }
 
-/**
- * 使用者 Response DTO
- */
+export class UserPageDto {
+  @Expose()
+  pageId!: number;
+
+  @Expose()
+  pageCode!: number;
+}
+
 export class UserResponseDto {
   @Expose()
   id!: string;
@@ -92,6 +87,12 @@ export class UserResponseDto {
   email!: string;
 
   @Expose()
+  userType!: string;
+
+  @Expose()
+  vendorId!: string | null;
+
+  @Expose()
   isActive!: boolean;
 
   @Expose()
@@ -102,8 +103,11 @@ export class UserResponseDto {
   role!: UserRoleDto | null;
 
   @Expose()
-  @Type(() => PermissionSetting)
-  permissionSettings!: PermissionSetting[];
+  @Type(() => UserPageDto)
+  pages!: UserPageDto[];
+
+  @Expose()
+  permissionIds!: number[];
 
   @Expose()
   createdAt!: Date;

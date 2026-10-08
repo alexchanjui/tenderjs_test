@@ -1,13 +1,15 @@
 // src/dtos/permission.dto.ts
 import { Expose, Type } from "class-transformer";
-import { IsString, IsOptional, IsInt, Length, IsBoolean, Min } from "class-validator";
+import { IsBoolean, IsInt, IsOptional, IsString, Length } from "class-validator";
 
 /**
  * 建立權限 Request DTO
  */
 export class CreatePermissionRequestDto {
-  @IsInt({ message: "功能代碼必須為整數" })
-  featureCode!: number;
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt({ message: "頁面 ID 必須為整數" })
+  pageId?: number | null;
 
   @IsString({ message: "權限名稱必須為字串" })
   @Length(2, 50, { message: "權限名稱長度需介於 2~50 字元" })
@@ -36,14 +38,8 @@ export class CreatePermissionRequestDto {
 export class UpdatePermissionRequestDto {
   @IsOptional()
   @Type(() => Number)
-  @IsInt({ message: "排序必須為整數" })
-  @Min(1, { message: "排序最小為 1" })
-  sortOrder?: number;
-
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt({ message: "功能代碼必須為整數" })
-  featureCode?: number;
+  @IsInt({ message: "頁面 ID 必須為整數" })
+  pageId?: number | null;
 
   @IsOptional()
   @IsString({ message: "權限名稱必須為字串" })
@@ -81,10 +77,7 @@ export class PermissionResponseDto {
   id!: number;
 
   @Expose()
-  sortOrder!: number;
-
-  @Expose()
-  featureCode!: number;
+  pageId!: number | null;
 
   @Expose()
   name!: string;
@@ -97,6 +90,9 @@ export class PermissionResponseDto {
 
   @Expose()
   isActive!: boolean;
+
+  @Expose()
+  isRequired!: boolean;
 
   @Expose()
   description!: string | null;

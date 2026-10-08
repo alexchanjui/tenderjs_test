@@ -16,15 +16,10 @@ export class AuthService {
 
   constructor(private readonly ctx: IServiceContext) {
     const secret = process.env.JWT_SECRET;
-    if (!secret) {
-      throw new Error("❌ 未設定 JWT_SECRET 環境變數，服務無法啟動！");
-    }
+    if (!secret) throw new Error("❌ 未設定 JWT_SECRET 環境變數，服務無法啟動！");
     this.jwtSecret = new TextEncoder().encode(secret);
   }
 
-  /**
-   * 產生登入驗證碼
-   */
   public async generateCaptcha() {
     const captcha = svgCaptcha.create({
       size: 4,
@@ -35,119 +30,70 @@ export class AuthService {
     });
 
     const captchaId = randomUUID();
-    const redisKey = `${this.CAPTCHA_PREFIX}${captchaId}`;
-
-    // 驗證碼統一轉小寫儲存，並設定 5 分鐘後自動失效
-    await this.ctx.redis.set(redisKey, captcha.text.toLowerCase(), "EX", 300);
+    await this.ctx.redis.set(
+      `${this.CAPTCHA_PREFIX}${captchaId}`,
+      captcha.text.toLowerCase(),
+      "EX",
+      300,
+    );
 
     return {
       captchaId,
       svg: captcha.data,
-      ...(process.env.NODE_ENV === "development" && {
-        text: captcha.text,
-      }),
+      ...(process.env.NODE_ENV === "development" && { text: captcha.text }),
     };
   }
 
-  /**
-   * 使用者登入
-   */
   public async login(data: LoginRequestDto): Promise<LoginResponseDto> {
     const { username, password, captchaId, captcha } = data;
-
-    // 驗證登入驗證碼
     const redisKey = `${this.CAPTCHA_PREFIX}${captchaId}`;
     const storedCaptcha = await this.ctx.redis.get(redisKey);
 
-    // Redis 找不到，代表驗證碼已過期或不存在
-    if (!storedCaptcha) {
-      throw new AppError(ErrorCode.CAPTCHA_EXPIRED);
-    }
-
-    // 驗證碼錯誤
-    if (storedCaptcha !== captcha.toLowerCase()) {
-      throw new AppError(ErrorCode.CAPTCHA_ERROR);
-    }
-
-    // 驗證成功後立即刪除，避免同一組驗證碼重複使用
+    if (!storedCaptcha) throw new AppError(ErrorCode.CAPTCHA_EXPIRED);
+    if (storedCaptcha !== captcha.toLowerCase()) throw new AppError(ErrorCode.CAPTCHA_ERROR);
     await this.ctx.redis.del(redisKey);
 
-    const user = await this.ctx.repos.user.findByUsername(username);
-
-    if (!user) {
-      throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);
-    }
-
-    if (!user.isActive) {
-      throw new AppError(ErrorCode.ACCOUNT_DISABLED);
-    }
-
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-
-    if (!isPasswordValid) {
-      throw new AppError(ErrorCode.PASSWORD_ERROR);
-    }
-
+    const user = await this.validateUser(username, password);
     return this.generateTokenResponse(user);
   }
 
-  /**
-   * 自動登入（開發環境專用）
-   */
   public async autoLogin(data: AutoLoginRequestDto): Promise<LoginResponseDto> {
     if (process.env.NODE_ENV === "production") {
       throw new Error("此功能僅限開發環境使用");
     }
 
-    const { username, password } = data;
-
-    const user = await this.ctx.repos.user.findByUsername(username);
-
-    if (!user) {
-      throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);
-    }
-
-    if (!user.isActive) {
-      throw new AppError(ErrorCode.ACCOUNT_DISABLED);
-    }
-
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-
-    if (!isPasswordValid) {
-      throw new AppError(ErrorCode.PASSWORD_ERROR);
-    }
-
+    const user = await this.validateUser(data.username, data.password);
     return this.generateTokenResponse(user);
   }
 
-  /**
-   * 產生 JWT Token 與使用者資料
-   */
+  private async validateUser(username: string, password: string): Promise<User> {
+    const user = await this.ctx.repos.user.findByUsername(username);
+
+    if (!user) throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);
+    if (!user.isActive) throw new AppError(ErrorCode.ACCOUNT_DISABLED);
+    if (!(await bcrypt.compare(password, user.password))) {
+      throw new AppError(ErrorCode.PASSWORD_ERROR);
+    }
+
+    return user;
+  }
+
   private async generateTokenResponse(user: User): Promise<LoginResponseDto> {
-    // 放進 JWT 的使用者資料
     const userPayload = {
       id: user.id,
       username: user.username,
       email: user.email,
       roleId: user.roleId,
+      userType: user.userType,
+      vendorId: user.vendorId,
     };
 
-    // 產生 JWT Token
     const token = await new SignJWT(userPayload)
       .setProtectedHeader({ alg: "HS256" })
       .setIssuedAt()
       .setExpirationTime(process.env.JWT_EXPIRES_IN || "1d")
       .sign(this.jwtSecret);
 
-    return plainToInstance(
-      LoginResponseDto,
-      {
-        token,
-        user,
-      },
-      {
-        excludeExtraneousValues: true,
-      },
-    );
+    return plainToInstance(LoginResponseDto, { token, user }, { excludeExtraneousValues: true });
   }
 }

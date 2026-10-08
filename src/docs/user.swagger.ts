@@ -2,6 +2,13 @@
 
 /**
  * @openapi
+ * tags:
+ *   - name: Users
+ *     description: 使用者帳號管理。
+ */
+
+/**
+ * @openapi
  * /users:
  *   get:
  *     tags: [Users]
@@ -15,7 +22,6 @@
  *           type: integer
  *           minimum: 1
  *           default: 1
- *         example: 1
  *       - in: query
  *         name: limit
  *         schema:
@@ -23,7 +29,6 @@
  *           minimum: 1
  *           maximum: 100
  *           default: 20
- *         example: 20
  *     responses:
  *       200:
  *         description: 成功
@@ -39,18 +44,14 @@
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - username
- *               - nickname
- *               - email
- *               - password
+ *             required: [username, nickname, email, password, userType]
  *             properties:
- *               nickname:
- *                 type: string
- *                 example: "測試人員"
  *               username:
  *                 type: string
  *                 example: test
+ *               nickname:
+ *                 type: string
+ *                 example: 測試人員
  *               email:
  *                 type: string
  *                 format: email
@@ -60,6 +61,34 @@
  *                 minLength: 8
  *                 maxLength: 16
  *                 example: "12345678"
+ *               userType:
+ *                 type: string
+ *                 enum: [PLATFORM, VENDOR]
+ *                 example: VENDOR
+ *               vendorId:
+ *                 type: string
+ *                 format: uuid
+ *                 nullable: true
+ *                 description: userType=VENDOR 時必填；PLATFORM 時不可指定
+ *               roleId:
+ *                 type: string
+ *                 format: uuid
+ *                 nullable: true
+ *                 description: PLATFORM 只能使用 PLATFORM Role；VENDOR 只能使用同業者 VENDOR Role
+ *     responses:
+ *       200:
+ *         description: 成功
+ */
+
+/**
+ * @openapi
+ * /users/me:
+ *   get:
+ *     tags: [Users]
+ *     summary: 取得當前使用者詳細資訊
+ *     description: 回傳 userType、vendorId、角色可存取頁面與 permissionIds。
+ *     security:
+ *       - BearerAuth: []
  *     responses:
  *       200:
  *         description: 成功
@@ -83,24 +112,7 @@
  *     responses:
  *       200:
  *         description: 成功
- */
-
-/**
- * @openapi
- * /users/me:
- *   get:
- *     tags: [Users]
- *     summary: 取得當前使用者詳細資訊
- *     security:
- *       - BearerAuth: []
- *     responses:
- *       200:
- *         description: 成功
- */
-
-/**
- * @openapi
- * /users/{id}:
+ *
  *   put:
  *     tags: [Users]
  *     summary: 更新使用者
@@ -122,21 +134,16 @@
  *             properties:
  *               username:
  *                 type: string
- *                 example: test
  *               nickname:
  *                 type: string
- *                 example: "測試人員"
  *               email:
  *                 type: string
  *                 format: email
- *                 example: test@example.com
  *               roleId:
  *                 type: string
  *                 format: uuid
- *                 example: 5a07d8e0-ae57-4887-b6a1-b9dfd6bf5a6c
  *               isActive:
  *                 type: boolean
- *                 example: true
  *     responses:
  *       200:
  *         description: 成功
@@ -156,11 +163,11 @@
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - ids
+ *             required: [ids]
  *             properties:
  *               ids:
  *                 type: array
+ *                 minItems: 1
  *                 items:
  *                   type: string
  *                   format: uuid
@@ -168,4 +175,3 @@
  *       200:
  *         description: 成功
  */
-export {};

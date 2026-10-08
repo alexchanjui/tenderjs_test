@@ -15,4 +15,30 @@ export class OptionsService {
       value: role.id,
     }));
   }
+
+  /**
+   * 取得頁面選項
+   */
+  public async getPageOptions() {
+    const pages = await this.ctx.repos.page.findAll();
+
+    return pages.map((page) => ({
+      label: page.name,
+      value: page.id,
+      pageCode: page.pageCode,
+    }));
+  }
+
+  /**
+   * 取得業者選項
+   */
+  public async getVendorOptions() {
+    const vendors = await this.ctx.repos.vendor.findAll();
+
+    return vendors.map((vendor) => ({
+      label: vendor.name,
+      value: vendor.id,
+      code: vendor.code,
+    }));
+  }
 }

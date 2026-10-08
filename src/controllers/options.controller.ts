@@ -1,5 +1,4 @@
 // src/controllers/options.controller.ts
-
 import { Router } from "express";
 import type { Request, Response } from "express";
 import type { OptionsService } from "../services/options.service";
@@ -19,6 +18,8 @@ export class OptionsController implements IController {
    */
   private initializeRoutes(): void {
     this.router.get("/roles", this.getRoleOptions);
+    this.router.get("/pages", this.getPageOptions);
+    this.router.get("/vendors", this.getVendorOptions);
   }
 
   /**
@@ -26,6 +27,24 @@ export class OptionsController implements IController {
    */
   private getRoleOptions = async (_req: Request, res: Response): Promise<void> => {
     const result = await this.optionsService.getRoleOptions();
+
+    R.success(res, result);
+  };
+
+  /**
+   * 取得頁面選項
+   */
+  private getPageOptions = async (_req: Request, res: Response): Promise<void> => {
+    const result = await this.optionsService.getPageOptions();
+
+    R.success(res, result);
+  };
+
+  /**
+   * 取得業者選項
+   */
+  private getVendorOptions = async (_req: Request, res: Response): Promise<void> => {
+    const result = await this.optionsService.getVendorOptions();
 
     R.success(res, result);
   };

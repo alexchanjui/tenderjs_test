@@ -2,32 +2,14 @@
 
 /**
  * @openapi
+ * tags:
+ *   - name: Permissions
+ *     description: API 權限管理，提供業者與角色權限設定使用。
+ */
+
+/**
+ * @openapi
  * /permissions:
- *   get:
- *     tags: [Permissions]
- *     summary: 取得權限列表
- *     security:
- *       - BearerAuth: []
- *     parameters:
- *       - in: query
- *         name: page
- *         schema:
- *           type: integer
- *           minimum: 1
- *           default: 1
- *         example: 1
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *           minimum: 1
- *           maximum: 100
- *           default: 20
- *         example: 20
- *     responses:
- *       200:
- *         description: 成功
- *
  *   post:
  *     tags: [Permissions]
  *     summary: 建立權限
@@ -40,14 +22,15 @@
  *           schema:
  *             type: object
  *             required:
- *               - featureCode
  *               - name
  *               - apiPath
  *               - actionType
  *             properties:
- *               featureCode:
+ *               pageId:
  *                 type: integer
- *                 example: 1001
+ *                 nullable: true
+ *                 description: 頁面描述
+ *                 example: 100
  *               name:
  *                 type: string
  *                 minLength: 2
@@ -60,6 +43,10 @@
  *                 type: integer
  *                 description: 0=GET, 1=POST, 2=PUT, 3=DELETE
  *                 example: 0
+ *               isRequired:
+ *                 type: boolean
+ *                 description: 是否需要登入及權限驗證
+ *                 example: true
  *               description:
  *                 type: string
  *                 maxLength: 200
@@ -118,9 +105,11 @@
  *           schema:
  *             type: object
  *             properties:
- *               featureCode:
+ *               pageId:
  *                 type: integer
- *                 example: 1001
+ *                 nullable: true
+ *                 description: 頁面描述
+ *                 example: 100
  *               name:
  *                 type: string
  *                 minLength: 2
@@ -135,6 +124,10 @@
  *                 example: 0
  *               isActive:
  *                 type: boolean
+ *                 example: true
+ *               isRequired:
+ *                 type: boolean
+ *                 description: 是否需要登入及權限驗證
  *                 example: true
  *               description:
  *                 type: string
@@ -159,16 +152,16 @@
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - ids
  *             properties:
  *               ids:
  *                 type: array
+ *                 minItems: 1
  *                 items:
  *                   type: integer
- *                 minItems: 1
  *                 example: [1, 2, 3]
  *     responses:
  *       200:
  *         description: 成功
  */
-
-export {};
