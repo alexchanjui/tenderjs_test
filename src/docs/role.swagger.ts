@@ -15,7 +15,6 @@
  *           type: integer
  *           minimum: 1
  *           default: 1
- *         example: 1
  *       - in: query
  *         name: limit
  *         schema:
@@ -23,7 +22,6 @@
  *           minimum: 1
  *           maximum: 100
  *           default: 20
- *         example: 20
  *     responses:
  *       200:
  *         description: 成功
@@ -39,18 +37,26 @@
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - name
+ *             required: [name, scope]
  *             properties:
  *               name:
  *                 type: string
  *                 minLength: 2
  *                 maxLength: 50
- *                 example: Admin
+ *                 example: Vendor Admin
  *               description:
  *                 type: string
  *                 maxLength: 200
- *                 example: 系統管理員
+ *                 example: 業者管理員
+ *               scope:
+ *                 type: string
+ *                 enum: [PLATFORM, VENDOR]
+ *                 example: VENDOR
+ *               vendorId:
+ *                 type: string
+ *                 format: uuid
+ *                 nullable: true
+ *                 description: scope=VENDOR 時必填；PLATFORM 時不可指定
  *     responses:
  *       200:
  *         description: 成功
@@ -98,14 +104,11 @@
  *                 type: string
  *                 minLength: 2
  *                 maxLength: 50
- *                 example: Manager
  *               description:
  *                 type: string
  *                 maxLength: 200
- *                 example: 管理者
  *               isActive:
  *                 type: boolean
- *                 example: true
  *     responses:
  *       200:
  *         description: 成功
@@ -125,8 +128,7 @@
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - ids
+ *             required: [ids]
  *             properties:
  *               ids:
  *                 type: array
@@ -141,10 +143,11 @@
 
 /**
  * @openapi
- * /roles/{id}/permissions:
+ * /roles/{id}/pages:
  *   put:
  *     tags: [Roles]
- *     summary: 更新角色權限
+ *     summary: 更新角色可存取頁面
+ *     description: RolePage 僅表示角色是否可以進入頁面，不再使用 VIEW / EDIT / NONE。
  *     security:
  *       - BearerAuth: []
  *     parameters:
@@ -160,26 +163,47 @@
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - settings
+ *             required: [pageIds]
  *             properties:
- *               settings:
+ *               pageIds:
  *                 type: array
- *                 minItems: 1
  *                 items:
- *                   type: object
- *                   required:
- *                     - pageCode
- *                     - accessLevel
- *                   properties:
- *                     pageCode:
- *                       type: integer
- *                       example: 100
- *                     accessLevel:
- *                       type: string
- *                       description: NONE=無權限、VIEW=檢視、EDIT=編輯
- *                       enum: [NONE, VIEW, EDIT]
- *                       example: EDIT
+ *                   type: integer
+ *                 example: [1, 2, 3]
+ *     responses:
+ *       200:
+ *         description: 成功
+ */
+
+/**
+ * @openapi
+ * /roles/{id}/permissions:
+ *   put:
+ *     tags: [Roles]
+ *     summary: 更新角色 API 權限
+ *     description: VENDOR 角色只能設定該 VendorPermission 已授權的 Permission。
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [permissionIds]
+ *             properties:
+ *               permissionIds:
+ *                 type: array
+ *                 items:
+ *                   type: integer
+ *                 example: [1, 2, 3]
  *     responses:
  *       200:
  *         description: 成功

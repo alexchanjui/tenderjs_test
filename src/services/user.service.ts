@@ -2,7 +2,6 @@
 import bcrypt from "bcrypt";
 import { plainToInstance } from "class-transformer";
 import type { PaginationRequestDto, PaginationResponseDto } from "../dtos/pagination.dto";
-import { PermissionAccessLevel, PermissionSettingResponse } from "../dtos/role.dto";
 import { UserResponseDto, type CreateUserDto, type UpdateUserRequestDto } from "../dtos/user.dto";
 import { AppError } from "../errors/app.error";
 import { ErrorCode } from "../errors/error.codes";
@@ -13,167 +12,130 @@ export class UserService {
 
   private getCurrentUser() {
     const currentUser = this.ctx.currentUser;
-
-    if (!currentUser) {
-      throw new AppError(ErrorCode.UNAUTH, "使用者未登入");
-    }
-
+    if (!currentUser) throw new AppError(ErrorCode.UNAUTH, "使用者未登入");
     return currentUser;
   }
 
-  /**
-   * 建立使用者
-   */
   public async createUser(data: CreateUserDto): Promise<UserResponseDto> {
-    const { username, nickname, email, password } = data;
-
-    // 1. 檢查 Email 是否已存在
-    const user = await this.ctx.repos.user.findByEmail(email);
-
-    if (user) {
+    if (await this.ctx.repos.user.findByEmail(data.email)) {
       throw new AppError(ErrorCode.ACCOUNT_EXIST);
     }
 
-    // 2. 密碼加密
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // 3. 建立使用者
-    const newUser = await this.ctx.repos.user.create({
-      username,
-      nickname,
-      email,
-      password: hashedPassword,
-    });
-
-    // 4. DTO 轉換
-    return plainToInstance(UserResponseDto, newUser, {
-      excludeExtraneousValues: true,
-    });
-  }
-
-  /**
-   * 取得使用者詳細資訊
-   */
-  public async getUserById(id: string): Promise<UserResponseDto> {
-    const user = await this.ctx.repos.user.findById(id);
-
-    if (!user) {
-      throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);
+    if (data.userType === "PLATFORM" && data.vendorId) {
+      throw new AppError(ErrorCode.REQUEST_DATA, "平台帳號不可指定業者");
     }
 
-    return plainToInstance(UserResponseDto, user, {
+    if (data.userType === "VENDOR" && !data.vendorId) {
+      throw new AppError(ErrorCode.REQUEST_DATA, "業者帳號必須指定業者");
+    }
+
+    if (data.roleId) await this.validateRole(data.userType, data.vendorId ?? null, data.roleId);
+
+    const user = await this.ctx.repos.user.create({
+      ...data,
+      password: await bcrypt.hash(data.password, 10),
+    });
+
+    return plainToInstance(UserResponseDto, user, { excludeExtraneousValues: true });
+  }
+
+  public async getUserById(id: string): Promise<UserResponseDto> {
+    const user = await this.ctx.repos.user.findById(id);
+    if (!user) throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);
+
+    return plainToInstance(UserResponseDto, this.toResponse(user), {
       excludeExtraneousValues: true,
     });
   }
 
-  /**
-   * 取得使用者列表（分頁）
-   */
   public async getUsers(
     dto: PaginationRequestDto,
   ): Promise<PaginationResponseDto<UserResponseDto>> {
+    const currentUser = this.getCurrentUser();
     const { page, limit } = dto;
 
-    const skip = (page - 1) * limit;
-
     const [users, total] = await this.ctx.repos.user.findAndCount({
-      skip,
+      skip: (page - 1) * limit,
       take: limit,
+      ...(currentUser.userType === "VENDOR"
+        ? { vendorId: currentUser.vendorId, userType: "VENDOR" }
+        : {}),
     });
 
     return {
-      data: plainToInstance(UserResponseDto, users, {
-        excludeExtraneousValues: true,
-      }),
-      meta: {
-        total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit),
-      },
+      data: plainToInstance(
+        UserResponseDto,
+        users.map((user) => this.toResponse(user)),
+        { excludeExtraneousValues: true },
+      ),
+      meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
     };
   }
 
-  /**
-   * 更新使用者
-   */
   public async updateUser(id: string, data: UpdateUserRequestDto): Promise<void> {
     const user = await this.ctx.repos.user.findById(id);
+    if (!user) throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);
 
-    if (!user) {
-      throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);
+    const currentUser = this.getCurrentUser();
+    if (currentUser.userType === "VENDOR" && user.vendorId !== currentUser.vendorId) {
+      throw new AppError(ErrorCode.PERMISSION);
     }
 
-    // 如果有更新角色，先確認角色存在
-    if (data.roleId) {
-      const role = await this.ctx.repos.role.findById(data.roleId);
-
-      if (!role) {
-        throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
-      }
-    }
-
+    if (data.roleId) await this.validateRole(user.userType, user.vendorId, data.roleId);
     await this.ctx.repos.user.update(id, data);
   }
 
-  /**
-   * 批次刪除使用者
-   */
   public async batchDeleteUser(ids: string[]): Promise<void> {
     const currentUser = this.getCurrentUser();
-
     if (ids.includes(currentUser.id)) {
       throw new AppError(ErrorCode.REQUEST_DATA, "無法刪除自己");
     }
 
-    const count = await this.ctx.repos.user.batchDelete(ids);
+    if (currentUser.userType === "VENDOR") {
+      const count = await this.ctx.prisma.user.count({
+        where: { id: { in: ids }, vendorId: currentUser.vendorId, userType: "VENDOR" },
+      });
+      if (count !== ids.length) throw new AppError(ErrorCode.PERMISSION);
+    }
 
-    if (count !== ids.length) {
-      throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);
+    const count = await this.ctx.repos.user.batchDelete(ids);
+    if (count !== ids.length) throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);
+  }
+
+  public async getMyUserInfo(): Promise<UserResponseDto> {
+    const currentUser = this.getCurrentUser();
+    const user = await this.ctx.repos.user.findById(currentUser.id);
+    if (!user) throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);
+
+    return plainToInstance(UserResponseDto, this.toResponse(user), {
+      excludeExtraneousValues: true,
+    });
+  }
+
+  private async validateRole(userType: string, vendorId: string | null, roleId: string) {
+    const role = await this.ctx.repos.role.findById(roleId);
+    if (!role) throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
+
+    if (userType === "PLATFORM" && (role.scope !== "PLATFORM" || role.vendorId !== null)) {
+      throw new AppError(ErrorCode.REQUEST_DATA, "平台帳號只能使用平台角色");
+    }
+
+    if (userType === "VENDOR" && (role.scope !== "VENDOR" || role.vendorId !== vendorId)) {
+      throw new AppError(ErrorCode.REQUEST_DATA, "業者帳號只能使用同業者角色");
     }
   }
 
-  /**
-   * 取得當前使用者詳細資訊
-   *
-   * 根據所有啟用中的頁面，以及使用者所屬角色的頁面權限，
-   * 整理各頁面的權限等級：
-   * - NONE：沒有該頁面的權限
-   * - VIEW：具有檢視權限
-   * - EDIT：具有編輯權限
-   */
-  public async getMyUserInfo(): Promise<UserResponseDto> {
-    const id = this.ctx.currentUser?.id || "";
-
-    const user = await this.ctx.repos.user.findById(id);
-
-    if (!user) {
-      throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);
-    }
-
-    // 取得所有啟用中的頁面
-    const pages = await this.ctx.repos.page.findAll();
-
-    // 整理使用者所屬角色在各頁面下的權限等級
-    const permissionSettings: PermissionSettingResponse[] = pages.map((page) => {
-      const rolePage = user.role?.rolePages.find((rolePage) => rolePage.pageId === page.id);
-
-      return {
-        pageId: page.id,
-        pageCode: page.pageCode,
-        accessLevel: (rolePage?.accessLevel ?? PermissionAccessLevel.NONE) as PermissionAccessLevel,
-      };
-    });
-
-    return plainToInstance(
-      UserResponseDto,
-      {
-        ...user,
-        permissionSettings,
-      },
-      {
-        excludeExtraneousValues: true,
-      },
-    );
+  private toResponse(user: {
+    role: {
+      rolePages: { pageId: number }[];
+      rolePermissions: { permissionId: number }[];
+    } | null;
+    [key: string]: unknown;
+  }) {
+    return {
+      ...user,
+      pages: user.role?.rolePages.map((item) => ({ pageId: item.pageId })) ?? [],
+      permissionIds: user.role?.rolePermissions.map((item) => item.permissionId) ?? [],
+    };
   }
 }

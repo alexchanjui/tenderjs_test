@@ -4,74 +4,43 @@ import prismaInstance from "./utils/prisma";
 import redisInstance from "./utils/redis";
 import { requestContextStorage } from "./utils/request-context";
 
-// Repositories
 import { UserPrismaRepository } from "./repositories/prisma/user.prisma.repository";
 import { RolePrismaRepository } from "./repositories/prisma/role.prisma.repository";
 import { PermissionPrismaRepository } from "./repositories/prisma/permission.prisma.repository";
-import { StopPrismaRepository } from "./repositories/prisma/stop.prisma.repository";
 import { PagePrismaRepository } from "./repositories/prisma/page.prisma.repository";
 
-// Services
 import { HealthService } from "./services/health.service";
 import { UserService } from "./services/user.service";
 import { AuthService } from "./services/auth.service";
 import { RoleService } from "./services/role.service";
 import { PermissionService } from "./services/permission.service";
-import { StopService } from "./services/stop.service";
-import { ImportService } from "./services/import.service";
-import { ExportService } from "./services/export.service";
 import { OptionsService } from "./services/options.service";
 import { PageService } from "./services/page.service";
 
-// Controllers
 import type { IController } from "./controllers/interface/controller.interface";
 import { HealthController } from "./controllers/health.controller";
 import { UserController } from "./controllers/user.controller";
 import { AuthController } from "./controllers/auth.controller";
 import { RoleController } from "./controllers/role.controller";
 import { PermissionController } from "./controllers/permission.controller";
-import { StopController } from "./controllers/stop.controller";
-import { ImportController } from "./controllers/import.controller";
-import { ExportController } from "./controllers/export.controller";
 import { OptionsController } from "./controllers/options.controller";
 import { PageController } from "./controllers/page.controller";
 
-// Types
 import type { IServiceContext } from "./types/service.context";
 import type { IDbContext } from "./types/db.context";
 
-/**
- * 應用程式容器
- *
- * 負責建立共用依賴，並組裝 Service 與 Controller，
- * 最後提供 Controller 清單給 Routes 使用。
- * Tip: 這裡只在 App 啟動時執行一次。
- */
 export class AppContainer {
-  /**
-   * 取得所有 Controller
-   */
   public getControllers(): IController[] {
-    /**
-     * 建立 Repository Context (DB Context)
-     */
     const dbContext: IDbContext = {
       logger: loggerInstance,
       prisma: prismaInstance.client,
     };
 
-    /**
-     * 建立 Repositories
-     */
     const userRepo = new UserPrismaRepository(dbContext);
     const roleRepo = new RolePrismaRepository(dbContext);
     const permissionRepo = new PermissionPrismaRepository(dbContext);
-    const stopRepo = new StopPrismaRepository(dbContext);
     const pageRepo = new PagePrismaRepository(dbContext);
 
-    /**
-     * 建立 Service 共用依賴
-     */
     const ctx: IServiceContext = {
       logger: loggerInstance,
       prisma: prismaInstance.client,
@@ -80,7 +49,6 @@ export class AppContainer {
         user: userRepo,
         role: roleRepo,
         permission: permissionRepo,
-        stop: stopRepo,
         page: pageRepo,
       },
       get currentUser() {
@@ -88,34 +56,14 @@ export class AppContainer {
       },
     };
 
-    /**
-     * 組裝 Services
-     */
-    const healthService = new HealthService(ctx);
-    const userService = new UserService(ctx);
-    const authService = new AuthService(ctx);
-    const roleService = new RoleService(ctx);
-    const permissionService = new PermissionService(ctx);
-    const stopService = new StopService(ctx);
-    const importService = new ImportService(ctx);
-    const exportService = new ExportService(ctx);
-    const optionsService = new OptionsService(ctx);
-    const pageService = new PageService(ctx);
-
-    /**
-     * 組裝 Controllers
-     */
     return [
-      new HealthController(healthService),
-      new UserController(userService),
-      new AuthController(authService),
-      new RoleController(roleService),
-      new PermissionController(permissionService),
-      new StopController(stopService),
-      new ImportController(importService),
-      new ExportController(exportService),
-      new OptionsController(optionsService),
-      new PageController(pageService),
+      new HealthController(new HealthService(ctx)),
+      new UserController(new UserService(ctx)),
+      new AuthController(new AuthService(ctx)),
+      new RoleController(new RoleService(ctx)),
+      new PermissionController(new PermissionService(ctx)),
+      new OptionsController(new OptionsService(ctx)),
+      new PageController(new PageService(ctx)),
     ];
   }
 }

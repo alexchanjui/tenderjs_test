@@ -1,11 +1,12 @@
 // src/services/role.service.ts
 import { plainToInstance } from "class-transformer";
 import { invalidateRolePages } from "../caches/rolePage.cache";
+import { invalidateRolePermissions } from "../caches/rolePermission.cache";
 import type { PaginationRequestDto, PaginationResponseDto } from "../dtos/pagination.dto";
 import {
   CreateRoleRequestDto,
-  PermissionAccessLevel,
   RoleResponseDto,
+  UpdateRolePagesRequestDto,
   UpdateRolePermissionsRequestDto,
   UpdateRoleRequestDto,
 } from "../dtos/role.dto";
@@ -16,177 +17,145 @@ import type { IServiceContext } from "../types/service.context";
 export class RoleService {
   constructor(private readonly ctx: IServiceContext) {}
 
-  /**
-   * 建立角色
-   */
   public async createRole(data: CreateRoleRequestDto): Promise<RoleResponseDto> {
-    const role = await this.ctx.repos.role.findByName(data.name);
-
-    if (role) {
-      throw new AppError(ErrorCode.DUPLICATE, "角色名稱已存在");
+    if (data.scope === "PLATFORM" && data.vendorId) {
+      throw new AppError(ErrorCode.REQUEST_DATA, "平台角色不可指定業者");
     }
 
-    const newRole = await this.ctx.repos.role.create(data);
+    if (data.scope === "VENDOR" && !data.vendorId) {
+      throw new AppError(ErrorCode.REQUEST_DATA, "業者角色必須指定業者");
+    }
 
-    return plainToInstance(RoleResponseDto, newRole, {
-      excludeExtraneousValues: true,
-    });
+    const vendorId = data.scope === "VENDOR" ? data.vendorId! : null;
+    const existing = await this.ctx.repos.role.findByName(data.name, data.scope, vendorId);
+
+    if (existing) throw new AppError(ErrorCode.DUPLICATE, "角色名稱已存在");
+
+    const role = await this.ctx.repos.role.create(data);
+    return plainToInstance(RoleResponseDto, role, { excludeExtraneousValues: true });
   }
 
-  /**
-   * 取得角色列表（分頁）
-   */
   public async getRoles(
     dto: PaginationRequestDto,
   ): Promise<PaginationResponseDto<RoleResponseDto>> {
     const { page, limit } = dto;
-
-    const skip = (page - 1) * limit;
-
     const [roles, total] = await this.ctx.repos.role.findAndCount({
-      skip,
+      skip: (page - 1) * limit,
       take: limit,
     });
 
-    const pages = await this.ctx.repos.page.findAll();
-
-    const data = roles.map((role) => ({
-      ...role,
-      userCount: role._count.users,
-      permissionSettings: this.getPermissionSettings(role.rolePages, pages),
-    }));
-
     return {
-      data: plainToInstance(RoleResponseDto, data, {
-        excludeExtraneousValues: true,
-      }),
-      meta: {
-        total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit),
-      },
+      data: plainToInstance(
+        RoleResponseDto,
+        roles.map((role) => this.toResponse(role)),
+        { excludeExtraneousValues: true },
+      ),
+      meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
     };
   }
 
-  /**
-   * 取得角色詳細資訊
-   */
   public async getRoleById(id: string): Promise<RoleResponseDto> {
     const role = await this.ctx.repos.role.findById(id);
+    if (!role) throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
 
-    if (!role) {
-      throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
-    }
-
-    const pages = await this.ctx.repos.page.findAll();
-
-    return plainToInstance(
-      RoleResponseDto,
-      {
-        ...role,
-        userCount: role._count.users,
-        permissionSettings: this.getPermissionSettings(role.rolePages, pages),
-      },
-      {
-        excludeExtraneousValues: true,
-      },
-    );
+    return plainToInstance(RoleResponseDto, this.toResponse(role), {
+      excludeExtraneousValues: true,
+    });
   }
 
-  /**
-   * 更新角色
-   */
   public async updateRole(id: string, data: UpdateRoleRequestDto): Promise<void> {
     const role = await this.ctx.repos.role.findById(id);
-
-    if (!role) {
-      throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
-    }
+    if (!role) throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
 
     if (data.name && data.name !== role.name) {
-      const existingRole = await this.ctx.repos.role.findByName(data.name);
-
-      if (existingRole) {
-        throw new AppError(ErrorCode.DUPLICATE, "角色名稱已存在");
-      }
+      const existing = await this.ctx.repos.role.findByName(data.name, role.scope, role.vendorId);
+      if (existing) throw new AppError(ErrorCode.DUPLICATE, "角色名稱已存在");
     }
 
     await this.ctx.repos.role.update(id, data);
   }
 
-  /**
-   * 批次刪除角色
-   */
   public async batchDeleteRole(ids: string[]): Promise<void> {
-    const userCount = await this.ctx.repos.role.countUsersByRoleIds(ids);
+    const roles = await Promise.all(ids.map((id) => this.ctx.repos.role.findById(id)));
+    if (roles.some((role) => role?.isSystem)) {
+      throw new AppError(ErrorCode.REQUEST_DATA, "系統角色不可刪除");
+    }
 
+    const userCount = await this.ctx.repos.role.countUsersByRoleIds(ids);
     if (userCount > 0) {
-      throw new Error(`選取的角色仍有 ${userCount} 位使用者使用，無法刪除。`);
+      throw new AppError(ErrorCode.REQUEST_DATA, `選取的角色仍有 ${userCount} 位使用者使用`);
     }
 
     await this.ctx.repos.role.batchDelete(ids);
   }
 
-  /**
-   * 更新角色頁面權限
-   */
+  public async updateRolePages(roleId: string, dto: UpdateRolePagesRequestDto): Promise<void> {
+    const role = await this.ctx.repos.role.findById(roleId);
+    if (!role) throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
+
+    const count = await this.ctx.prisma.page.count({
+      where: { id: { in: dto.pageIds }, isActive: true },
+    });
+
+    if (count !== dto.pageIds.length) {
+      throw new AppError(ErrorCode.DATA_NOT_FOUND, "頁面不存在");
+    }
+
+    await this.ctx.repos.role.updatePages(roleId, dto.pageIds);
+    await invalidateRolePages(roleId);
+  }
+
   public async updateRolePermissions(
     roleId: string,
     dto: UpdateRolePermissionsRequestDto,
   ): Promise<void> {
     const role = await this.ctx.repos.role.findById(roleId);
+    if (!role) throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
 
-    if (!role) {
-      throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
+    const permissionCount = await this.ctx.prisma.permission.count({
+      where: { id: { in: dto.permissionIds }, isActive: true, isRequired: true },
+    });
+
+    if (permissionCount !== dto.permissionIds.length) {
+      throw new AppError(ErrorCode.DATA_NOT_FOUND, "權限不存在");
     }
 
-    const pages = await this.ctx.repos.page.findAll();
-    const pageIdByCode = new Map(pages.map((page) => [page.pageCode, page.id]));
+    if (role.scope === "VENDOR") {
+      if (!role.vendorId) throw new AppError(ErrorCode.REQUEST_DATA, "業者角色缺少 vendorId");
 
-    // 只允許設定存在且啟用的頁面
-    const invalidSetting = dto.settings.find((setting) => !pageIdByCode.has(setting.pageCode));
+      const vendorPermissionCount = await this.ctx.prisma.vendorPermission.count({
+        where: {
+          vendorId: role.vendorId,
+          permissionId: { in: dto.permissionIds },
+        },
+      });
 
-    if (invalidSetting) {
-      throw new AppError(ErrorCode.DATA_NOT_FOUND, "頁面不存在");
+      if (vendorPermissionCount !== dto.permissionIds.length) {
+        throw new AppError(ErrorCode.PERMISSION, "角色權限超出業者可用權限");
+      }
     }
 
-    if (new Set(dto.settings.map((setting) => setting.pageCode)).size !== dto.settings.length) {
-      throw new AppError(ErrorCode.REQUEST_DATA, "頁面權限不可重複設定");
-    }
-
-    // NONE 不需要寫入 RolePage
-    const rolePages = dto.settings
-      .filter((setting) => setting.accessLevel !== PermissionAccessLevel.NONE)
-      .map((setting) => ({
-        pageId: pageIdByCode.get(setting.pageCode)!,
-        accessLevel: setting.accessLevel,
-      }));
-
-    await this.ctx.repos.role.updatePermissions(roleId, rolePages);
-
-    // 清除角色頁面權限 Redis 快取
-    await invalidateRolePages(roleId);
+    await this.ctx.repos.role.updatePermissions(roleId, dto.permissionIds);
+    await invalidateRolePermissions(roleId);
   }
 
-  /**
-   * 計算角色權限設定
-   */
-  private getPermissionSettings(
-    rolePages: {
-      pageId: number;
-      accessLevel: string;
-    }[],
-    pages: { id: number; pageCode: number }[],
-  ) {
-    return pages.map((page) => {
-      const rolePage = rolePages.find((rolePage) => rolePage.pageId === page.id);
-
-      return {
-        pageId: page.id,
-        pageCode: page.pageCode,
-        accessLevel: rolePage?.accessLevel ?? PermissionAccessLevel.NONE,
-      };
-    });
+  private toResponse(role: {
+    id: string;
+    name: string;
+    description: string | null;
+    scope: string;
+    vendorId: string | null;
+    isSystem: boolean;
+    isActive: boolean;
+    rolePages: { pageId: number }[];
+    rolePermissions: { permissionId: number }[];
+    _count: { users: number };
+  }) {
+    return {
+      ...role,
+      userCount: role._count.users,
+      pages: role.rolePages.map((item) => ({ pageId: item.pageId })),
+      permissionIds: role.rolePermissions.map((item) => item.permissionId),
+    };
   }
 }

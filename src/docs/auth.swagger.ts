@@ -12,11 +12,7 @@
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - username
- *               - password
- *               - captchaId
- *               - captcha
+ *             required: [username, password, captchaId, captcha]
  *             properties:
  *               username:
  *                 type: string
@@ -26,13 +22,11 @@
  *                 example: "password123"
  *               captchaId:
  *                 type: string
- *                 example: "abc-123"
  *               captcha:
  *                 type: string
- *                 example: "xyz789"
  *     responses:
  *       200:
- *         description: 成功
+ *         description: 成功。user 會包含 userType、vendorId、roleId。
  */
 
 /**
@@ -52,15 +46,14 @@
  *   post:
  *     tags: [Auth]
  *     summary: 自動登入
+ *     description: 僅開發環境使用。
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - username
- *               - password
+ *             required: [username, password]
  *             properties:
  *               username:
  *                 type: string

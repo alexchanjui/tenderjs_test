@@ -1,28 +1,27 @@
 // src/repositories/interface/role.repository.interface.ts
-import type { Role, RolePage } from "@prisma/client";
+import type { Role, RolePage, RolePermission } from "@prisma/client";
 import type { CreateRoleRequestDto, UpdateRoleRequestDto } from "../../dtos/role.dto";
 
-/**
- * 包含頁面權限與使用人數的角色資料
- */
-export type RoleWithPages = Role & {
+export type RoleWithPermissions = Role & {
   rolePages: RolePage[];
-  _count: {
-    users: number;
-  };
+  rolePermissions: RolePermission[];
+  _count: { users: number };
 };
 
 export interface IRoleRepository {
   create(data: CreateRoleRequestDto): Promise<Role>;
   findAll(): Promise<Role[]>;
-  findById(id: string): Promise<RoleWithPages | null>;
-  findByName(name: string): Promise<Role | null>;
-  findAndCount(params: { skip?: number; take?: number }): Promise<[RoleWithPages[], number]>;
+  findById(id: string): Promise<RoleWithPermissions | null>;
+  findByName(name: string, scope: string, vendorId: string | null): Promise<Role | null>;
+  findAndCount(params: {
+    skip?: number;
+    take?: number;
+    scope?: string;
+    vendorId?: string | null;
+  }): Promise<[RoleWithPermissions[], number]>;
   update(id: string, data: UpdateRoleRequestDto): Promise<void>;
   countUsersByRoleIds(ids: string[]): Promise<number>;
   batchDelete(ids: string[]): Promise<void>;
-  updatePermissions(
-    roleId: string,
-    pages: { pageId: number; accessLevel: string }[],
-  ): Promise<void>;
+  updatePages(roleId: string, pageIds: number[]): Promise<void>;
+  updatePermissions(roleId: string, permissionIds: number[]): Promise<void>;
 }

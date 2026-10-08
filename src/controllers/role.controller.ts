@@ -4,6 +4,7 @@ import { Router } from "express";
 import type { Request, Response } from "express";
 import {
   CreateRoleRequestDto,
+  UpdateRolePagesRequestDto,
   UpdateRolePermissionsRequestDto,
   UpdateRoleRequestDto,
 } from "../dtos/role.dto";
@@ -22,9 +23,6 @@ export class RoleController implements IController {
     this.initializeRoutes();
   }
 
-  /**
-   * 初始化路由
-   */
   private initializeRoutes(): void {
     this.router.get("/", validationMiddleware(PaginationRequestDto, "query"), this.getRoles);
     this.router.get("/:id", this.getRoleById);
@@ -36,76 +34,65 @@ export class RoleController implements IController {
       this.batchDeleteRole,
     );
     this.router.put(
+      "/:id/pages",
+      validationMiddleware(UpdateRolePagesRequestDto),
+      this.updateRolePages,
+    );
+    this.router.put(
       "/:id/permissions",
       validationMiddleware(UpdateRolePermissionsRequestDto),
       this.updateRolePermissions,
     );
   }
 
-  /**
-   * 建立角色
-   */
   private createRole = async (req: Request, res: Response): Promise<void> => {
-    const dto = plainToInstance(CreateRoleRequestDto, req.body);
-
-    const result = await this.roleService.createRole(dto);
-
+    const result = await this.roleService.createRole(
+      plainToInstance(CreateRoleRequestDto, req.body),
+    );
     R.success(res, result);
   };
 
-  /**
-   * 取得角色列表
-   */
   private getRoles = async (req: Request, res: Response): Promise<void> => {
-    const dto = plainToInstance(PaginationRequestDto, req.query);
-
-    const result = await this.roleService.getRoles(dto);
-
+    const result = await this.roleService.getRoles(
+      plainToInstance(PaginationRequestDto, req.query),
+    );
     R.success(res, result);
   };
 
-  /**
-   * 取得角色詳細資訊
-   */
   private getRoleById = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
-    const result = await this.roleService.getRoleById(req.params.id);
-
-    R.success(res, result);
+    R.success(res, await this.roleService.getRoleById(req.params.id));
   };
 
-  /**
-   * 更新角色
-   */
   private updateRole = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
-    const dto = plainToInstance(UpdateRoleRequestDto, req.body);
-
-    await this.roleService.updateRole(req.params.id, dto);
-
+    await this.roleService.updateRole(
+      req.params.id,
+      plainToInstance(UpdateRoleRequestDto, req.body),
+    );
     R.success(res);
   };
 
-  /**
-   * 批次刪除角色
-   */
   private batchDeleteRole = async (req: Request, res: Response): Promise<void> => {
     const dto = plainToInstance(BatchDeleteStringIdsDto, req.body);
-
     await this.roleService.batchDeleteRole(dto.ids);
-
     R.success(res);
   };
 
-  /**
-   * 更新角色權限
-   */
+  private updateRolePages = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
+    await this.roleService.updateRolePages(
+      req.params.id,
+      plainToInstance(UpdateRolePagesRequestDto, req.body),
+    );
+    R.success(res);
+  };
+
   private updateRolePermissions = async (
     req: Request<{ id: string }>,
     res: Response,
   ): Promise<void> => {
-    const dto = plainToInstance(UpdateRolePermissionsRequestDto, req.body);
-
-    await this.roleService.updateRolePermissions(req.params.id, dto);
-
+    await this.roleService.updateRolePermissions(
+      req.params.id,
+      plainToInstance(UpdateRolePermissionsRequestDto, req.body),
+    );
     R.success(res);
   };
 }
