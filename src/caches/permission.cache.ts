@@ -8,6 +8,7 @@ import logger from "../utils/logger";
  */
 export interface ICachedRule {
   pageId: number | null;
+  isStatic: boolean;
   method: string;
   regex: RegExp;
   isRequired: boolean;
@@ -38,10 +39,11 @@ export const reloadRules = (permissions: Permission[]): void => {
     }
 
     try {
-      const { regexp } = pathToRegexp(permission.apiPath);
+      const { regexp, keys } = pathToRegexp(permission.apiPath);
 
       cachedRules.push({
         pageId: permission.pageId,
+        isStatic: keys.length === 0,
         method,
         regex: regexp,
         isRequired: permission.isRequired,
@@ -56,7 +58,13 @@ export const reloadRules = (permissions: Permission[]): void => {
  * 找出目前 API 對應的權限規則
  */
 export const findRouteRule = (method: string, path: string): ICachedRule | undefined => {
-  return cachedRules.find((rule) => rule.method === method && rule.regex.test(path));
+  // 固定路徑優先，避免 /users/:id 先匹配到 /users/me。
+  // 使用原本的 regexp，維持大小寫與結尾斜線的比對方式。
+  const staticRule = cachedRules.find(
+    (rule) => rule.isStatic && rule.method === method && rule.regex.test(path),
+  );
+
+  return staticRule ?? cachedRules.find((rule) => rule.method === method && rule.regex.test(path));
 };
 
 /**
