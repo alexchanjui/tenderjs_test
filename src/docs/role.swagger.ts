@@ -144,7 +144,7 @@
  * /roles/{id}/pages:
  *   put:
  *     tags: [Roles]
- *     summary: 更新角色頁面存取
+ *     summary: 更新角色頁面使用
  *     security:
  *       - BearerAuth: []
  *     parameters:
@@ -165,7 +165,7 @@
  *             properties:
  *               pageCodes:
  *                 type: array
- *                 description: 角色可存取的頁面代碼；空陣列代表無任何頁面權限
+ *                 description: 角色可使用的頁面代碼；空陣列代表無任何頁面權限
  *                 items:
  *                   type: integer
  *                 example: [100, 200, 300]

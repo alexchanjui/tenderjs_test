@@ -54,10 +54,10 @@ export class RolePrismaRepository implements IRoleRepository {
   }
 
   /**
-   * 根據角色名稱查找角色
+   * 依名稱查詢角色
    */
   public async findByName(name: string): Promise<Role | null> {
-    return this.ctx.prisma.role.findUnique({
+    return this.ctx.prisma.role.findFirst({
       where: { name },
     });
   }

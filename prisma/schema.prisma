@@ -34,11 +34,18 @@ model User {
   /// 啟用狀態
   isActive Boolean @default(true) @map("is_active")
 
+  /// 所屬業者 ID
+  /// null 代表營運使用者
+  vendorId String? @map("vendor_id") @db.UniqueIdentifier
+
+  /// 所屬業者
+  vendor Vendor? @relation(fields: [vendorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
   /// 所屬角色 ID
   roleId String? @map("role_id") @db.UniqueIdentifier
 
   /// 所屬角色
-  role Role? @relation(fields: [roleId], references: [id])
+  role Role? @relation(fields: [roleId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   /// 使用者的 API 稽核日誌
   auditLogs AuditLog[]
@@ -49,23 +56,31 @@ model User {
   /// 更新時間
   updatedAt DateTime @updatedAt @map("update_time")
 
+  @@index([vendorId])
   @@map("user")
 }
 
 /// 系統角色
-/// 用途：管理系統角色
+/// 用途：管理角色
 model Role {
   /// 角色 ID
   id String @id @default(dbgenerated("newid()")) @db.UniqueIdentifier
 
   /// 角色名稱
-  name String @unique
+  name String
 
   /// 角色說明
   description String?
 
   /// 啟用狀態
   isActive Boolean @default(true) @map("is_active")
+
+  /// 所屬業者 ID
+  /// null 代表營運角色
+  vendorId String? @map("vendor_id") @db.UniqueIdentifier
+
+  /// 所屬業者
+  vendor Vendor? @relation(fields: [vendorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   /// 建立時間
   createdAt DateTime @default(now()) @map("create_time")
@@ -79,11 +94,12 @@ model Role {
   /// 角色擁有的頁面權限
   rolePages RolePage[]
 
+  @@index([vendorId])
   @@map("role")
 }
 
 /// 頁面
-/// 用途：管理系統頁面
+/// 用途：管理頁面
 model Page {
   /// 固定頁面 ID
   id Int @id @default(autoincrement())
@@ -109,8 +125,12 @@ model Page {
   /// 更新時間
   updatedAt DateTime @updatedAt @map("update_time")
 
+  /// 使用此頁面的業者
+  vendorPages VendorPage[]
+
   /// 使用此頁面的角色
   rolePages RolePage[]
+
   permissions Permission[]
 
   @@map("page")
@@ -124,8 +144,8 @@ model Permission {
 
   /// 頁面 ID
   /// null 代表不屬於頁面的系統 API
-  pageId Int? @map("page_id")
-  page Page? @relation(fields: [pageId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  pageId Int?  @map("page_id")
+  page   Page? @relation(fields: [pageId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   /// 權限名稱
   name String @unique
@@ -158,12 +178,48 @@ model Permission {
   @@map("permission")
 }
 
+/// 業者
+/// 用途：管理業者
+model Vendor {
+  /// 業者 ID
+  id String @id @default(dbgenerated("newid()")) @db.UniqueIdentifier
+
+  /// 業者代碼
+  code String @unique
+
+  /// 業者名稱
+  name String
+
+  /// 業者說明
+  description String?
+
+  /// 啟用狀態
+  isActive Boolean @default(true) @map("is_active")
+
+  /// 業者使用者
+  users User[]
+
+  /// 業者角色
+  roles Role[]
+
+  /// 業者可使用的頁面
+  vendorPages VendorPage[]
+
+  /// 建立時間
+  createdAt DateTime @default(now()) @map("create_time")
+
+  /// 更新時間
+  updatedAt DateTime @updatedAt @map("update_time")
+
+  @@map("vendor")
+}
+
 // ==========================================
 // 關聯資料
 // ==========================================
 
 /// 角色頁面權限
-/// 用途：管理角色可存取的頁面
+/// 用途：管理角色可使用的頁面
 model RolePage {
   /// 角色 ID
   roleId String @map("role_id") @db.UniqueIdentifier
@@ -179,8 +235,27 @@ model RolePage {
 
   /// 同一角色與頁面只能有一筆設定
   @@id([roleId, pageId])
-
   @@map("role_page")
+}
+
+/// 業者頁面權限
+/// 用途：管理業者可使用的頁面範圍
+model VendorPage {
+  /// 業者 ID
+  vendorId String @map("vendor_id") @db.UniqueIdentifier
+
+  /// 頁面 ID
+  pageId Int @map("page_id")
+
+  /// 業者
+  vendor Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  /// 頁面
+  page Page @relation(fields: [pageId], references: [id], onDelete: Cascade)
+
+  /// 同一業者與頁面只能有一筆設定
+  @@id([vendorId, pageId])
+  @@map("vendor_page")
 }
 
 // ==========================================
@@ -235,4 +310,3 @@ model AuditLog {
   @@index([statusCode])
   @@map("audit_log")
 }
-

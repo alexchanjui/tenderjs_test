@@ -191,7 +191,7 @@ const permissionsData = [
     actionType: 2, // PUT
     isRequired: true,
     isActive: true,
-    description: "更新角色頁面存取",
+    description: "更新角色頁面使用",
   },
 
   // 300 - 頁面管理
@@ -294,18 +294,23 @@ async function main() {
   // ==========================================
   // Step 3: 建立 superAdmin Role
   // ==========================================
-  const superAdminRole = await prisma.role.upsert({
+  let superAdminRole = await prisma.role.findFirst({
     where: {
       name: "superAdmin",
-    },
-    update: {
-      description: "超級管理員",
-    },
-    create: {
-      name: "superAdmin",
-      description: "超級管理員",
+      vendorId: null,
     },
   });
+
+  if (!superAdminRole) {
+    superAdminRole = await prisma.role.create({
+      data: {
+        name: "superAdmin",
+        description: "超級管理員",
+        isActive: true,
+        vendorId: null,
+      },
+    });
+  }
 
   logger.info("✅ superAdmin Role 建立完成");
 

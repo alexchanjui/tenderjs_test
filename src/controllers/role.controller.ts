@@ -96,7 +96,7 @@ export class RoleController implements IController {
   };
 
   /**
-   * 更新角色頁面存取
+   * 更新角色頁面使用
    */
   private updateRolePages = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
     const dto = plainToInstance(UpdateRolePagesRequestDto, req.body);
