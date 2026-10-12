@@ -5,7 +5,7 @@ import type { PaginationRequestDto, PaginationResponseDto } from "../dtos/pagina
 import {
   CreateRoleRequestDto,
   RoleResponseDto,
-  UpdateRolePermissionsRequestDto,
+  UpdateRolePagesRequestDto,
   UpdateRoleRequestDto,
 } from "../dtos/role.dto";
 import { AppError } from "../errors/app.error";
@@ -125,10 +125,7 @@ export class RoleService {
   /**
    * 更新角色頁面權限
    */
-  public async updateRolePermissions(
-    roleId: string,
-    dto: UpdateRolePermissionsRequestDto,
-  ): Promise<void> {
+  public async updateRolePages(roleId: string, dto: UpdateRolePagesRequestDto): Promise<void> {
     const role = await this.ctx.repos.role.findById(roleId);
 
     if (!role) {
@@ -152,7 +149,7 @@ export class RoleService {
       pageId: pageIdByCode.get(pageCode)!,
     }));
 
-    await this.ctx.repos.role.updatePermissions(roleId, rolePages);
+    await this.ctx.repos.role.updatePages(roleId, rolePages);
     await invalidateRolePages(roleId);
   }
 }

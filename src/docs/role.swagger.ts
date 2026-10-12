@@ -141,10 +141,10 @@
 
 /**
  * @openapi
- * /roles/{id}/permissions:
+ * /roles/{id}/pages:
  *   put:
  *     tags: [Roles]
- *     summary: 更新角色頁面權限
+ *     summary: 更新角色頁面存取
  *     security:
  *       - BearerAuth: []
  *     parameters:

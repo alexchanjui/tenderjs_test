@@ -25,5 +25,5 @@ export interface IRoleRepository {
   update(id: string, data: UpdateRoleRequestDto): Promise<void>;
   countUsersByRoleIds(ids: string[]): Promise<number>;
   batchDelete(ids: string[]): Promise<void>;
-  updatePermissions(roleId: string, pages: { pageId: number }[]): Promise<void>;
+  updatePages(roleId: string, pages: { pageId: number }[]): Promise<void>;
 }

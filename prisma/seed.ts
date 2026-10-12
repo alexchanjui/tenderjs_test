@@ -191,7 +191,7 @@ const permissionsData = [
     actionType: 2, // PUT
     isRequired: true,
     isActive: true,
-    description: "更新角色權限",
+    description: "更新角色頁面存取",
   },
 
   // 300 - 頁面管理

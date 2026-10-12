@@ -61,7 +61,7 @@ export class RoleResponseDto {
 /**
  * 更新角色頁面權限 Request DTO
  */
-export class UpdateRolePermissionsRequestDto {
+export class UpdateRolePagesRequestDto {
   @IsArray({ message: "頁面代碼必須為陣列" })
   @IsInt({ each: true, message: "頁面代碼必須為整數" })
   pageCodes!: number[];
