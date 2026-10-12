@@ -4,7 +4,6 @@ import { invalidateRolePages } from "../caches/rolePage.cache";
 import type { PaginationRequestDto, PaginationResponseDto } from "../dtos/pagination.dto";
 import {
   CreateRoleRequestDto,
-  PermissionAccessLevel,
   RoleResponseDto,
   UpdateRolePermissionsRequestDto,
   UpdateRoleRequestDto,
@@ -40,7 +39,6 @@ export class RoleService {
     dto: PaginationRequestDto,
   ): Promise<PaginationResponseDto<RoleResponseDto>> {
     const { page, limit } = dto;
-
     const skip = (page - 1) * limit;
 
     const [roles, total] = await this.ctx.repos.role.findAndCount({
@@ -48,12 +46,10 @@ export class RoleService {
       take: limit,
     });
 
-    const pages = await this.ctx.repos.page.findAll();
-
     const data = roles.map((role) => ({
       ...role,
       userCount: role._count.users,
-      permissionSettings: this.getPermissionSettings(role.rolePages, pages),
+      pageCodes: role.rolePages.map((rolePage) => rolePage.page.pageCode),
     }));
 
     return {
@@ -79,14 +75,12 @@ export class RoleService {
       throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
     }
 
-    const pages = await this.ctx.repos.page.findAll();
-
     return plainToInstance(
       RoleResponseDto,
       {
         ...role,
         userCount: role._count.users,
-        permissionSettings: this.getPermissionSettings(role.rolePages, pages),
+        pageCodes: role.rolePages.map((rolePage) => rolePage.page.pageCode),
       },
       {
         excludeExtraneousValues: true,
@@ -141,52 +135,24 @@ export class RoleService {
       throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
     }
 
+    if (new Set(dto.pageCodes).size !== dto.pageCodes.length) {
+      throw new AppError(ErrorCode.REQUEST_DATA, "頁面不可重複設定");
+    }
+
     const pages = await this.ctx.repos.page.findAll();
     const pageIdByCode = new Map(pages.map((page) => [page.pageCode, page.id]));
 
-    // 只允許設定存在且啟用的頁面
-    const invalidSetting = dto.settings.find((setting) => !pageIdByCode.has(setting.pageCode));
+    const invalidPageCode = dto.pageCodes.find((pageCode) => !pageIdByCode.has(pageCode));
 
-    if (invalidSetting) {
+    if (invalidPageCode !== undefined) {
       throw new AppError(ErrorCode.DATA_NOT_FOUND, "頁面不存在");
     }
 
-    if (new Set(dto.settings.map((setting) => setting.pageCode)).size !== dto.settings.length) {
-      throw new AppError(ErrorCode.REQUEST_DATA, "頁面權限不可重複設定");
-    }
-
-    // NONE 不需要寫入 RolePage
-    const rolePages = dto.settings
-      .filter((setting) => setting.accessLevel !== PermissionAccessLevel.NONE)
-      .map((setting) => ({
-        pageId: pageIdByCode.get(setting.pageCode)!,
-        accessLevel: setting.accessLevel,
-      }));
+    const rolePages = dto.pageCodes.map((pageCode) => ({
+      pageId: pageIdByCode.get(pageCode)!,
+    }));
 
     await this.ctx.repos.role.updatePermissions(roleId, rolePages);
-
-    // 清除角色頁面權限 Redis 快取
     await invalidateRolePages(roleId);
-  }
-
-  /**
-   * 計算角色權限設定
-   */
-  private getPermissionSettings(
-    rolePages: {
-      pageId: number;
-      accessLevel: string;
-    }[],
-    pages: { id: number; pageCode: number }[],
-  ) {
-    return pages.map((page) => {
-      const rolePage = rolePages.find((rolePage) => rolePage.pageId === page.id);
-
-      return {
-        pageId: page.id,
-        pageCode: page.pageCode,
-        accessLevel: rolePage?.accessLevel ?? PermissionAccessLevel.NONE,
-      };
-    });
   }
 }

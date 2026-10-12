@@ -6,7 +6,11 @@ import type { CreateRoleRequestDto, UpdateRoleRequestDto } from "../../dtos/role
  * 包含頁面權限與使用人數的角色資料
  */
 export type RoleWithPages = Role & {
-  rolePages: RolePage[];
+  rolePages: (RolePage & {
+    page: {
+      pageCode: number;
+    };
+  })[];
   _count: {
     users: number;
   };
@@ -21,8 +25,5 @@ export interface IRoleRepository {
   update(id: string, data: UpdateRoleRequestDto): Promise<void>;
   countUsersByRoleIds(ids: string[]): Promise<number>;
   batchDelete(ids: string[]): Promise<void>;
-  updatePermissions(
-    roleId: string,
-    pages: { pageId: number; accessLevel: string }[],
-  ): Promise<void>;
+  updatePermissions(roleId: string, pages: { pageId: number }[]): Promise<void>;
 }

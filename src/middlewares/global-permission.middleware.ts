@@ -1,7 +1,7 @@
 // src/middlewares/global-permission.middleware.ts
 import type { NextFunction, Request, Response } from "express";
 import { findRouteRule } from "../caches/permission.cache";
-import { getRolePages } from "../caches/rolePage.cache";
+import { getRolePageIds } from "../caches/rolePage.cache";
 import { AppError } from "../errors/app.error";
 import { ErrorCode } from "../errors/error.codes";
 import { verifyAuthToken } from "../utils/auth.helper";
@@ -52,27 +52,15 @@ export const globalPermissionGuard = async (
       throw new AppError(ErrorCode.PERMISSION);
     }
 
-    // 7. 取得角色頁面權限
-    const rolePages = await getRolePages(currentUser.roleId);
+    // 7. 取得角色擁有的頁面 ID
+    const pageIds = await getRolePageIds(currentUser.roleId);
 
-    // 8. 取得目前 API 所屬頁面權限
-    const rolePage = rolePages.find((rolePage) => rolePage.pageId === rule.pageId);
-
-    if (!rolePage) {
+    // 8. 確認角色是否具有目前 API 所屬頁面的權限
+    if (!pageIds.includes(rule.pageId)) {
       throw new AppError(ErrorCode.PERMISSION);
     }
 
-    // 9. GET 允許 VIEW / EDIT，其餘操作需要 EDIT
-    const hasPermission =
-      req.method === "GET"
-        ? rolePage.accessLevel === "VIEW" || rolePage.accessLevel === "EDIT"
-        : rolePage.accessLevel === "EDIT";
-
-    if (!hasPermission) {
-      throw new AppError(ErrorCode.PERMISSION);
-    }
-
-    // 10. 建立 Request Context
+    // 9. 建立 Request Context
     requestContextStorage.run(currentUser, () => {
       next();
     });

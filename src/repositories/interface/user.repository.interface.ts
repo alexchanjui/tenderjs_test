@@ -1,4 +1,3 @@
-// src/repositories/interface/user.repository.interface.ts
 import type { Role, RolePage, User } from "@prisma/client";
 import type { CreateUserDto, UpdateUserRequestDto } from "../../dtos/user.dto";
 
@@ -8,7 +7,11 @@ import type { CreateUserDto, UpdateUserRequestDto } from "../../dtos/user.dto";
 export type UserWithRole = User & {
   role:
     | (Role & {
-        rolePages: RolePage[];
+        rolePages: (RolePage & {
+          page: {
+            pageCode: number;
+          };
+        })[];
       })
     | null;
 };

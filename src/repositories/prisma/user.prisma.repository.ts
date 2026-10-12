@@ -24,7 +24,15 @@ export class UserPrismaRepository implements IUserRepository {
       include: {
         role: {
           include: {
-            rolePages: true,
+            rolePages: {
+              include: {
+                page: {
+                  select: {
+                    pageCode: true,
+                  },
+                },
+              },
+            },
           },
         },
       },
@@ -40,7 +48,15 @@ export class UserPrismaRepository implements IUserRepository {
       include: {
         role: {
           include: {
-            rolePages: true,
+            rolePages: {
+              include: {
+                page: {
+                  select: {
+                    pageCode: true,
+                  },
+                },
+              },
+            },
           },
         },
       },
@@ -56,7 +72,15 @@ export class UserPrismaRepository implements IUserRepository {
       include: {
         role: {
           include: {
-            rolePages: true,
+            rolePages: {
+              include: {
+                page: {
+                  select: {
+                    pageCode: true,
+                  },
+                },
+              },
+            },
           },
         },
       },
@@ -78,7 +102,15 @@ export class UserPrismaRepository implements IUserRepository {
         include: {
           role: {
             include: {
-              rolePages: true,
+              rolePages: {
+                include: {
+                  page: {
+                    select: {
+                      pageCode: true,
+                    },
+                  },
+                },
+              },
             },
           },
         },

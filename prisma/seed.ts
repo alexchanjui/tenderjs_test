@@ -386,7 +386,6 @@ async function main() {
       data: pages.map((page) => ({
         roleId: superAdminRole.id,
         pageId: page.id,
-        accessLevel: "EDIT",
       })),
     }),
   ]);

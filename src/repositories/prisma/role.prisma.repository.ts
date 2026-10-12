@@ -35,7 +35,15 @@ export class RolePrismaRepository implements IRoleRepository {
     return this.ctx.prisma.role.findUnique({
       where: { id },
       include: {
-        rolePages: true,
+        rolePages: {
+          include: {
+            page: {
+              select: {
+                pageCode: true,
+              },
+            },
+          },
+        },
         _count: {
           select: {
             users: true,
@@ -69,7 +77,15 @@ export class RolePrismaRepository implements IRoleRepository {
           createdAt: "desc",
         },
         include: {
-          rolePages: true,
+          rolePages: {
+            include: {
+              page: {
+                select: {
+                  pageCode: true,
+                },
+              },
+            },
+          },
           _count: {
             select: {
               users: true,
@@ -120,10 +136,7 @@ export class RolePrismaRepository implements IRoleRepository {
   /**
    * 更新角色的頁面權限
    */
-  public async updatePermissions(
-    roleId: string,
-    pages: { pageId: number; accessLevel: string }[],
-  ): Promise<void> {
+  public async updatePermissions(roleId: string, pages: { pageId: number }[]): Promise<void> {
     await this.ctx.prisma.$transaction(async (tx) => {
       // 先清除原本頁面權限
       await tx.rolePage.deleteMany({
@@ -138,7 +151,6 @@ export class RolePrismaRepository implements IRoleRepository {
           data: pages.map((page) => ({
             roleId,
             pageId: page.pageId,
-            accessLevel: page.accessLevel,
           })),
         });
       }

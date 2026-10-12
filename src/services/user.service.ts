@@ -2,7 +2,6 @@
 import bcrypt from "bcrypt";
 import { plainToInstance } from "class-transformer";
 import type { PaginationRequestDto, PaginationResponseDto } from "../dtos/pagination.dto";
-import { PermissionAccessLevel, PermissionSettingResponse } from "../dtos/role.dto";
 import { UserResponseDto, type CreateUserDto, type UpdateUserRequestDto } from "../dtos/user.dto";
 import { AppError } from "../errors/app.error";
 import { ErrorCode } from "../errors/error.codes";
@@ -135,41 +134,23 @@ export class UserService {
 
   /**
    * 取得當前使用者詳細資訊
-   *
-   * 根據所有啟用中的頁面，以及使用者所屬角色的頁面權限，
-   * 整理各頁面的權限等級：
-   * - NONE：沒有該頁面的權限
-   * - VIEW：具有檢視權限
-   * - EDIT：具有編輯權限
    */
   public async getMyUserInfo(): Promise<UserResponseDto> {
-    const id = this.ctx.currentUser?.id || "";
+    const currentUser = this.getCurrentUser();
 
-    const user = await this.ctx.repos.user.findById(id);
+    const user = await this.ctx.repos.user.findById(currentUser.id);
 
     if (!user) {
       throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);
     }
 
-    // 取得所有啟用中的頁面
-    const pages = await this.ctx.repos.page.findAll();
-
-    // 整理使用者所屬角色在各頁面下的權限等級
-    const permissionSettings: PermissionSettingResponse[] = pages.map((page) => {
-      const rolePage = user.role?.rolePages.find((rolePage) => rolePage.pageId === page.id);
-
-      return {
-        pageId: page.id,
-        pageCode: page.pageCode,
-        accessLevel: (rolePage?.accessLevel ?? PermissionAccessLevel.NONE) as PermissionAccessLevel,
-      };
-    });
+    const pageCodes = user.role?.rolePages.map((rolePage) => rolePage.page.pageCode) ?? [];
 
     return plainToInstance(
       UserResponseDto,
       {
         ...user,
-        permissionSettings,
+        pageCodes,
       },
       {
         excludeExtraneousValues: true,
