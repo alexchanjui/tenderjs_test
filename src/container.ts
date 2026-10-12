@@ -18,8 +18,6 @@ import { AuthService } from "./services/auth.service";
 import { RoleService } from "./services/role.service";
 import { PermissionService } from "./services/permission.service";
 import { StopService } from "./services/stop.service";
-import { ImportService } from "./services/import.service";
-import { ExportService } from "./services/export.service";
 import { OptionsService } from "./services/options.service";
 import { PageService } from "./services/page.service";
 
@@ -31,8 +29,6 @@ import { AuthController } from "./controllers/auth.controller";
 import { RoleController } from "./controllers/role.controller";
 import { PermissionController } from "./controllers/permission.controller";
 import { StopController } from "./controllers/stop.controller";
-import { ImportController } from "./controllers/import.controller";
-import { ExportController } from "./controllers/export.controller";
 import { OptionsController } from "./controllers/options.controller";
 import { PageController } from "./controllers/page.controller";
 
@@ -97,8 +93,6 @@ export class AppContainer {
     const roleService = new RoleService(ctx);
     const permissionService = new PermissionService(ctx);
     const stopService = new StopService(ctx);
-    const importService = new ImportService(ctx);
-    const exportService = new ExportService(ctx);
     const optionsService = new OptionsService(ctx);
     const pageService = new PageService(ctx);
 
@@ -112,8 +106,6 @@ export class AppContainer {
       new RoleController(roleService),
       new PermissionController(permissionService),
       new StopController(stopService),
-      new ImportController(importService),
-      new ExportController(exportService),
       new OptionsController(optionsService),
       new PageController(pageService),
     ];
