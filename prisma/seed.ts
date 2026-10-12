@@ -34,13 +34,6 @@ const pagesData = [
     routePath: "/pages",
     isActive: true,
   },
-  {
-    pageCode: 400,
-    name: "招呼站管理",
-    description: "管理招呼站",
-    routePath: "/stops",
-    isActive: true,
-  },
 ];
 
 // ==========================================
@@ -246,53 +239,6 @@ const permissionsData = [
     isRequired: true,
     isActive: true,
     description: "刪除頁面",
-  },
-
-  // 400 - 招呼站管理
-  {
-    pageCode: 400,
-    name: "stop:list",
-    apiPath: "/api/stops",
-    actionType: 0, // GET
-    isRequired: true,
-    isActive: true,
-    description: "查詢招呼站列表",
-  },
-  {
-    pageCode: 400,
-    name: "stop:create",
-    apiPath: "/api/stops",
-    actionType: 1, // POST
-    isRequired: true,
-    isActive: true,
-    description: "新增招呼站",
-  },
-  {
-    pageCode: 400,
-    name: "stop:detail",
-    apiPath: "/api/stops/:id",
-    actionType: 0, // GET
-    isRequired: true,
-    isActive: true,
-    description: "查詢招呼站詳細資訊",
-  },
-  {
-    pageCode: 400,
-    name: "stop:update",
-    apiPath: "/api/stops/:id",
-    actionType: 2, // PUT
-    isRequired: true,
-    isActive: true,
-    description: "更新招呼站資訊",
-  },
-  {
-    pageCode: 400,
-    name: "stop:delete",
-    apiPath: "/api/stops/:id",
-    actionType: 3, // DELETE
-    isRequired: true,
-    isActive: true,
-    description: "刪除招呼站",
   },
 ];
 

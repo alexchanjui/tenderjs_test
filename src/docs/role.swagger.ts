@@ -144,7 +144,7 @@
  * /roles/{id}/permissions:
  *   put:
  *     tags: [Roles]
- *     summary: 更新角色權限
+ *     summary: 更新角色頁面權限
  *     security:
  *       - BearerAuth: []
  *     parameters:
@@ -161,25 +161,14 @@
  *           schema:
  *             type: object
  *             required:
- *               - settings
+ *               - pageCodes
  *             properties:
- *               settings:
+ *               pageCodes:
  *                 type: array
- *                 minItems: 1
+ *                 description: 角色可存取的頁面代碼；空陣列代表無任何頁面權限
  *                 items:
- *                   type: object
- *                   required:
- *                     - pageCode
- *                     - accessLevel
- *                   properties:
- *                     pageCode:
- *                       type: integer
- *                       example: 100
- *                     accessLevel:
- *                       type: string
- *                       description: NONE=無權限、VIEW=檢視、EDIT=編輯
- *                       enum: [NONE, VIEW, EDIT]
- *                       example: EDIT
+ *                   type: integer
+ *                 example: [100, 200, 300]
  *     responses:
  *       200:
  *         description: 成功

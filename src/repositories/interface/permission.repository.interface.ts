@@ -11,7 +11,6 @@ export interface IPermissionRepository {
   findById(id: number): Promise<Permission | null>;
   findByName(name: string): Promise<Permission | null>;
   findByPageId(pageId: number): Promise<Permission[]>;
-  findAndCount(params: { skip?: number; take?: number }): Promise<[Permission[], number]>;
   update(id: number, data: UpdatePermissionRequestDto): Promise<void>;
   batchDelete(ids: number[]): Promise<void>;
 }

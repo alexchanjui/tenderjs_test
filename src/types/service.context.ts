@@ -7,7 +7,6 @@ import { IUserRepository } from "../repositories/interface/user.repository.inter
 import { IRoleRepository } from "../repositories/interface/role.repository.interface";
 import { IPermissionRepository } from "../repositories/interface/permission.repository.interface";
 import { IPageRepository } from "../repositories/interface/page.repository.interface";
-import { IStopRepository } from "../repositories/interface/stop.repository.interface";
 
 /**
  * 目前登入的使用者資訊
@@ -25,7 +24,6 @@ export interface IRepositoryContext {
   role: IRoleRepository;
   permission: IPermissionRepository;
   page: IPageRepository;
-  stop: IStopRepository;
 }
 
 /**

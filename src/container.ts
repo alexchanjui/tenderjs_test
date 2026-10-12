@@ -8,7 +8,6 @@ import { requestContextStorage } from "./utils/request-context";
 import { UserPrismaRepository } from "./repositories/prisma/user.prisma.repository";
 import { RolePrismaRepository } from "./repositories/prisma/role.prisma.repository";
 import { PermissionPrismaRepository } from "./repositories/prisma/permission.prisma.repository";
-import { StopPrismaRepository } from "./repositories/prisma/stop.prisma.repository";
 import { PagePrismaRepository } from "./repositories/prisma/page.prisma.repository";
 
 // Services
@@ -17,7 +16,6 @@ import { UserService } from "./services/user.service";
 import { AuthService } from "./services/auth.service";
 import { RoleService } from "./services/role.service";
 import { PermissionService } from "./services/permission.service";
-import { StopService } from "./services/stop.service";
 import { OptionsService } from "./services/options.service";
 import { PageService } from "./services/page.service";
 
@@ -28,7 +26,6 @@ import { UserController } from "./controllers/user.controller";
 import { AuthController } from "./controllers/auth.controller";
 import { RoleController } from "./controllers/role.controller";
 import { PermissionController } from "./controllers/permission.controller";
-import { StopController } from "./controllers/stop.controller";
 import { OptionsController } from "./controllers/options.controller";
 import { PageController } from "./controllers/page.controller";
 
@@ -62,7 +59,6 @@ export class AppContainer {
     const userRepo = new UserPrismaRepository(dbContext);
     const roleRepo = new RolePrismaRepository(dbContext);
     const permissionRepo = new PermissionPrismaRepository(dbContext);
-    const stopRepo = new StopPrismaRepository(dbContext);
     const pageRepo = new PagePrismaRepository(dbContext);
 
     /**
@@ -76,7 +72,6 @@ export class AppContainer {
         user: userRepo,
         role: roleRepo,
         permission: permissionRepo,
-        stop: stopRepo,
         page: pageRepo,
       },
       get currentUser() {
@@ -92,7 +87,6 @@ export class AppContainer {
     const authService = new AuthService(ctx);
     const roleService = new RoleService(ctx);
     const permissionService = new PermissionService(ctx);
-    const stopService = new StopService(ctx);
     const optionsService = new OptionsService(ctx);
     const pageService = new PageService(ctx);
 
@@ -105,7 +99,6 @@ export class AppContainer {
       new AuthController(authService),
       new RoleController(roleService),
       new PermissionController(permissionService),
-      new StopController(stopService),
       new OptionsController(optionsService),
       new PageController(pageService),
     ];
