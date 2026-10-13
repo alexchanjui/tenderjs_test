@@ -40,16 +40,16 @@
  *           schema:
  *             type: object
  *             required:
+ *               - account
  *               - username
- *               - nickname
  *               - email
  *               - password
  *               - vendorId
  *             properties:
- *               nickname:
+ *               username:
  *                 type: string
  *                 example: "測試人員"
- *               username:
+ *               account:
  *                 type: string
  *                 example: test
  *               email:
@@ -128,10 +128,10 @@
  *           schema:
  *             type: object
  *             properties:
- *               username:
+ *               account:
  *                 type: string
  *                 example: test
- *               nickname:
+ *               username:
  *                 type: string
  *                 example: "測試人員"
  *               email:

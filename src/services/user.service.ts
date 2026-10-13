@@ -28,7 +28,7 @@ export class UserService {
    * 建立使用者
    */
   public async createUser(data: CreateUserRequestDto): Promise<void> {
-    const { username, nickname, email, password, vendorId } = data;
+    const { account, username, email, password, vendorId } = data;
 
     const user = await this.ctx.repos.user.findByEmail(email);
 
@@ -47,8 +47,8 @@ export class UserService {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     await this.ctx.repos.user.create({
+      account,
       username,
-      nickname,
       email,
       password: hashedPassword,
       vendorId,

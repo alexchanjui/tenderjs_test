@@ -53,7 +53,7 @@ export class AuthService {
    * 使用者登入
    */
   public async login(data: LoginRequestDto): Promise<LoginResponseDto> {
-    const { username, password, captchaId, captcha } = data;
+    const { account, password, captchaId, captcha } = data;
 
     // 驗證登入驗證碼
     const redisKey = `${this.CAPTCHA_PREFIX}${captchaId}`;
@@ -72,7 +72,7 @@ export class AuthService {
     // 驗證成功後立即刪除，避免同一組驗證碼重複使用
     await this.ctx.redis.del(redisKey);
 
-    const user = await this.ctx.repos.user.findByUsername(username);
+    const user = await this.ctx.repos.user.findByAccount(account);
 
     if (!user) {
       throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);
@@ -99,9 +99,9 @@ export class AuthService {
       throw new Error("此功能僅限開發環境使用");
     }
 
-    const { username, password } = data;
+    const { account, password } = data;
 
-    const user = await this.ctx.repos.user.findByUsername(username);
+    const user = await this.ctx.repos.user.findByAccount(account);
 
     if (!user) {
       throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);
@@ -127,7 +127,7 @@ export class AuthService {
     // 放進 JWT 的使用者資料
     const userPayload = {
       id: user.id,
-      username: user.username,
+      account: user.account,
       email: user.email,
       roleId: user.roleId,
     };

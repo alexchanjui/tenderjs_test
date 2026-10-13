@@ -55,7 +55,7 @@ export const errorMiddleware: ErrorRequestHandler = (
       /**
        * 唯一值重複
        *
-       * 例如 username 或 email 已存在。
+       * 例如 account 或 email 已存在。
        */
       case "P2002":
         R.failed(res, ErrorCode.DUPLICATE, "資料已存在，請勿重複建立", error.meta ?? null);

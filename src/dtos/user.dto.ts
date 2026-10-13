@@ -19,13 +19,13 @@ export class CreateUserRequestDto {
   @Length(2, 20, {
     message: "使用者名稱長度需介於 2~20 字元",
   })
-  username!: string;
+  account!: string;
 
   @IsString({ message: "暱稱必須為字串" })
   @Length(2, 20, {
     message: "暱稱長度需介於 2~20 字元",
   })
-  nickname!: string;
+  username!: string;
 
   @IsEmail({}, { message: "Email 格式錯誤" })
   email!: string;
@@ -55,14 +55,14 @@ export class UpdateUserRequestDto {
   @Length(2, 20, {
     message: "使用者名稱長度需介於 2~20 字元",
   })
-  username!: string;
+  account!: string;
 
   @IsOptional()
   @IsString({ message: "暱稱必須為字串" })
   @Length(2, 20, {
     message: "暱稱長度需介於 2~20 字元",
   })
-  nickname!: string;
+  username!: string;
 
   @IsOptional()
   @IsEmail({}, { message: "Email 格式錯誤" })
@@ -111,10 +111,10 @@ export class UserResponseDto {
   id!: string;
 
   @Expose()
-  username!: string;
+  account!: string;
 
   @Expose()
-  nickname!: string;
+  username!: string;
 
   @Expose()
   email!: string;

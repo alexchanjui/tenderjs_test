@@ -13,12 +13,12 @@
  *           schema:
  *             type: object
  *             required:
- *               - username
+ *               - account
  *               - password
  *               - captchaId
  *               - captcha
  *             properties:
- *               username:
+ *               account:
  *                 type: string
  *                 example: admin
  *               password:
@@ -59,10 +59,10 @@
  *           schema:
  *             type: object
  *             required:
- *               - username
+ *               - account
  *               - password
  *             properties:
- *               username:
+ *               account:
  *                 type: string
  *                 example: admin
  *               password:

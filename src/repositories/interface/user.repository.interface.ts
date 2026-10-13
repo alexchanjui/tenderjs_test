@@ -26,7 +26,7 @@ export interface IUserRepository {
   create(data: CreateUserRequestDto): Promise<User>;
   findById(id: string): Promise<UserWithRole | null>;
   findByEmail(email: string): Promise<UserWithRole | null>;
-  findByUsername(username: string): Promise<UserWithRole | null>;
+  findByAccount(account: string): Promise<UserWithRole | null>;
   findAndCount(params: { skip?: number; take?: number }): Promise<[UserWithRole[], number]>;
   update(id: string, data: UpdateUserRequestDto): Promise<void>;
   batchDelete(ids: string[]): Promise<number>;

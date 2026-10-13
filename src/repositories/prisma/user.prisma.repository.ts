@@ -78,11 +78,11 @@ export class UserPrismaRepository implements IUserRepository {
   }
 
   /**
-   * 根據 Username 取得使用者
+   * 根據帳號取得使用者
    */
-  public async findByUsername(username: string): Promise<UserWithRole | null> {
+  public async findByAccount(account: string): Promise<UserWithRole | null> {
     return this.ctx.prisma.user.findUnique({
-      where: { username },
+      where: { account },
       include: {
         role: {
           include: {

@@ -8,7 +8,7 @@ import { IsString, Length } from "class-validator";
 export class LoginRequestDto {
   @IsString({ message: "帳號必須是字串" })
   @Length(2, 20, { message: "帳號長度需介於 2~20 字元" })
-  username!: string;
+  account!: string;
 
   @IsString({ message: "密碼必須為字串" })
   @Length(8, 16, {
@@ -29,7 +29,7 @@ export class LoginRequestDto {
 export class AutoLoginRequestDto {
   @IsString({ message: "帳號必須是字串" })
   @Length(2, 20, { message: "帳號長度需介於 2~20 字元" })
-  username!: string;
+  account!: string;
 
   @IsString({ message: "密碼必須為字串" })
   @Length(8, 16, {
@@ -46,7 +46,7 @@ export class LoginUserDto {
   id!: string;
 
   @Expose()
-  username!: string;
+  account!: string;
 
   @Expose()
   email!: string;
