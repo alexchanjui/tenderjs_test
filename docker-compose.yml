@@ -1,29 +1,29 @@
 services:
   db:
     image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: tenderjs_mssql
+    container_name: vueAdmin_mssql
     restart: always
     environment:
       ACCEPT_EULA: "Y"
       MSSQL_SA_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "1433:1433"
+      - "1435:1433"
     volumes:
-      - tenderjs_mssql_data:/var/opt/mssql
+      - vueAdmin_mssql_data:/var/opt/mssql
 
   redis:
     image: redis:alpine
-    container_name: tenderjs_redis
+    container_name: vueAdmin_redis
     restart: always
     ports:
       - "6380:6379"
     volumes:
-      - tenderjs_redis_data:/data
+      - vueAdmin_redis_data:/data
     command: redis-server --appendonly yes
 
   app:
-    image: alex46732/tenderjs-api:${APP_VERSION}
-    container_name: tenderjs-api
+    image: alex46732/vueAdmin-api:${APP_VERSION}
+    container_name: vueAdmin-api
     restart: always
     ports:
       - "3001:3001"
@@ -34,5 +34,5 @@ services:
       - redis
 
 volumes:
-  tenderjs_mssql_data:
-  tenderjs_redis_data:
+  vueAdmin_mssql_data:
+  vueAdmin_redis_data:

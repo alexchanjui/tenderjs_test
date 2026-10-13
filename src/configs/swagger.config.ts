@@ -8,9 +8,9 @@ const options: swaggerJsdoc.Options = {
     openapi: "3.0.3",
 
     info: {
-      title: "TenderJS API",
+      title: "vueAdmin API",
       version: appVersion,
-      description: "TenderJS Backend API 文件",
+      description: "vueAdmin Backend API 文件",
     },
 
     servers: [
