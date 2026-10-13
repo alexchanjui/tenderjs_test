@@ -77,9 +77,11 @@ export class RoleController implements IController {
    * 更新角色
    */
   private updateRole = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
+    const { id } = req.params;
+
     const dto = plainToInstance(UpdateRoleRequestDto, req.body);
 
-    await this.roleService.updateRole(req.params.id, dto);
+    await this.roleService.updateRole(id, dto);
 
     R.success(res);
   };
@@ -99,9 +101,11 @@ export class RoleController implements IController {
    * 更新角色頁面使用
    */
   private updateRolePages = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
+    const { id } = req.params;
+
     const dto = plainToInstance(UpdateRolePagesRequestDto, req.body);
 
-    await this.roleService.updateRolePages(req.params.id, dto);
+    await this.roleService.updateRolePages(id, dto);
 
     R.success(res);
   };

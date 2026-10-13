@@ -9,6 +9,7 @@ import { UserPrismaRepository } from "./repositories/prisma/user.prisma.reposito
 import { RolePrismaRepository } from "./repositories/prisma/role.prisma.repository";
 import { PermissionPrismaRepository } from "./repositories/prisma/permission.prisma.repository";
 import { PagePrismaRepository } from "./repositories/prisma/page.prisma.repository";
+import { VendorPrismaRepository } from "./repositories/prisma/vendor.prisma.repository";
 
 // Services
 import { HealthService } from "./services/health.service";
@@ -18,6 +19,7 @@ import { RoleService } from "./services/role.service";
 import { PermissionService } from "./services/permission.service";
 import { OptionsService } from "./services/options.service";
 import { PageService } from "./services/page.service";
+import { VendorService } from "./services/vendor.service";
 
 // Controllers
 import type { IController } from "./controllers/interface/controller.interface";
@@ -28,6 +30,7 @@ import { RoleController } from "./controllers/role.controller";
 import { PermissionController } from "./controllers/permission.controller";
 import { OptionsController } from "./controllers/options.controller";
 import { PageController } from "./controllers/page.controller";
+import { VendorController } from "./controllers/vendor.controller";
 
 // Types
 import type { IServiceContext } from "./types/service.context";
@@ -60,6 +63,7 @@ export class AppContainer {
     const roleRepo = new RolePrismaRepository(dbContext);
     const permissionRepo = new PermissionPrismaRepository(dbContext);
     const pageRepo = new PagePrismaRepository(dbContext);
+    const vendorRepo = new VendorPrismaRepository(dbContext);
 
     /**
      * 建立 Service 共用依賴
@@ -73,6 +77,7 @@ export class AppContainer {
         role: roleRepo,
         permission: permissionRepo,
         page: pageRepo,
+        vendor: vendorRepo,
       },
       get currentUser() {
         return requestContextStorage.getStore();
@@ -89,6 +94,7 @@ export class AppContainer {
     const permissionService = new PermissionService(ctx);
     const optionsService = new OptionsService(ctx);
     const pageService = new PageService(ctx);
+    const vendorService = new VendorService(ctx);
 
     /**
      * 組裝 Controllers
@@ -101,6 +107,7 @@ export class AppContainer {
       new PermissionController(permissionService),
       new OptionsController(optionsService),
       new PageController(pageService),
+      new VendorController(vendorService),
     ];
   }
 }

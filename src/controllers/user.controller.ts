@@ -70,9 +70,11 @@ export class UserController implements IController {
    * 更新使用者
    */
   private updateUser = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
+    const { id } = req.params;
+
     const dto = plainToInstance(UpdateUserRequestDto, req.body);
 
-    await this.userService.updateUser(req.params.id, dto);
+    await this.userService.updateUser(id, dto);
 
     R.success(res);
   };

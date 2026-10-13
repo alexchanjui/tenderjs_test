@@ -23,7 +23,7 @@ export class UserService {
   /**
    * 建立使用者
    */
-  public async createUser(data: CreateUserDto): Promise<UserResponseDto> {
+  public async createUser(data: CreateUserDto): Promise<void> {
     const { username, nickname, email, password } = data;
 
     // 1. 檢查 Email 是否已存在
@@ -37,16 +37,11 @@ export class UserService {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // 3. 建立使用者
-    const newUser = await this.ctx.repos.user.create({
+    await this.ctx.repos.user.create({
       username,
       nickname,
       email,
       password: hashedPassword,
-    });
-
-    // 4. DTO 轉換
-    return plainToInstance(UserResponseDto, newUser, {
-      excludeExtraneousValues: true,
     });
   }
 

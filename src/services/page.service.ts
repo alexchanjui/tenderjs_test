@@ -12,18 +12,14 @@ export class PageService {
   /**
    * 建立頁面
    */
-  public async createPage(data: CreatePageRequestDto): Promise<PageResponseDto> {
+  public async createPage(data: CreatePageRequestDto): Promise<void> {
     const page = await this.ctx.repos.page.findByCode(data.pageCode);
 
     if (page) {
       throw new AppError(ErrorCode.DUPLICATE, "頁面代碼已存在");
     }
 
-    const newPage = await this.ctx.repos.page.create(data);
-
-    return plainToInstance(PageResponseDto, newPage, {
-      excludeExtraneousValues: true,
-    });
+    await this.ctx.repos.page.create(data);
   }
 
   /**

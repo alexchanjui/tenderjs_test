@@ -39,10 +39,26 @@ export class PagePrismaRepository implements IPageRepository {
     return this.ctx.prisma.page.findUnique({ where: { id } });
   }
 
+  /**
+   * 根據頁面代碼查找頁面
+   */
   public async findByCode(pageCode: number): Promise<Page | null> {
     return this.ctx.prisma.page.findUnique({
       where: {
         pageCode,
+      },
+    });
+  }
+
+  /**
+   * 根據頁面代碼查找多個頁面
+   */
+  public async findByCodes(pageCodes: number[]): Promise<Page[]> {
+    return this.ctx.prisma.page.findMany({
+      where: {
+        pageCode: {
+          in: pageCodes,
+        },
       },
     });
   }

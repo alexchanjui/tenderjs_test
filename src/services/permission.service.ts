@@ -16,7 +16,7 @@ export class PermissionService {
   /**
    * 建立權限
    */
-  public async createPermission(data: CreatePermissionRequestDto): Promise<PermissionResponseDto> {
+  public async createPermission(data: CreatePermissionRequestDto): Promise<void> {
     if (data.pageId != null && !(await this.ctx.repos.page.findById(data.pageId))) {
       throw new AppError(ErrorCode.DATA_NOT_FOUND, "頁面不存在");
     }
@@ -29,14 +29,10 @@ export class PermissionService {
     }
 
     // 建立權限
-    const newPermission = await this.ctx.repos.permission.create(data);
+    await this.ctx.repos.permission.create(data);
 
     // 重新載入權限快取
     await cacheInitService.reloadPermissionRules();
-
-    return plainToInstance(PermissionResponseDto, newPermission, {
-      excludeExtraneousValues: true,
-    });
   }
 
   /**

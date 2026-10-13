@@ -18,18 +18,14 @@ export class RoleService {
   /**
    * 建立角色
    */
-  public async createRole(data: CreateRoleRequestDto): Promise<RoleResponseDto> {
+  public async createRole(data: CreateRoleRequestDto): Promise<void> {
     const role = await this.ctx.repos.role.findByName(data.name);
 
     if (role) {
       throw new AppError(ErrorCode.DUPLICATE, "角色名稱已存在");
     }
 
-    const newRole = await this.ctx.repos.role.create(data);
-
-    return plainToInstance(RoleResponseDto, newRole, {
-      excludeExtraneousValues: true,
-    });
+    await this.ctx.repos.role.create(data);
   }
 
   /**
