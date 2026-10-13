@@ -6,7 +6,7 @@ import type { UserService } from "../services/user.service";
 import { UpdateUserRequestDto } from "../dtos/user.dto";
 import type { IController } from "./interface/controller.interface";
 import { validationMiddleware } from "../middlewares/validation.middleware";
-import { CreateUserDto } from "../dtos/user.dto";
+import { CreateUserRequestDto } from "../dtos/user.dto";
 import { PaginationRequestDto } from "../dtos/pagination.dto";
 import * as R from "../utils/response";
 import { BatchDeleteStringIdsDto } from "../dtos/common.dto";
@@ -23,7 +23,7 @@ export class UserController implements IController {
    * 初始化路由
    */
   private initializeRoutes(): void {
-    this.router.post("/", validationMiddleware(CreateUserDto), this.createUser);
+    this.router.post("/", validationMiddleware(CreateUserRequestDto), this.createUser);
     this.router.get("/me", this.getMyUserInfo);
     this.router.get("/", validationMiddleware(PaginationRequestDto, "query"), this.getUsers);
     this.router.get("/:id", this.getUserById);
@@ -39,7 +39,7 @@ export class UserController implements IController {
    * 建立使用者
    */
   private createUser = async (req: Request, res: Response): Promise<void> => {
-    const dto = plainToInstance(CreateUserDto, req.body);
+    const dto = plainToInstance(CreateUserRequestDto, req.body);
 
     const result = await this.userService.createUser(dto);
 

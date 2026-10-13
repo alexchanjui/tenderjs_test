@@ -34,6 +34,13 @@ const pagesData = [
     routePath: "/pages",
     isActive: true,
   },
+  {
+    pageCode: 400,
+    name: "業者管理",
+    description: "管理業者",
+    routePath: "/vendors",
+    isActive: true,
+  },
 ];
 
 // ==========================================
@@ -135,7 +142,7 @@ const permissionsData = [
     actionType: 3, // DELETE
     isRequired: true,
     isActive: true,
-    description: "刪除使用者",
+    description: "批次刪除使用者",
   },
 
   // 200 - 角色管理
@@ -177,21 +184,21 @@ const permissionsData = [
   },
   {
     pageCode: 200,
-    name: "role:delete",
-    apiPath: "/api/roles/:id",
+    name: "role:batch-delete",
+    apiPath: "/api/roles/batch",
     actionType: 3, // DELETE
     isRequired: true,
     isActive: true,
-    description: "刪除角色",
+    description: "批次刪除角色",
   },
   {
     pageCode: 200,
-    name: "role:update-permissions",
-    apiPath: "/api/roles/:id/permissions",
+    name: "role:update-pages",
+    apiPath: "/api/roles/:id/pages",
     actionType: 2, // PUT
     isRequired: true,
     isActive: true,
-    description: "更新角色頁面使用",
+    description: "更新角色頁面權限",
   },
 
   // 300 - 頁面管理
@@ -238,7 +245,63 @@ const permissionsData = [
     actionType: 3, // DELETE
     isRequired: true,
     isActive: true,
-    description: "刪除頁面",
+    description: "批次刪除頁面",
+  },
+
+  // 400 - 業者管理
+  {
+    pageCode: 400,
+    name: "vendor:list",
+    apiPath: "/api/vendors",
+    actionType: 0, // GET
+    isRequired: true,
+    isActive: true,
+    description: "查詢業者列表",
+  },
+  {
+    pageCode: 400,
+    name: "vendor:create",
+    apiPath: "/api/vendors",
+    actionType: 1, // POST
+    isRequired: true,
+    isActive: true,
+    description: "新增業者",
+  },
+  {
+    pageCode: 400,
+    name: "vendor:detail",
+    apiPath: "/api/vendors/:id",
+    actionType: 0, // GET
+    isRequired: true,
+    isActive: true,
+    description: "查詢業者詳細資訊",
+  },
+  {
+    pageCode: 400,
+    name: "vendor:update",
+    apiPath: "/api/vendors/:id",
+    actionType: 2, // PUT
+    isRequired: true,
+    isActive: true,
+    description: "更新業者資訊",
+  },
+  {
+    pageCode: 400,
+    name: "vendor:batch-delete",
+    apiPath: "/api/vendors/batch",
+    actionType: 3, // DELETE
+    isRequired: true,
+    isActive: true,
+    description: "批次刪除業者",
+  },
+  {
+    pageCode: 400,
+    name: "vendor:pages",
+    apiPath: "/api/vendors/:id/pages",
+    actionType: 2, // PUT
+    isRequired: true,
+    isActive: true,
+    description: "更新業者頁面權限",
   },
 ];
 

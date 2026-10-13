@@ -2,7 +2,11 @@
 import bcrypt from "bcrypt";
 import { plainToInstance } from "class-transformer";
 import type { PaginationRequestDto, PaginationResponseDto } from "../dtos/pagination.dto";
-import { UserResponseDto, type CreateUserDto, type UpdateUserRequestDto } from "../dtos/user.dto";
+import {
+  UserResponseDto,
+  type CreateUserRequestDto,
+  type UpdateUserRequestDto,
+} from "../dtos/user.dto";
 import { AppError } from "../errors/app.error";
 import { ErrorCode } from "../errors/error.codes";
 import type { IServiceContext } from "../types/service.context";
@@ -23,25 +27,31 @@ export class UserService {
   /**
    * 建立使用者
    */
-  public async createUser(data: CreateUserDto): Promise<void> {
-    const { username, nickname, email, password } = data;
+  public async createUser(data: CreateUserRequestDto): Promise<void> {
+    const { username, nickname, email, password, vendorId } = data;
 
-    // 1. 檢查 Email 是否已存在
     const user = await this.ctx.repos.user.findByEmail(email);
 
     if (user) {
       throw new AppError(ErrorCode.ACCOUNT_EXIST);
     }
 
-    // 2. 密碼加密
+    if (vendorId) {
+      const vendor = await this.ctx.repos.vendor.findById(vendorId);
+
+      if (!vendor) {
+        throw new AppError(ErrorCode.DATA_NOT_FOUND, "業者不存在");
+      }
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // 3. 建立使用者
     await this.ctx.repos.user.create({
       username,
       nickname,
       email,
       password: hashedPassword,
+      vendorId,
     });
   }
 

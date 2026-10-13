@@ -69,10 +69,4 @@ export class PageResponseDto {
 
   @Expose()
   isActive!: boolean;
-
-  @Expose()
-  createdAt!: Date;
-
-  @Expose()
-  updatedAt!: Date;
 }

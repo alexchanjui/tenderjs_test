@@ -44,6 +44,7 @@
  *               - nickname
  *               - email
  *               - password
+ *               - vendorId
  *             properties:
  *               nickname:
  *                 type: string
@@ -60,6 +61,13 @@
  *                 minLength: 8
  *                 maxLength: 16
  *                 example: "12345678"
+ *               vendorId:
+ *                 type:
+ *                   - string
+ *                   - "null"
+ *                 format: uuid
+ *                 description: 業者 ID，null 代表營運使用者
+ *                 example: "550e8400-e29b-41d4-a716-446655440000"
  *     responses:
  *       200:
  *         description: 成功

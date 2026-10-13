@@ -1,5 +1,5 @@
 import type { Role, RolePage, User } from "@prisma/client";
-import type { CreateUserDto, UpdateUserRequestDto } from "../../dtos/user.dto";
+import type { CreateUserRequestDto, UpdateUserRequestDto } from "../../dtos/user.dto";
 
 /**
  * 包含角色的使用者資料
@@ -14,10 +14,16 @@ export type UserWithRole = User & {
         })[];
       })
     | null;
+
+  vendor: {
+    id: string;
+    code: string;
+    name: string;
+  } | null;
 };
 
 export interface IUserRepository {
-  create(data: CreateUserDto): Promise<User>;
+  create(data: CreateUserRequestDto): Promise<User>;
   findById(id: string): Promise<UserWithRole | null>;
   findByEmail(email: string): Promise<UserWithRole | null>;
   findByUsername(username: string): Promise<UserWithRole | null>;

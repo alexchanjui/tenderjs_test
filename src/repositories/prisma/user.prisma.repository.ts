@@ -1,7 +1,7 @@
 // src/repositories/prisma/user.prisma.repository.ts
 import type { User } from "@prisma/client";
 import type { UserWithRole } from "../interface/user.repository.interface";
-import type { CreateUserDto, UpdateUserRequestDto } from "../../dtos/user.dto";
+import type { CreateUserRequestDto, UpdateUserRequestDto } from "../../dtos/user.dto";
 import type { IUserRepository } from "../interface/user.repository.interface";
 import type { IDbContext } from "../../types/db.context";
 
@@ -11,7 +11,7 @@ export class UserPrismaRepository implements IUserRepository {
   /**
    * 建立使用者
    */
-  public async create(data: CreateUserDto): Promise<User> {
+  public async create(data: CreateUserRequestDto): Promise<User> {
     return this.ctx.prisma.user.create({ data });
   }
 
@@ -33,6 +33,13 @@ export class UserPrismaRepository implements IUserRepository {
                 },
               },
             },
+          },
+        },
+        vendor: {
+          select: {
+            id: true,
+            code: true,
+            name: true,
           },
         },
       },
@@ -59,6 +66,13 @@ export class UserPrismaRepository implements IUserRepository {
             },
           },
         },
+        vendor: {
+          select: {
+            id: true,
+            code: true,
+            name: true,
+          },
+        },
       },
     });
   }
@@ -81,6 +95,13 @@ export class UserPrismaRepository implements IUserRepository {
                 },
               },
             },
+          },
+        },
+        vendor: {
+          select: {
+            id: true,
+            code: true,
+            name: true,
           },
         },
       },
@@ -111,6 +132,13 @@ export class UserPrismaRepository implements IUserRepository {
                   },
                 },
               },
+            },
+          },
+          vendor: {
+            select: {
+              id: true,
+              code: true,
+              name: true,
             },
           },
         },

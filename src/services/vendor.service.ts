@@ -16,14 +16,18 @@ export class VendorService {
   /**
    * 建立業者
    */
-  public async createVendor(data: CreateVendorRequestDto): Promise<void> {
+  public async createVendor(data: CreateVendorRequestDto): Promise<VendorResponseDto> {
     const vendor = await this.ctx.repos.vendor.findByCode(data.code);
 
     if (vendor) {
       throw new AppError(ErrorCode.DUPLICATE, "業者代碼已存在");
     }
 
-    await this.ctx.repos.vendor.create(data);
+    const newVendor = await this.ctx.repos.vendor.create(data);
+
+    return plainToInstance(VendorResponseDto, newVendor, {
+      excludeExtraneousValues: true,
+    });
   }
 
   /**

@@ -10,8 +10,8 @@ export class VendorPrismaRepository implements IVendorRepository {
   /**
    * 建立新業者
    */
-  public async create(data: CreateVendorRequestDto): Promise<void> {
-    await this.ctx.prisma.vendor.create({
+  public async create(data: CreateVendorRequestDto): Promise<Vendor> {
+    return await this.ctx.prisma.vendor.create({
       data,
     });
   }

@@ -14,7 +14,7 @@ export type VendorWithPages = Vendor & {
 };
 
 export interface IVendorRepository {
-  create(data: CreateVendorRequestDto): Promise<void>;
+  create(data: CreateVendorRequestDto): Promise<Vendor>;
   findById(id: string): Promise<VendorWithPages | null>;
   findByCode(code: string): Promise<Vendor | null>;
   findAndCount(params: { skip?: number; take?: number }): Promise<[VendorWithPages[], number]>;

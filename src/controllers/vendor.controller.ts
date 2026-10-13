@@ -47,9 +47,9 @@ export class VendorController implements IController {
   private createVendor = async (req: Request, res: Response): Promise<void> => {
     const dto = plainToInstance(CreateVendorRequestDto, req.body);
 
-    await this.vendorService.createVendor(dto);
+    const result = await this.vendorService.createVendor(dto);
 
-    R.success(res);
+    R.success(res, result);
   };
 
   /**
