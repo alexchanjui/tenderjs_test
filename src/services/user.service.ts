@@ -28,7 +28,7 @@ export class UserService {
    * 建立使用者
    */
   public async createUser(data: CreateUserRequestDto): Promise<void> {
-    const { account, username, email, password, vendorId } = data;
+    const { account, username, email, password, vendorId, roleId } = data;
 
     const user = await this.ctx.repos.user.findByEmail(email);
 
@@ -36,6 +36,7 @@ export class UserService {
       throw new AppError(ErrorCode.ACCOUNT_EXIST);
     }
 
+    // 確認業者存在
     if (vendorId) {
       const vendor = await this.ctx.repos.vendor.findById(vendorId);
 
@@ -44,14 +45,29 @@ export class UserService {
       }
     }
 
+    // 確認角色存在且與使用者屬於相同業者
+    if (roleId) {
+      const role = await this.ctx.repos.role.findById(roleId);
+
+      if (!role) {
+        throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
+      }
+
+      if (role.vendorId !== vendorId) {
+        throw new AppError(ErrorCode.REQUEST_DATA, "使用者與角色必須屬於相同業者");
+      }
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // 建立使用者
     await this.ctx.repos.user.create({
       account,
       username,
       email,
       password: hashedPassword,
       vendorId,
+      roleId,
     });
   }
 
@@ -108,15 +124,20 @@ export class UserService {
       throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);
     }
 
-    // 如果有更新角色，先確認角色存在
+    // 確認角色存在且與使用者屬於相同業者
     if (data.roleId) {
       const role = await this.ctx.repos.role.findById(data.roleId);
 
       if (!role) {
         throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
       }
+
+      if (role.vendorId !== user.vendorId) {
+        throw new AppError(ErrorCode.REQUEST_DATA, "使用者與角色必須屬於相同業者");
+      }
     }
 
+    // 更新使用者
     await this.ctx.repos.user.update(id, data);
   }
 

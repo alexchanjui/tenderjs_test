@@ -73,10 +73,6 @@ export class UpdateUserRequestDto {
   roleId?: string;
 
   @IsOptional()
-  @IsUUID("4", { message: "業者 ID 格式錯誤" })
-  vendorId?: string | null;
-
-  @IsOptional()
   @IsBoolean({ message: "啟用狀態必須為布林值" })
   isActive?: boolean;
 }
