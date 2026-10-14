@@ -9,10 +9,14 @@ import type { CurrentUser } from "../types/service.context";
  */
 export const verifyAuthToken = async (token: string): Promise<CurrentUser> => {
   try {
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET || "dev_secret_key");
+    const secret = process.env.JWT_SECRET;
+
+    if (!secret) {
+      throw new Error("未設定 JWT_SECRET");
+    }
 
     // 1. 驗證 Token
-    const { payload } = await jwtVerify(token, secret);
+    const { payload } = await jwtVerify(token, new TextEncoder().encode(secret));
 
     // 2. 檢查 Token 是否包含必要資料
     if (!payload.id || !payload.nodeId) {
