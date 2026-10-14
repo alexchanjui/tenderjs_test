@@ -28,7 +28,12 @@ export class UserService {
    * 建立使用者
    */
   public async createUser(data: CreateUserRequestDto): Promise<void> {
+    const currentUser = this.getCurrentUser();
     const { account, username, email, password, nodeId, roleId } = data;
+
+    // 業者只能操作自己的節點，營運可指定操作節點
+    const currentNodeId =
+      currentUser.nodeType === "VENDOR" ? currentUser.nodeId : (nodeId ?? currentUser.nodeId);
 
     const user = await this.ctx.repos.user.findByEmail(email);
 
@@ -44,7 +49,7 @@ export class UserService {
         throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
       }
 
-      if (role.nodeId !== nodeId) {
+      if (role.nodeId !== currentNodeId) {
         throw new AppError(ErrorCode.REQUEST_DATA, "使用者與角色必須屬於相同節點");
       }
     }
@@ -57,7 +62,7 @@ export class UserService {
       username,
       email,
       password: hashedPassword,
-      nodeId,
+      nodeId: currentNodeId,
       roleId,
     });
   }
@@ -84,16 +89,17 @@ export class UserService {
     dto: PaginationRequestDto,
   ): Promise<PaginationResponseDto<UserResponseDto>> {
     const currentUser = this.getCurrentUser();
-    const { page, limit } = dto;
+    const { page, limit, nodeId } = dto;
     const skip = (page - 1) * limit;
 
-    // 取得目前登入者可存取的節點
-    const nodeIds = await this.ctx.repos.nodeScope.getAccessibleNodeIds(currentUser.nodeId);
+    // 業者只能操作自己的節點，營運可指定操作節點
+    const currentNodeId =
+      currentUser.nodeType === "VENDOR" ? currentUser.nodeId : (nodeId ?? currentUser.nodeId);
 
     const [users, total] = await this.ctx.repos.user.findAndCount({
       skip,
       take: limit,
-      nodeIds,
+      nodeId: currentNodeId,
     });
 
     return {

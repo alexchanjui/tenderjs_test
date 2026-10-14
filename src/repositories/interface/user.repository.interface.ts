@@ -32,7 +32,7 @@ export interface IUserRepository {
   findAndCount(params: {
     skip?: number;
     take?: number;
-    nodeIds?: string[];
+    nodeId?: string;
   }): Promise<[UserWithRole[], number]>;
   update(id: string, data: UpdateUserRequestDto): Promise<void>;
   batchDelete(ids: string[]): Promise<number>;

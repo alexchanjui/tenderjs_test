@@ -148,6 +148,7 @@ export class AuthService {
       email: user.email,
       roleId: user.roleId,
       nodeId: user.nodeId,
+      nodeType: user.node.type,
     };
 
     // 產生 JWT Token

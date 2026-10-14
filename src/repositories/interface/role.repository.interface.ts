@@ -22,7 +22,11 @@ export interface IRoleRepository {
   findByIds(ids: string[]): Promise<Role[]>;
   findByNodeId(nodeId: string): Promise<Role[]>;
   findByName(name: string, nodeId: string): Promise<Role | null>;
-  findAndCount(params: { skip?: number; take?: number }): Promise<[RoleWithPages[], number]>;
+  findAndCount(params: {
+    skip?: number;
+    take?: number;
+    nodeId?: string;
+  }): Promise<[RoleWithPages[], number]>;
   update(id: string, data: UpdateRoleRequestDto): Promise<void>;
   countUsersByRoleIds(ids: string[]): Promise<number>;
   batchDelete(ids: string[]): Promise<void>;

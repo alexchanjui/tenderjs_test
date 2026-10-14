@@ -15,6 +15,16 @@ import type { IServiceContext } from "../types/service.context";
 export class RoleService {
   constructor(private readonly ctx: IServiceContext) {}
 
+  private getCurrentUser() {
+    const currentUser = this.ctx.currentUser;
+
+    if (!currentUser) {
+      throw new AppError(ErrorCode.UNAUTH, "使用者未登入");
+    }
+
+    return currentUser;
+  }
+
   /**
    * 建立角色
    */
@@ -36,12 +46,18 @@ export class RoleService {
   public async getRoles(
     dto: PaginationRequestDto,
   ): Promise<PaginationResponseDto<RoleResponseDto>> {
-    const { page, limit } = dto;
+    const currentUser = this.getCurrentUser();
+    const { page, limit, nodeId } = dto;
     const skip = (page - 1) * limit;
+
+    // 業者只能操作自己的節點，營運可指定操作節點
+    const currentNodeId =
+      currentUser.nodeType === "VENDOR" ? currentUser.nodeId : (nodeId ?? currentUser.nodeId);
 
     const [roles, total] = await this.ctx.repos.role.findAndCount({
       skip,
       take: limit,
+      nodeId: currentNodeId,
     });
 
     const data = roles.map((role) => ({

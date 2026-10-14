@@ -24,6 +24,12 @@
  *           maximum: 100
  *           default: 20
  *         example: 20
+ *       - in: query
+ *         name: nodeId
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         required: false
  *     responses:
  *       200:
  *         description: 成功

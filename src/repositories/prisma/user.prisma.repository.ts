@@ -119,13 +119,11 @@ export class UserPrismaRepository implements IUserRepository {
   public async findAndCount(params: {
     skip?: number;
     take?: number;
-    nodeIds?: string[];
+    nodeId?: string;
   }): Promise<[UserWithRole[], number]> {
-    const where = params.nodeIds
+    const where = params.nodeId
       ? {
-          nodeId: {
-            in: params.nodeIds,
-          },
+          nodeId: params.nodeId,
         }
       : undefined;
 

@@ -10,7 +10,6 @@ import { RolePrismaRepository } from "./repositories/prisma/role.prisma.reposito
 import { PermissionPrismaRepository } from "./repositories/prisma/permission.prisma.repository";
 import { PagePrismaRepository } from "./repositories/prisma/page.prisma.repository";
 import { VendorPrismaRepository } from "./repositories/prisma/vendor.prisma.repository";
-import { NodeScopePrismaRepository } from "./repositories/prisma/node-scope.prisma.repository";
 import { OptionsPrismaRepository } from "./repositories/prisma/options.prisma.repository";
 
 // Services
@@ -66,7 +65,6 @@ export class AppContainer {
     const permissionRepo = new PermissionPrismaRepository(dbContext);
     const pageRepo = new PagePrismaRepository(dbContext);
     const vendorRepo = new VendorPrismaRepository(dbContext);
-    const nodeScopeRepo = new NodeScopePrismaRepository(dbContext);
     const optionsRepo = new OptionsPrismaRepository(dbContext);
 
     /**
@@ -82,7 +80,6 @@ export class AppContainer {
         permission: permissionRepo,
         page: pageRepo,
         vendor: vendorRepo,
-        nodeScope: nodeScopeRepo,
         options: optionsRepo,
       },
       get currentUser() {

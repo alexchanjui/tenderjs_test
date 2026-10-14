@@ -1,5 +1,6 @@
 // src/utils/auth.helper.ts
 import { jwtVerify } from "jose";
+
 import { AppError } from "../errors/app.error";
 import { ErrorCode } from "../errors/error.codes";
 import type { CurrentUser } from "../types/service.context";
@@ -19,7 +20,7 @@ export const verifyAuthToken = async (token: string): Promise<CurrentUser> => {
     const { payload } = await jwtVerify(token, new TextEncoder().encode(secret));
 
     // 2. 檢查 Token 是否包含必要資料
-    if (!payload.id || !payload.nodeId) {
+    if (!payload.id || !payload.nodeId || !payload.nodeType) {
       throw new AppError(ErrorCode.UNAUTH, "Token 格式錯誤");
     }
 
@@ -28,6 +29,7 @@ export const verifyAuthToken = async (token: string): Promise<CurrentUser> => {
       id: payload.id as string,
       roleId: (payload.roleId as string) ?? null,
       nodeId: payload.nodeId as string,
+      nodeType: payload.nodeType as "OPERATOR" | "VENDOR",
     };
   } catch (error) {
     // 保留自己定義的錯誤

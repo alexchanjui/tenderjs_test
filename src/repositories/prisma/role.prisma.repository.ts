@@ -81,7 +81,14 @@ export class RolePrismaRepository implements IRoleRepository {
   public async findAndCount(params: {
     skip?: number;
     take?: number;
+    nodeId?: string;
   }): Promise<[RoleWithPages[], number]> {
+    const where = params.nodeId
+      ? {
+          nodeId: params.nodeId,
+        }
+      : undefined;
+
     return this.ctx.prisma.$transaction([
       this.ctx.prisma.role.findMany({
         skip: params.skip,
@@ -89,6 +96,7 @@ export class RolePrismaRepository implements IRoleRepository {
         orderBy: {
           createdAt: "desc",
         },
+        where,
         include: {
           rolePages: {
             include: {
@@ -106,7 +114,9 @@ export class RolePrismaRepository implements IRoleRepository {
           },
         },
       }),
-      this.ctx.prisma.role.count(),
+      this.ctx.prisma.role.count({
+        where,
+      }),
     ]);
   }
 

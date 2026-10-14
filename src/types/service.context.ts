@@ -8,7 +8,6 @@ import { IRoleRepository } from "../repositories/interface/role.repository.inter
 import { IPermissionRepository } from "../repositories/interface/permission.repository.interface";
 import type { IPageRepository } from "../repositories/interface/page.repository.interface";
 import type { IVendorRepository } from "../repositories/interface/vendor.repository.interface";
-import type { INodeScopeRepository } from "../repositories/interface/node-scope.repository.interface";
 import type { IOptionsRepository } from "../repositories/interface/options.repository.interface";
 
 /**
@@ -18,6 +17,7 @@ export interface CurrentUser {
   id: string;
   roleId: string | null;
   nodeId: string;
+  nodeType: "OPERATOR" | "VENDOR";
 }
 
 /**
@@ -29,7 +29,6 @@ export interface IRepositoryContext {
   permission: IPermissionRepository;
   page: IPageRepository;
   vendor: IVendorRepository;
-  nodeScope: INodeScopeRepository;
   options: IOptionsRepository;
 }
 

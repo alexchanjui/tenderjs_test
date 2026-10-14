@@ -106,10 +106,8 @@ export class VendorResponseDto {
 
   @Expose()
   @Transform(({ obj }) =>
-    obj.vendorPages
-      ? obj.vendorPages.map(
-          (vendorPage: { page: { pageCode: number } }) => vendorPage.page.pageCode,
-        )
+    obj.nodePages
+      ? obj.nodePages.map((nodePage: { page: { pageCode: number } }) => nodePage.page.pageCode)
       : [],
   )
   pageCodes!: number[];
