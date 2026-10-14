@@ -16,18 +16,26 @@ export class VendorService {
   /**
    * 建立業者
    */
-  public async createVendor(data: CreateVendorRequestDto): Promise<VendorResponseDto> {
+  public async createVendor(data: CreateVendorRequestDto): Promise<void> {
     const vendor = await this.ctx.repos.vendor.findByCode(data.code);
 
     if (vendor) {
       throw new AppError(ErrorCode.DUPLICATE, "業者代碼已存在");
     }
 
-    const newVendor = await this.ctx.repos.vendor.create(data);
+    const accountUser = await this.ctx.repos.user.findByAccount(data.admin.account);
 
-    return plainToInstance(VendorResponseDto, newVendor, {
-      excludeExtraneousValues: true,
-    });
+    if (accountUser) {
+      throw new AppError(ErrorCode.ACCOUNT_EXIST, "管理員帳號已存在");
+    }
+
+    const emailUser = await this.ctx.repos.user.findByEmail(data.admin.email);
+
+    if (emailUser) {
+      throw new AppError(ErrorCode.ACCOUNT_EXIST, "管理員 Email 已存在");
+    }
+
+    await this.ctx.repos.vendor.createWithAdmin(data);
   }
 
   /**

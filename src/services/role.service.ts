@@ -122,30 +122,62 @@ export class RoleService {
    * 更新角色頁面權限
    */
   public async updateRolePages(roleId: string, dto: UpdateRolePagesRequestDto): Promise<void> {
+    // 確認角色存在
     const role = await this.ctx.repos.role.findById(roleId);
 
     if (!role) {
       throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
     }
 
+    // 業者最高管理員權限由 VendorPage 自動同步
+    if (role.isVendorAdmin) {
+      throw new AppError(ErrorCode.PERMISSION, "業者最高管理員權限不可手動修改");
+    }
+
+    // 檢查頁面是否重複
     if (new Set(dto.pageCodes).size !== dto.pageCodes.length) {
       throw new AppError(ErrorCode.REQUEST_DATA, "頁面不可重複設定");
     }
 
+    // 取得所有頁面
     const pages = await this.ctx.repos.page.findAll();
     const pageIdByCode = new Map(pages.map((page) => [page.pageCode, page.id]));
 
+    // 檢查頁面是否存在
     const invalidPageCode = dto.pageCodes.find((pageCode) => !pageIdByCode.has(pageCode));
 
     if (invalidPageCode !== undefined) {
       throw new AppError(ErrorCode.DATA_NOT_FOUND, "頁面不存在");
     }
 
+    // 業者角色只能設定該業者已授權的頁面
+    if (role.vendorId) {
+      const vendor = await this.ctx.repos.vendor.findById(role.vendorId);
+
+      if (!vendor) {
+        throw new AppError(ErrorCode.DATA_NOT_FOUND, "業者不存在");
+      }
+
+      const vendorPageCodes = new Set(
+        vendor.vendorPages.map((vendorPage) => vendorPage.page.pageCode),
+      );
+
+      const unauthorizedPageCode = dto.pageCodes.find((pageCode) => !vendorPageCodes.has(pageCode));
+
+      if (unauthorizedPageCode !== undefined) {
+        throw new AppError(ErrorCode.PERMISSION, "角色頁面權限不可超出業者授權範圍");
+      }
+    }
+
+    // 轉換為 RolePage
     const rolePages = dto.pageCodes.map((pageCode) => ({
       pageId: pageIdByCode.get(pageCode)!,
     }));
 
+    // 更新角色頁面權限
     await this.ctx.repos.role.updatePages(roleId, rolePages);
+
+    // 清除角色頁面權限快取
     await invalidateRolePages(roleId);
   }
 }

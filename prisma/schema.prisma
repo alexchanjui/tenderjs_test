@@ -75,6 +75,9 @@ model Role {
   /// 啟用狀態
   isActive Boolean @default(true) @map("is_active")
 
+  /// 是否為業者預設管理員角色
+  isVendorAdmin Boolean @default(false) @map("is_vendor_admin")
+
   /// 所屬業者 ID
   /// null 代表營運角色
   vendorId String? @map("vendor_id") @db.UniqueIdentifier
@@ -219,7 +222,7 @@ model Vendor {
 // ==========================================
 
 /// 角色頁面權限
-/// 用途：管理角色可使用的頁面
+/// 用途：管理角色實際使用頁面
 model RolePage {
   /// 角色 ID
   roleId String @map("role_id") @db.UniqueIdentifier
@@ -239,7 +242,7 @@ model RolePage {
 }
 
 /// 業者頁面權限
-/// 用途：管理業者可使用的頁面範圍
+/// 用途：管理業者最大可使用頁面
 model VendorPage {
   /// 業者 ID
   vendorId String @map("vendor_id") @db.UniqueIdentifier

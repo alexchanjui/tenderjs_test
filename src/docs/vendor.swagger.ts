@@ -31,6 +31,7 @@
  *   post:
  *     tags: [Vendors]
  *     summary: 建立業者
+ *     description: 建立業者時，同時建立業者最高管理員角色與首位管理員帳號
  *     security:
  *       - BearerAuth: []
  *     requestBody:
@@ -42,6 +43,7 @@
  *             required:
  *               - code
  *               - name
+ *               - admin
  *             properties:
  *               code:
  *                 type: string
@@ -55,7 +57,36 @@
  *                 example: 測試業者
  *               description:
  *                 type: string
+ *                 maxLength: 200
  *                 example: 測試業者說明
+ *               admin:
+ *                 type: object
+ *                 required:
+ *                   - account
+ *                   - username
+ *                   - email
+ *                   - password
+ *                 properties:
+ *                   account:
+ *                     type: string
+ *                     minLength: 2
+ *                     maxLength: 50
+ *                     example: vendor_admin
+ *                   username:
+ *                     type: string
+ *                     minLength: 2
+ *                     maxLength: 50
+ *                     example: 王小明
+ *                   email:
+ *                     type: string
+ *                     format: email
+ *                     example: admin@example.com
+ *                   password:
+ *                     type: string
+ *                     format: password
+ *                     minLength: 6
+ *                     maxLength: 100
+ *                     example: "123456"
  *     responses:
  *       200:
  *         description: 成功

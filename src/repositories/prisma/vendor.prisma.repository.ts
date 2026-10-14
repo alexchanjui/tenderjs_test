@@ -1,4 +1,5 @@
 // src/repositories/prisma/vendor.prisma.repository.ts
+import bcrypt from "bcrypt";
 import type { Vendor } from "@prisma/client";
 import type { CreateVendorRequestDto, UpdateVendorRequestDto } from "../../dtos/vendor.dto";
 import type { IDbContext } from "../../types/db.context";
@@ -8,11 +9,35 @@ export class VendorPrismaRepository implements IVendorRepository {
   constructor(private readonly ctx: IDbContext) {}
 
   /**
-   * 建立新業者
+   * 建立業者與首位管理員
    */
-  public async create(data: CreateVendorRequestDto): Promise<Vendor> {
-    return await this.ctx.prisma.vendor.create({
-      data,
+  public async createWithAdmin(data: CreateVendorRequestDto): Promise<void> {
+    const { admin, ...vendorData } = data;
+    const hashedPassword = await bcrypt.hash(admin.password, 10);
+
+    return this.ctx.prisma.$transaction(async (tx) => {
+      const vendor = await tx.vendor.create({
+        data: vendorData,
+      });
+
+      const role = await tx.role.create({
+        data: {
+          name: "業者最高管理員",
+          vendorId: vendor.id,
+          isVendorAdmin: true,
+        },
+      });
+
+      await tx.user.create({
+        data: {
+          account: admin.account,
+          username: admin.username,
+          email: admin.email,
+          password: hashedPassword,
+          vendorId: vendor.id,
+          roleId: role.id,
+        },
+      });
     });
   }
 
@@ -99,16 +124,61 @@ export class VendorPrismaRepository implements IVendorRepository {
    * 更新業者頁面權限
    */
   public async updatePages(vendorId: string, pages: { pageId: number }[]): Promise<void> {
-    await this.ctx.prisma.$transaction([
-      this.ctx.prisma.vendorPage.deleteMany({
+    const pageIds = pages.map((page) => page.pageId);
+
+    await this.ctx.prisma.$transaction(async (tx) => {
+      // 更新業者頁面權限
+      await tx.vendorPage.deleteMany({
         where: { vendorId },
-      }),
-      this.ctx.prisma.vendorPage.createMany({
-        data: pages.map((page) => ({
+      });
+
+      if (pageIds.length > 0) {
+        await tx.vendorPage.createMany({
+          data: pageIds.map((pageId) => ({
+            vendorId,
+            pageId,
+          })),
+        });
+      }
+
+      // 取得業者最高管理員角色
+      const vendorAdminRole = await tx.role.findFirst({
+        where: {
           vendorId,
-          pageId: page.pageId,
-        })),
-      }),
-    ]);
+          isVendorAdmin: true,
+        },
+      });
+
+      // 同步業者最高管理員頁面權限
+      if (vendorAdminRole) {
+        await tx.rolePage.deleteMany({
+          where: {
+            roleId: vendorAdminRole.id,
+          },
+        });
+
+        if (pageIds.length > 0) {
+          await tx.rolePage.createMany({
+            data: pageIds.map((pageId) => ({
+              roleId: vendorAdminRole.id,
+              pageId,
+            })),
+          });
+        }
+      }
+
+      // 移除一般角色已超出業者範圍的頁面權限
+      await tx.rolePage.deleteMany({
+        where: {
+          role: {
+            vendorId,
+            isVendorAdmin: false,
+          },
+          pageId: {
+            notIn: pageIds,
+          },
+        },
+      });
+    });
   }
 }
