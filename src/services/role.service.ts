@@ -109,12 +109,23 @@ export class RoleService {
    * 批次刪除角色
    */
   public async batchDeleteRole(ids: string[]): Promise<void> {
+    // 檢查是否包含業者最高管理員角色
+    const roles = await this.ctx.repos.role.findByIds(ids);
+
+    const vendorAdminRole = roles.find((role) => role.isVendorAdmin);
+
+    if (vendorAdminRole) {
+      throw new AppError(ErrorCode.REQUEST_DATA, "業者最高管理員角色不可刪除");
+    }
+
+    // 檢查角色是否仍有使用者
     const userCount = await this.ctx.repos.role.countUsersByRoleIds(ids);
 
     if (userCount > 0) {
       throw new Error(`選取的角色仍有 ${userCount} 位使用者使用，無法刪除。`);
     }
 
+    // 刪除角色
     await this.ctx.repos.role.batchDelete(ids);
   }
 

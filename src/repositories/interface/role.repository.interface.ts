@@ -20,6 +20,7 @@ export interface IRoleRepository {
   create(data: CreateRoleRequestDto): Promise<Role>;
   findAll(): Promise<Role[]>;
   findById(id: string): Promise<RoleWithPages | null>;
+  findByIds(ids: string[]): Promise<Role[]>;
   findByName(name: string): Promise<Role | null>;
   findAndCount(params: { skip?: number; take?: number }): Promise<[RoleWithPages[], number]>;
   update(id: string, data: UpdateRoleRequestDto): Promise<void>;
