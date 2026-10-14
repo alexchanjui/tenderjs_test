@@ -119,9 +119,19 @@ export class UserPrismaRepository implements IUserRepository {
   public async findAndCount(params: {
     skip?: number;
     take?: number;
+    nodeIds?: string[];
   }): Promise<[UserWithRole[], number]> {
+    const where = params.nodeIds
+      ? {
+          nodeId: {
+            in: params.nodeIds,
+          },
+        }
+      : undefined;
+
     return this.ctx.prisma.$transaction([
       this.ctx.prisma.user.findMany({
+        where,
         skip: params.skip,
         take: params.take,
         orderBy: {
@@ -152,7 +162,9 @@ export class UserPrismaRepository implements IUserRepository {
           },
         },
       }),
-      this.ctx.prisma.user.count(),
+      this.ctx.prisma.user.count({
+        where,
+      }),
     ]);
   }
 

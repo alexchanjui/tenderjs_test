@@ -10,6 +10,7 @@ import { RolePrismaRepository } from "./repositories/prisma/role.prisma.reposito
 import { PermissionPrismaRepository } from "./repositories/prisma/permission.prisma.repository";
 import { PagePrismaRepository } from "./repositories/prisma/page.prisma.repository";
 import { VendorPrismaRepository } from "./repositories/prisma/vendor.prisma.repository";
+import { NodeScopePrismaRepository } from "./repositories/prisma/node-scope.prisma.repository";
 
 // Services
 import { HealthService } from "./services/health.service";
@@ -64,6 +65,7 @@ export class AppContainer {
     const permissionRepo = new PermissionPrismaRepository(dbContext);
     const pageRepo = new PagePrismaRepository(dbContext);
     const vendorRepo = new VendorPrismaRepository(dbContext);
+    const nodeScopeRepo = new NodeScopePrismaRepository(dbContext);
 
     /**
      * 建立 Service 共用依賴
@@ -78,6 +80,7 @@ export class AppContainer {
         permission: permissionRepo,
         page: pageRepo,
         vendor: vendorRepo,
+        nodeScope: nodeScopeRepo,
       },
       get currentUser() {
         return requestContextStorage.getStore();

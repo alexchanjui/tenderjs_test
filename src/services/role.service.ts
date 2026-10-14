@@ -144,7 +144,7 @@ export class RoleService {
       throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
     }
 
-    // 業者最高管理員權限由 VendorPage 自動同步
+    // 業者最高管理員權限由 NodePage 自動同步
     if (role.isVendorAdmin) {
       throw new AppError(ErrorCode.PERMISSION, "業者最高管理員權限不可手動修改");
     }

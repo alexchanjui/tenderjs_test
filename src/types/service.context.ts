@@ -8,6 +8,7 @@ import { IRoleRepository } from "../repositories/interface/role.repository.inter
 import { IPermissionRepository } from "../repositories/interface/permission.repository.interface";
 import type { IPageRepository } from "../repositories/interface/page.repository.interface";
 import type { IVendorRepository } from "../repositories/interface/vendor.repository.interface";
+import type { INodeScopeRepository } from "../repositories/interface/node-scope.repository.interface";
 
 /**
  * 目前登入的使用者資訊
@@ -27,6 +28,7 @@ export interface IRepositoryContext {
   permission: IPermissionRepository;
   page: IPageRepository;
   vendor: IVendorRepository;
+  nodeScope: INodeScopeRepository;
 }
 
 /**

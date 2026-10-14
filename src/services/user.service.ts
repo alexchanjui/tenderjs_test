@@ -83,12 +83,17 @@ export class UserService {
   public async getUsers(
     dto: PaginationRequestDto,
   ): Promise<PaginationResponseDto<UserResponseDto>> {
+    const currentUser = this.getCurrentUser();
     const { page, limit } = dto;
     const skip = (page - 1) * limit;
+
+    // 取得目前登入者可存取的節點
+    const nodeIds = await this.ctx.repos.nodeScope.getAccessibleNodeIds(currentUser.nodeId);
 
     const [users, total] = await this.ctx.repos.user.findAndCount({
       skip,
       take: limit,
+      nodeIds,
     });
 
     return {
