@@ -67,6 +67,17 @@ export class RolePrismaRepository implements IRoleRepository {
   }
 
   /**
+   * 根據業者 ID 取得角色
+   */
+  public async findByVendorId(vendorId: string): Promise<Role[]> {
+    return this.ctx.prisma.role.findMany({
+      where: {
+        vendorId,
+      },
+    });
+  }
+
+  /**
    * 根據名稱與所屬業者查找角色
    */
   public async findByName(name: string, vendorId: string | null): Promise<Role | null> {

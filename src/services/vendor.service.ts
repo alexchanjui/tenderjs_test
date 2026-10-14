@@ -9,6 +9,7 @@ import {
 import { AppError } from "../errors/app.error";
 import { ErrorCode } from "../errors/error.codes";
 import type { IServiceContext } from "../types/service.context";
+import { invalidateRolePages } from "../caches/rolePage.cache";
 
 export class VendorService {
   constructor(private readonly ctx: IServiceContext) {}
@@ -104,23 +105,31 @@ export class VendorService {
    * 更新業者頁面權限
    */
   public async updateVendorPages(id: string, pageCodes: number[]): Promise<void> {
+    // 確認業者存在
     const vendor = await this.ctx.repos.vendor.findById(id);
 
     if (!vendor) {
       throw new AppError(ErrorCode.DATA_NOT_FOUND, "業者不存在");
     }
 
+    // 確認頁面代碼都存在
     const pages = await this.ctx.repos.page.findByCodes(pageCodes);
 
     if (pages.length !== pageCodes.length) {
       throw new AppError(ErrorCode.DATA_NOT_FOUND, "部分頁面不存在");
     }
 
+    // 更新業者頁面權限
     await this.ctx.repos.vendor.updatePages(
       id,
       pages.map((page) => ({
         pageId: page.id,
       })),
     );
+
+    // 清除業者所有角色的頁面權限快取
+    const roles = await this.ctx.repos.role.findByVendorId(id);
+
+    await Promise.all(roles.map((role) => invalidateRolePages(role.id)));
   }
 }
