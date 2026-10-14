@@ -23,6 +23,20 @@ export class AuthService {
   }
 
   /**
+   * 檢查業者是否可使用
+   */
+  private async validateVendor(user: User): Promise<void> {
+    // 營運使用者不屬於業者
+    if (!user.vendorId) return;
+
+    const vendor = await this.ctx.repos.vendor.findById(user.vendorId);
+
+    if (!vendor || !vendor.isActive) {
+      throw new AppError(ErrorCode.ACCOUNT_DISABLED);
+    }
+  }
+
+  /**
    * 產生登入驗證碼
    */
   public async generateCaptcha() {
@@ -82,6 +96,9 @@ export class AuthService {
       throw new AppError(ErrorCode.ACCOUNT_DISABLED);
     }
 
+    // 檢查所屬業者是否啟用
+    await this.validateVendor(user);
+
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
@@ -110,6 +127,9 @@ export class AuthService {
     if (!user.isActive) {
       throw new AppError(ErrorCode.ACCOUNT_DISABLED);
     }
+
+    // 檢查所屬業者是否啟用
+    await this.validateVendor(user);
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
