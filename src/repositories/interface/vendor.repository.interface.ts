@@ -1,12 +1,11 @@
-// src/repositories/interface/vendor.repository.interface.ts
-import type { Vendor, VendorPage } from "@prisma/client";
+import type { Node, NodePage } from "@prisma/client";
 import type { CreateVendorRequestDto, UpdateVendorRequestDto } from "../../dtos/vendor.dto";
 
 /**
  * 包含頁面權限的業者資料
  */
-export type VendorWithPages = Vendor & {
-  vendorPages: (VendorPage & {
+export type VendorWithPages = Node & {
+  nodePages: (NodePage & {
     page: {
       pageCode: number;
     };
@@ -16,9 +15,9 @@ export type VendorWithPages = Vendor & {
 export interface IVendorRepository {
   createWithAdmin(data: CreateVendorRequestDto): Promise<void>;
   findById(id: string): Promise<VendorWithPages | null>;
-  findByCode(code: string): Promise<Vendor | null>;
+  findByCode(code: string): Promise<Node | null>;
   findAndCount(params: { skip?: number; take?: number }): Promise<[VendorWithPages[], number]>;
   update(id: string, data: UpdateVendorRequestDto): Promise<void>;
   batchDelete(ids: string[]): Promise<number>;
-  updatePages(vendorId: string, pages: { pageId: number }[]): Promise<void>;
+  updatePages(nodeId: string, pages: { pageId: number }[]): Promise<void>;
 }

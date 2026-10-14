@@ -14,15 +14,16 @@ export const verifyAuthToken = async (token: string): Promise<CurrentUser> => {
     // 1. 驗證 Token
     const { payload } = await jwtVerify(token, secret);
 
-    // 2. 檢查 Token 是否包含使用者 ID
-    if (!payload.id) {
-      throw new AppError(ErrorCode.UNAUTH, "Token 格式錯誤: 缺少 ID");
+    // 2. 檢查 Token 是否包含必要資料
+    if (!payload.id || !payload.nodeId) {
+      throw new AppError(ErrorCode.UNAUTH, "Token 格式錯誤");
     }
 
     // 3. 回傳目前登入者
     return {
       id: payload.id as string,
       roleId: (payload.roleId as string) ?? null,
+      nodeId: payload.nodeId as string,
     };
   } catch (error) {
     // 保留自己定義的錯誤

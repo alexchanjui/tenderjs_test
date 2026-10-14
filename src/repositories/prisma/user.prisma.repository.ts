@@ -1,9 +1,8 @@
 // src/repositories/prisma/user.prisma.repository.ts
 import type { User } from "@prisma/client";
-import type { UserWithRole } from "../interface/user.repository.interface";
 import type { CreateUserRequestDto, UpdateUserRequestDto } from "../../dtos/user.dto";
-import type { IUserRepository } from "../interface/user.repository.interface";
 import type { IDbContext } from "../../types/db.context";
+import type { IUserRepository, UserWithRole } from "../interface/user.repository.interface";
 
 export class UserPrismaRepository implements IUserRepository {
   constructor(private readonly ctx: IDbContext) {}
@@ -35,11 +34,13 @@ export class UserPrismaRepository implements IUserRepository {
             },
           },
         },
-        vendor: {
+        node: {
           select: {
             id: true,
             code: true,
             name: true,
+            type: true,
+            isActive: true,
           },
         },
       },
@@ -66,11 +67,13 @@ export class UserPrismaRepository implements IUserRepository {
             },
           },
         },
-        vendor: {
+        node: {
           select: {
             id: true,
             code: true,
             name: true,
+            type: true,
+            isActive: true,
           },
         },
       },
@@ -97,11 +100,13 @@ export class UserPrismaRepository implements IUserRepository {
             },
           },
         },
-        vendor: {
+        node: {
           select: {
             id: true,
             code: true,
             name: true,
+            type: true,
+            isActive: true,
           },
         },
       },
@@ -119,7 +124,9 @@ export class UserPrismaRepository implements IUserRepository {
       this.ctx.prisma.user.findMany({
         skip: params.skip,
         take: params.take,
-        orderBy: { createdAt: "desc" },
+        orderBy: {
+          createdAt: "desc",
+        },
         include: {
           role: {
             include: {
@@ -134,11 +141,13 @@ export class UserPrismaRepository implements IUserRepository {
               },
             },
           },
-          vendor: {
+          node: {
             select: {
               id: true,
               code: true,
               name: true,
+              type: true,
+              isActive: true,
             },
           },
         },

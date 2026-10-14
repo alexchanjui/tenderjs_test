@@ -19,29 +19,15 @@ export class RoleService {
    * 建立角色
    */
   public async createRole(data: CreateRoleRequestDto): Promise<void> {
-    const vendorId = data.vendorId ?? null;
-
-    // 確認業者存在
-    if (vendorId) {
-      const vendor = await this.ctx.repos.vendor.findById(vendorId);
-
-      if (!vendor) {
-        throw new AppError(ErrorCode.DATA_NOT_FOUND, "業者不存在");
-      }
-    }
-
-    // 檢查同一所屬範圍內角色名稱是否重複
-    const role = await this.ctx.repos.role.findByName(data.name, vendorId);
+    // 檢查同一節點內角色名稱是否重複
+    const role = await this.ctx.repos.role.findByName(data.name, data.nodeId);
 
     if (role) {
       throw new AppError(ErrorCode.DUPLICATE, "角色名稱已存在");
     }
 
     // 建立角色
-    await this.ctx.repos.role.create({
-      ...data,
-      vendorId,
-    });
+    await this.ctx.repos.role.create(data);
   }
 
   /**
@@ -112,7 +98,7 @@ export class RoleService {
 
     // 檢查同一所屬範圍內角色名稱是否重複
     if (data.name && data.name !== role.name) {
-      const existingRole = await this.ctx.repos.role.findByName(data.name, role.vendorId);
+      const existingRole = await this.ctx.repos.role.findByName(data.name, role.nodeId);
 
       if (existingRole) {
         throw new AppError(ErrorCode.DUPLICATE, "角色名稱已存在");
@@ -180,16 +166,10 @@ export class RoleService {
     }
 
     // 業者角色只能設定該業者已授權的頁面
-    if (role.vendorId) {
-      const vendor = await this.ctx.repos.vendor.findById(role.vendorId);
+    const vendor = await this.ctx.repos.vendor.findById(role.nodeId);
 
-      if (!vendor) {
-        throw new AppError(ErrorCode.DATA_NOT_FOUND, "業者不存在");
-      }
-
-      const vendorPageCodes = new Set(
-        vendor.vendorPages.map((vendorPage) => vendorPage.page.pageCode),
-      );
+    if (vendor) {
+      const vendorPageCodes = new Set(vendor.nodePages.map((nodePage) => nodePage.page.pageCode));
 
       const unauthorizedPageCode = dto.pageCodes.find((pageCode) => !vendorPageCodes.has(pageCode));
 

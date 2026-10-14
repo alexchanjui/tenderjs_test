@@ -1,15 +1,6 @@
 // src/dtos/user.dto.ts
 import { Expose, Type } from "class-transformer";
-import {
-  IsBoolean,
-  IsEmail,
-  IsOptional,
-  IsString,
-  IsUUID,
-  Length,
-  IsDefined,
-  ValidateIf,
-} from "class-validator";
+import { IsBoolean, IsEmail, IsOptional, IsString, IsUUID, Length } from "class-validator";
 
 /**
  * 建立使用者 Request DTO
@@ -40,10 +31,8 @@ export class CreateUserRequestDto {
   @IsUUID("4", { message: "角色 ID 格式錯誤" })
   roleId?: string;
 
-  @IsDefined({ message: "業者 ID 為必填" })
-  @ValidateIf((_, value) => value !== null)
-  @IsUUID("4", { message: "業者 ID 格式錯誤" })
-  vendorId!: string | null;
+  @IsUUID("4", { message: "節點 ID 格式錯誤" })
+  nodeId!: string;
 }
 
 /**
@@ -89,14 +78,17 @@ class UserRoleDto {
 }
 
 /**
- * 業者資訊 DTO
+ * 節點資訊 DTO
  */
-export class UserVendorResponseDto {
+export class UserNodeResponseDto {
   @Expose()
   name!: string;
 
   @Expose()
   code!: string;
+
+  @Expose()
+  type!: string;
 }
 
 /**
@@ -126,11 +118,11 @@ export class UserResponseDto {
   role!: UserRoleDto | null;
 
   @Expose()
-  vendorId!: string | null;
+  nodeId!: string;
 
   @Expose()
-  @Type(() => UserVendorResponseDto)
-  vendor!: UserVendorResponseDto | null;
+  @Type(() => UserNodeResponseDto)
+  node!: UserNodeResponseDto;
 
   @Expose()
   pageCodes!: number[];

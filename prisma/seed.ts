@@ -311,24 +311,48 @@ async function main() {
   // ==========================================
   // Step 1: 建立 Pages
   // ==========================================
+
   logger.info(`📋 同步 Pages (${pagesData.length} 筆)...`);
 
   const pageIdByCode = new Map<number, number>();
+
   for (const page of pagesData) {
     const ruleName = permissionsData.find((rule) => rule.pageCode === page.pageCode)?.name;
+
     const rule = ruleName
-      ? await prisma.permission.findUnique({ where: { name: ruleName } })
+      ? await prisma.permission.findUnique({
+          where: {
+            name: ruleName,
+          },
+        })
       : null;
+
     const existing =
       rule?.pageId != null
-        ? await prisma.page.findUnique({ where: { id: rule.pageId } })
+        ? await prisma.page.findUnique({
+            where: {
+              id: rule.pageId,
+            },
+          })
         : await prisma.page.findFirst({
-            where: { OR: [{ pageCode: page.pageCode }, { routePath: page.routePath }] },
+            where: {
+              OR: [{ pageCode: page.pageCode }, { routePath: page.routePath }],
+            },
           });
+
     const { pageCode, ...metadata } = page;
+
     const saved = existing
-      ? await prisma.page.update({ where: { id: existing.id }, data: metadata })
-      : await prisma.page.create({ data: page });
+      ? await prisma.page.update({
+          where: {
+            id: existing.id,
+          },
+          data: metadata,
+        })
+      : await prisma.page.create({
+          data: page,
+        });
+
     pageIdByCode.set(pageCode, saved.id);
   }
 
@@ -337,12 +361,21 @@ async function main() {
   // ==========================================
   // Step 2: 建立 Permissions
   // ==========================================
+
   logger.info(`📋 同步 Permissions (${permissionsData.length} 筆)...`);
 
   for (const { pageCode, ...permission } of permissionsData) {
     const pageId = pageCode === 0 ? null : pageIdByCode.get(pageCode);
-    if (pageId === undefined) throw new Error(`頁面代碼 ${pageCode} 不存在`);
-    const data = { ...permission, pageId };
+
+    if (pageId === undefined) {
+      throw new Error(`頁面代碼 ${pageCode} 不存在`);
+    }
+
+    const data = {
+      ...permission,
+      pageId,
+    };
+
     await prisma.permission.upsert({
       where: {
         name: permission.name,
@@ -355,12 +388,38 @@ async function main() {
   logger.info("✅ Permissions 建立完成");
 
   // ==========================================
-  // Step 3: 建立 superAdmin Role
+  // Step 3: 建立營運 Node
   // ==========================================
+
+  const operatorNode = await prisma.node.upsert({
+    where: {
+      code: "OPS",
+    },
+    update: {
+      name: "營運",
+      type: "OPERATOR",
+      description: "系統營運節點",
+      isActive: true,
+    },
+    create: {
+      code: "OPS",
+      name: "營運",
+      type: "OPERATOR",
+      description: "系統營運節點",
+      isActive: true,
+    },
+  });
+
+  logger.info("✅ 營運 Node 建立完成");
+
+  // ==========================================
+  // Step 4: 建立 superAdmin Role
+  // ==========================================
+
   let superAdminRole = await prisma.role.findFirst({
     where: {
       name: "superAdmin",
-      vendorId: null,
+      nodeId: operatorNode.id,
     },
   });
 
@@ -370,7 +429,8 @@ async function main() {
         name: "superAdmin",
         description: "超級管理員",
         isActive: true,
-        vendorId: null,
+        nodeId: operatorNode.id,
+        isVendorAdmin: false,
       },
     });
   }
@@ -378,9 +438,10 @@ async function main() {
   logger.info("✅ superAdmin Role 建立完成");
 
   // ==========================================
-  // Step 4: superAdmin 加入所有頁面權限
+  // Step 5: superAdmin 加入所有頁面權限
   // ==========================================
-  const pages = await prisma.page.findMany({
+
+  const activePages = await prisma.page.findMany({
     where: {
       isActive: true,
     },
@@ -397,18 +458,19 @@ async function main() {
     }),
 
     prisma.rolePage.createMany({
-      data: pages.map((page) => ({
+      data: activePages.map((page) => ({
         roleId: superAdminRole.id,
         pageId: page.id,
       })),
     }),
   ]);
 
-  logger.info(`✅ superAdmin 頁面權限同步完成 (${pages.length} 筆)`);
+  logger.info(`✅ superAdmin 頁面權限同步完成 (${activePages.length} 筆)`);
 
   // ==========================================
-  // Step 5: 建立 admin User
+  // Step 6: 建立 admin User
   // ==========================================
+
   const password = await bcrypt.hash("password123", 10);
 
   await prisma.user.upsert({
@@ -417,6 +479,7 @@ async function main() {
     },
     update: {
       roleId: superAdminRole.id,
+      nodeId: operatorNode.id,
     },
     create: {
       account: "admin",
@@ -425,6 +488,7 @@ async function main() {
       password,
       isActive: true,
       roleId: superAdminRole.id,
+      nodeId: operatorNode.id,
     },
   });
 

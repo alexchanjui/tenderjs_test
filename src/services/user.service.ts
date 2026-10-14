@@ -28,7 +28,7 @@ export class UserService {
    * 建立使用者
    */
   public async createUser(data: CreateUserRequestDto): Promise<void> {
-    const { account, username, email, password, vendorId, roleId } = data;
+    const { account, username, email, password, nodeId, roleId } = data;
 
     const user = await this.ctx.repos.user.findByEmail(email);
 
@@ -36,16 +36,7 @@ export class UserService {
       throw new AppError(ErrorCode.ACCOUNT_EXIST);
     }
 
-    // 確認業者存在
-    if (vendorId) {
-      const vendor = await this.ctx.repos.vendor.findById(vendorId);
-
-      if (!vendor) {
-        throw new AppError(ErrorCode.DATA_NOT_FOUND, "業者不存在");
-      }
-    }
-
-    // 確認角色存在且與使用者屬於相同業者
+    // 確認角色存在且與使用者屬於相同節點
     if (roleId) {
       const role = await this.ctx.repos.role.findById(roleId);
 
@@ -53,8 +44,8 @@ export class UserService {
         throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
       }
 
-      if (role.vendorId !== vendorId) {
-        throw new AppError(ErrorCode.REQUEST_DATA, "使用者與角色必須屬於相同業者");
+      if (role.nodeId !== nodeId) {
+        throw new AppError(ErrorCode.REQUEST_DATA, "使用者與角色必須屬於相同節點");
       }
     }
 
@@ -66,7 +57,7 @@ export class UserService {
       username,
       email,
       password: hashedPassword,
-      vendorId,
+      nodeId,
       roleId,
     });
   }
@@ -93,7 +84,6 @@ export class UserService {
     dto: PaginationRequestDto,
   ): Promise<PaginationResponseDto<UserResponseDto>> {
     const { page, limit } = dto;
-
     const skip = (page - 1) * limit;
 
     const [users, total] = await this.ctx.repos.user.findAndCount({
@@ -124,7 +114,7 @@ export class UserService {
       throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);
     }
 
-    // 確認角色存在且與使用者屬於相同業者
+    // 確認角色存在且與使用者屬於相同節點
     if (data.roleId) {
       const role = await this.ctx.repos.role.findById(data.roleId);
 
@@ -132,8 +122,8 @@ export class UserService {
         throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
       }
 
-      if (role.vendorId !== user.vendorId) {
-        throw new AppError(ErrorCode.REQUEST_DATA, "使用者與角色必須屬於相同業者");
+      if (role.nodeId !== user.nodeId) {
+        throw new AppError(ErrorCode.REQUEST_DATA, "使用者與角色必須屬於相同節點");
       }
     }
 

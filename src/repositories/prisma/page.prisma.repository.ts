@@ -33,7 +33,7 @@ export class PagePrismaRepository implements IPageRepository {
   }
 
   /**
-   * 根據頁面代碼查找頁面
+   * 根據頁面 ID 查找頁面
    */
   public async findById(id: number): Promise<Page | null> {
     return this.ctx.prisma.page.findUnique({ where: { id } });

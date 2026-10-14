@@ -15,6 +15,7 @@ import type { IVendorRepository } from "../repositories/interface/vendor.reposit
 export interface CurrentUser {
   id: string;
   roleId: string | null;
+  nodeId: string;
 }
 
 /**

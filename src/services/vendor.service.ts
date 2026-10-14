@@ -128,7 +128,7 @@ export class VendorService {
     );
 
     // 清除業者所有角色的頁面權限快取
-    const roles = await this.ctx.repos.role.findByVendorId(id);
+    const roles = await this.ctx.repos.role.findByNodeId(id);
 
     await Promise.all(roles.map((role) => invalidateRolePages(role.id)));
   }

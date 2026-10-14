@@ -15,9 +15,8 @@ export class CreateRoleRequestDto {
   @Length(0, 200, { message: "角色說明長度需介於 0~200 字元" })
   description?: string;
 
-  @IsOptional()
-  @IsUUID("4", { message: "業者 ID 格式錯誤" })
-  vendorId?: string | null;
+  @IsUUID("4", { message: "節點 ID 格式錯誤" })
+  nodeId!: string;
 }
 
 /**
@@ -59,7 +58,7 @@ export class RoleResponseDto {
   pageCodes!: number[];
 
   @Expose()
-  vendorId!: string | null;
+  nodeId!: string;
 
   @Expose()
   isVendorAdmin!: boolean;

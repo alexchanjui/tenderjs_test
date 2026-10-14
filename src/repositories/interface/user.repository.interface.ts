@@ -15,11 +15,13 @@ export type UserWithRole = User & {
       })
     | null;
 
-  vendor: {
+  node: {
     id: string;
     code: string;
     name: string;
-  } | null;
+    type: string;
+    isActive: boolean;
+  };
 };
 
 export interface IUserRepository {

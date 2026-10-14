@@ -1,14 +1,14 @@
 // src/services/auth.service.ts
 import bcrypt from "bcrypt";
+import { plainToInstance } from "class-transformer";
+import { randomUUID } from "node:crypto";
 import { SignJWT } from "jose";
-import type { IServiceContext } from "../types/service.context";
+import svgCaptcha from "svg-captcha";
 import { AutoLoginRequestDto, type LoginRequestDto, LoginResponseDto } from "../dtos/auth.dto";
 import { AppError } from "../errors/app.error";
 import { ErrorCode } from "../errors/error.codes";
-import type { User } from "@prisma/client";
-import { plainToInstance } from "class-transformer";
-import svgCaptcha from "svg-captcha";
-import { randomUUID } from "node:crypto";
+import type { UserWithRole } from "../repositories/interface/user.repository.interface";
+import type { IServiceContext } from "../types/service.context";
 
 export class AuthService {
   private readonly jwtSecret: Uint8Array;
@@ -16,22 +16,19 @@ export class AuthService {
 
   constructor(private readonly ctx: IServiceContext) {
     const secret = process.env.JWT_SECRET;
+
     if (!secret) {
       throw new Error("❌ 未設定 JWT_SECRET 環境變數，服務無法啟動！");
     }
+
     this.jwtSecret = new TextEncoder().encode(secret);
   }
 
   /**
-   * 檢查業者是否可使用
+   * 檢查所屬節點是否可使用
    */
-  private async validateVendor(user: User): Promise<void> {
-    // 營運使用者不屬於業者
-    if (!user.vendorId) return;
-
-    const vendor = await this.ctx.repos.vendor.findById(user.vendorId);
-
-    if (!vendor || !vendor.isActive) {
+  private validateNode(user: UserWithRole): void {
+    if (!user.node.isActive) {
       throw new AppError(ErrorCode.ACCOUNT_DISABLED);
     }
   }
@@ -96,8 +93,8 @@ export class AuthService {
       throw new AppError(ErrorCode.ACCOUNT_DISABLED);
     }
 
-    // 檢查所屬業者是否啟用
-    await this.validateVendor(user);
+    // 檢查所屬節點是否啟用
+    this.validateNode(user);
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
@@ -128,8 +125,8 @@ export class AuthService {
       throw new AppError(ErrorCode.ACCOUNT_DISABLED);
     }
 
-    // 檢查所屬業者是否啟用
-    await this.validateVendor(user);
+    // 檢查所屬節點是否啟用
+    this.validateNode(user);
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
@@ -143,13 +140,14 @@ export class AuthService {
   /**
    * 產生 JWT Token 與使用者資料
    */
-  private async generateTokenResponse(user: User): Promise<LoginResponseDto> {
+  private async generateTokenResponse(user: UserWithRole): Promise<LoginResponseDto> {
     // 放進 JWT 的使用者資料
     const userPayload = {
       id: user.id,
       account: user.account,
       email: user.email,
       roleId: user.roleId,
+      nodeId: user.nodeId,
     };
 
     // 產生 JWT Token
