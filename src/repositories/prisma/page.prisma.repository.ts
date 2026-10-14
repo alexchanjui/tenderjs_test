@@ -26,9 +26,6 @@ export class PagePrismaRepository implements IPageRepository {
       where: {
         isActive: true,
       },
-      orderBy: {
-        pageCode: "asc",
-      },
     });
   }
 

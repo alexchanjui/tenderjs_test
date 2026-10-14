@@ -27,3 +27,17 @@
  *       200:
  *         description: 查詢成功
  */
+
+/**
+ * @openapi
+ * /options/nodes:
+ *   get:
+ *     tags:
+ *       - Options
+ *     summary: 取得組織節點選項
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: 查詢成功
+ */

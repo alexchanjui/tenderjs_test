@@ -11,6 +11,7 @@ import { PermissionPrismaRepository } from "./repositories/prisma/permission.pri
 import { PagePrismaRepository } from "./repositories/prisma/page.prisma.repository";
 import { VendorPrismaRepository } from "./repositories/prisma/vendor.prisma.repository";
 import { NodeScopePrismaRepository } from "./repositories/prisma/node-scope.prisma.repository";
+import { OptionsPrismaRepository } from "./repositories/prisma/options.prisma.repository";
 
 // Services
 import { HealthService } from "./services/health.service";
@@ -18,9 +19,9 @@ import { UserService } from "./services/user.service";
 import { AuthService } from "./services/auth.service";
 import { RoleService } from "./services/role.service";
 import { PermissionService } from "./services/permission.service";
-import { OptionsService } from "./services/options.service";
 import { PageService } from "./services/page.service";
 import { VendorService } from "./services/vendor.service";
+import { OptionsService } from "./services/options.service";
 
 // Controllers
 import type { IController } from "./controllers/interface/controller.interface";
@@ -29,9 +30,9 @@ import { UserController } from "./controllers/user.controller";
 import { AuthController } from "./controllers/auth.controller";
 import { RoleController } from "./controllers/role.controller";
 import { PermissionController } from "./controllers/permission.controller";
-import { OptionsController } from "./controllers/options.controller";
 import { PageController } from "./controllers/page.controller";
 import { VendorController } from "./controllers/vendor.controller";
+import { OptionsController } from "./controllers/options.controller";
 
 // Types
 import type { IServiceContext } from "./types/service.context";
@@ -66,6 +67,7 @@ export class AppContainer {
     const pageRepo = new PagePrismaRepository(dbContext);
     const vendorRepo = new VendorPrismaRepository(dbContext);
     const nodeScopeRepo = new NodeScopePrismaRepository(dbContext);
+    const optionsRepo = new OptionsPrismaRepository(dbContext);
 
     /**
      * 建立 Service 共用依賴
@@ -81,6 +83,7 @@ export class AppContainer {
         page: pageRepo,
         vendor: vendorRepo,
         nodeScope: nodeScopeRepo,
+        options: optionsRepo,
       },
       get currentUser() {
         return requestContextStorage.getStore();
@@ -95,9 +98,9 @@ export class AppContainer {
     const authService = new AuthService(ctx);
     const roleService = new RoleService(ctx);
     const permissionService = new PermissionService(ctx);
-    const optionsService = new OptionsService(ctx);
     const pageService = new PageService(ctx);
     const vendorService = new VendorService(ctx);
+    const optionsService = new OptionsService(ctx);
 
     /**
      * 組裝 Controllers
@@ -108,9 +111,9 @@ export class AppContainer {
       new AuthController(authService),
       new RoleController(roleService),
       new PermissionController(permissionService),
-      new OptionsController(optionsService),
       new PageController(pageService),
       new VendorController(vendorService),
+      new OptionsController(optionsService),
     ];
   }
 }

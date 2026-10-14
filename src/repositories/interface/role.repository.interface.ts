@@ -18,7 +18,6 @@ export type RoleWithPages = Role & {
 
 export interface IRoleRepository {
   create(data: CreateRoleRequestDto): Promise<Role>;
-  findAll(): Promise<Role[]>;
   findById(id: string): Promise<RoleWithPages | null>;
   findByIds(ids: string[]): Promise<Role[]>;
   findByNodeId(nodeId: string): Promise<Role[]>;
