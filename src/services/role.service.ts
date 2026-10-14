@@ -19,13 +19,29 @@ export class RoleService {
    * 建立角色
    */
   public async createRole(data: CreateRoleRequestDto): Promise<void> {
-    const role = await this.ctx.repos.role.findByName(data.name);
+    const vendorId = data.vendorId ?? null;
+
+    // 確認業者存在
+    if (vendorId) {
+      const vendor = await this.ctx.repos.vendor.findById(vendorId);
+
+      if (!vendor) {
+        throw new AppError(ErrorCode.DATA_NOT_FOUND, "業者不存在");
+      }
+    }
+
+    // 檢查同一所屬範圍內角色名稱是否重複
+    const role = await this.ctx.repos.role.findByName(data.name, vendorId);
 
     if (role) {
       throw new AppError(ErrorCode.DUPLICATE, "角色名稱已存在");
     }
 
-    await this.ctx.repos.role.create(data);
+    // 建立角色
+    await this.ctx.repos.role.create({
+      ...data,
+      vendorId,
+    });
   }
 
   /**
@@ -94,14 +110,16 @@ export class RoleService {
       throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
     }
 
+    // 檢查同一所屬範圍內角色名稱是否重複
     if (data.name && data.name !== role.name) {
-      const existingRole = await this.ctx.repos.role.findByName(data.name);
+      const existingRole = await this.ctx.repos.role.findByName(data.name, role.vendorId);
 
       if (existingRole) {
         throw new AppError(ErrorCode.DUPLICATE, "角色名稱已存在");
       }
     }
 
+    // 更新角色
     await this.ctx.repos.role.update(id, data);
   }
 

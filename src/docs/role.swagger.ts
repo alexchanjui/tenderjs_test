@@ -31,6 +31,7 @@
  *   post:
  *     tags: [Roles]
  *     summary: 建立角色
+ *     description: 如果指定了 vendorId，則角色將屬於該業者；否則為營運角色
  *     security:
  *       - BearerAuth: []
  *     requestBody:
@@ -51,6 +52,11 @@
  *                 type: string
  *                 maxLength: 200
  *                 example: 系統管理員
+ *               vendorId:
+ *                 type: string
+ *                 format: uuid
+ *                 nullable: true
+ *                 example: 550e8400-e29b-41d4-a716-446655440000
  *     responses:
  *       200:
  *         description: 成功
