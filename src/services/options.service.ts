@@ -40,6 +40,7 @@ export class OptionsService {
       value: node.id,
       code: node.code,
       type: node.type,
+      pageCodes: node.nodePages.map((nodePage) => nodePage.page.pageCode),
     }));
   }
 }
