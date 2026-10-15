@@ -50,10 +50,9 @@ export class VendorPrismaRepository implements IVendorRepository {
    * 根據 ID 查找業者
    */
   public async findById(id: string): Promise<VendorWithPages | null> {
-    return this.ctx.prisma.node.findFirst({
+    return this.ctx.prisma.node.findUnique({
       where: {
         id,
-        type: "VENDOR",
       },
       include: {
         nodePages: {
@@ -90,9 +89,6 @@ export class VendorPrismaRepository implements IVendorRepository {
   }): Promise<[VendorWithPages[], number]> {
     return this.ctx.prisma.$transaction([
       this.ctx.prisma.node.findMany({
-        where: {
-          type: "VENDOR",
-        },
         skip: params.skip,
         take: params.take,
         include: {
@@ -111,11 +107,7 @@ export class VendorPrismaRepository implements IVendorRepository {
         },
       }),
 
-      this.ctx.prisma.node.count({
-        where: {
-          type: "VENDOR",
-        },
-      }),
+      this.ctx.prisma.node.count(),
     ]);
   }
 

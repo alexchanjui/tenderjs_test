@@ -438,7 +438,7 @@ async function main() {
   logger.info("✅ superAdmin Role 建立完成");
 
   // ==========================================
-  // Step 5: superAdmin 加入所有頁面權限
+  // Step 5: 初始化營運與 superAdmin 頁面權限
   // ==========================================
 
   const activePages = await prisma.page.findMany({
@@ -451,6 +451,21 @@ async function main() {
   });
 
   await prisma.$transaction([
+    // 營運可使用所有系統頁面
+    prisma.nodePage.deleteMany({
+      where: {
+        nodeId: operatorNode.id,
+      },
+    }),
+
+    prisma.nodePage.createMany({
+      data: activePages.map((page) => ({
+        nodeId: operatorNode.id,
+        pageId: page.id,
+      })),
+    }),
+
+    // superAdmin 擁有營運的所有頁面權限
     prisma.rolePage.deleteMany({
       where: {
         roleId: superAdminRole.id,
@@ -465,7 +480,7 @@ async function main() {
     }),
   ]);
 
-  logger.info(`✅ superAdmin 頁面權限同步完成 (${activePages.length} 筆)`);
+  logger.info(`✅ 營運與 superAdmin 頁面權限同步完成 (${activePages.length} 筆)`);
 
   // ==========================================
   // Step 6: 建立 admin User
