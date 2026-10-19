@@ -112,6 +112,11 @@ export class RoleService {
       throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
     }
 
+    // 最高管理員角色不可修改
+    if (role.name === "superAdmin" || role.isVendorAdmin) {
+      throw new AppError(ErrorCode.FAIL, "最高管理員角色不可修改");
+    }
+
     // 檢查同一所屬範圍內角色名稱是否重複
     if (data.name && data.name !== role.name) {
       const existingRole = await this.ctx.repos.role.findByName(data.name, role.nodeId);
@@ -132,10 +137,10 @@ export class RoleService {
     // 檢查是否包含業者最高管理員角色
     const roles = await this.ctx.repos.role.findByIds(ids);
 
-    const vendorAdminRole = roles.find((role) => role.isVendorAdmin);
+    const adminRole = roles.find((role) => role.name === "superAdmin" || role.isVendorAdmin);
 
-    if (vendorAdminRole) {
-      throw new AppError(ErrorCode.REQUEST_DATA, "業者最高管理員角色不可刪除");
+    if (adminRole) {
+      throw new AppError(ErrorCode.REQUEST_DATA, "最高管理員角色不可刪除");
     }
 
     // 檢查角色是否仍有使用者
@@ -160,9 +165,9 @@ export class RoleService {
       throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
     }
 
-    // 業者最高管理員權限由 NodePage 自動同步
-    if (role.isVendorAdmin) {
-      throw new AppError(ErrorCode.PERMISSION, "業者最高管理員權限不可手動修改");
+    // 最高管理員權限由 NodePage 自動同步
+    if (role.name === "superAdmin" || role.isVendorAdmin) {
+      throw new AppError(ErrorCode.FAIL, "最高管理員權限不可手動修改");
     }
 
     // 檢查頁面是否重複
@@ -190,7 +195,7 @@ export class RoleService {
       const unauthorizedPageCode = dto.pageCodes.find((pageCode) => !vendorPageCodes.has(pageCode));
 
       if (unauthorizedPageCode !== undefined) {
-        throw new AppError(ErrorCode.PERMISSION, "角色頁面權限不可超出業者授權範圍");
+        throw new AppError(ErrorCode.FAIL, "角色頁面權限不可超出業者授權範圍");
       }
     }
 

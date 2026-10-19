@@ -160,26 +160,33 @@ export class VendorPrismaRepository implements IVendorRepository {
         });
       }
 
-      // 取得業者最高管理員角色
-      const vendorAdminRole = await tx.role.findFirst({
+      // 取得業者
+      const node = await tx.node.findUnique({
         where: {
-          nodeId,
-          isVendorAdmin: true,
+          id: nodeId,
         },
       });
 
-      if (vendorAdminRole) {
+      // 取得業者最高管理員角色
+      const adminRole = await tx.role.findFirst({
+        where: {
+          nodeId,
+          ...(node?.type === "OPERATOR" ? { name: "superAdmin" } : { isVendorAdmin: true }),
+        },
+      });
+
+      if (adminRole) {
         // 最高管理員權限與 NodePage 完全同步
         await tx.rolePage.deleteMany({
           where: {
-            roleId: vendorAdminRole.id,
+            roleId: adminRole.id,
           },
         });
 
         if (pages.length > 0) {
           await tx.rolePage.createMany({
             data: pages.map((page) => ({
-              roleId: vendorAdminRole.id,
+              roleId: adminRole.id,
               pageId: page.pageId,
             })),
           });
@@ -191,7 +198,11 @@ export class VendorPrismaRepository implements IVendorRepository {
         where: {
           role: {
             nodeId,
-            isVendorAdmin: false,
+            ...(adminRole && {
+              id: {
+                not: adminRole.id,
+              },
+            }),
           },
           pageId: {
             notIn: pages.map((page) => page.pageId),
