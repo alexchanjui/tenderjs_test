@@ -200,17 +200,19 @@ export class RoleService {
       throw new AppError(ErrorCode.DATA_NOT_FOUND, "頁面不存在");
     }
 
-    // 業者角色只能設定該業者已授權的頁面
-    const vendor = await this.ctx.repos.vendor.findById(role.nodeId);
+    // 角色只能設定所屬節點已授權的頁面
+    const node = await this.ctx.repos.vendor.findById(role.nodeId);
 
-    if (vendor) {
-      const vendorPageCodes = new Set(vendor.nodePages.map((nodePage) => nodePage.page.pageCode));
+    if (!node) {
+      throw new AppError(ErrorCode.DATA_NOT_FOUND, "組織節點不存在");
+    }
 
-      const unauthorizedPageCode = dto.pageCodes.find((pageCode) => !vendorPageCodes.has(pageCode));
+    const nodePageCodes = new Set(node.nodePages.map((nodePage) => nodePage.page.pageCode));
 
-      if (unauthorizedPageCode !== undefined) {
-        throw new AppError(ErrorCode.FAIL, "角色頁面權限不可超出業者授權範圍");
-      }
+    const unauthorizedPageCode = dto.pageCodes.find((pageCode) => !nodePageCodes.has(pageCode));
+
+    if (unauthorizedPageCode !== undefined) {
+      throw new AppError(ErrorCode.FAIL, "角色頁面權限不可超出組織授權範圍");
     }
 
     // 轉換為 RolePage

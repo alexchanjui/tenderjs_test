@@ -7,6 +7,7 @@ import {
   IsInt,
   IsNotEmpty,
   IsOptional,
+  ValidateIf,
   IsString,
   ValidateNested,
 } from "class-validator";
@@ -45,6 +46,7 @@ export class UpdateVendorProfileRequestDto {
   phone?: string;
 
   @IsOptional()
+  @ValidateIf((_, value) => value !== "")
   @IsEmail()
   email?: string;
 
