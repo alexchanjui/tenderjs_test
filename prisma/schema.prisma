@@ -214,6 +214,9 @@ model Node {
   /// 節點可使用的頁面
   nodePages NodePage[]
 
+   /// 業者詳細資訊
+  vendorProfile VendorProfile?
+
   /// 建立時間
   createdAt DateTime @default(now()) @map("create_time")
 
@@ -270,7 +273,6 @@ model NodePage {
 
 // ==========================================
 // 系統日誌
-// 用途: API 稽核日誌
 // ==========================================
 
 model AuditLog {
@@ -319,4 +321,151 @@ model AuditLog {
   @@index([createdAt])
   @@index([statusCode])
   @@map("audit_log")
+}
+
+
+// ==========================================
+// 業者詳細資訊
+// ==========================================
+model VendorProfile {
+  id String @id @default(dbgenerated("newid()")) @db.UniqueIdentifier
+
+  /// 所屬節點 ID
+  nodeId String @unique @map("node_id") @db.UniqueIdentifier
+
+  /// 品牌名稱
+  brandName String @map("brand_name")
+
+  /// 品牌介紹
+  description String?
+
+  /// 品牌圖片
+  brandImage String? @map("brand_image")
+
+  /// 聯絡電話
+  phone String?
+
+  /// 聯絡信箱
+  email String?
+
+  /// 地址
+  address String?
+
+  /// 所屬節點
+  node Node @relation(fields: [nodeId], references: [id], onDelete: Cascade)
+
+  /// 主視覺橫幅
+  banners VendorBanner[]
+
+  /// 問答分類
+  faqCategories FaqCategory[]
+
+  /// 營運條款
+  operatingTerms OperatingTerm[]
+
+  /// 建立時間
+  createdAt DateTime @default(now()) @map("create_time")
+
+  /// 更新時間
+  updatedAt DateTime @updatedAt @map("update_time")
+
+  @@map("vendor_profile")
+}
+
+/// 業者主視覺橫幅
+model VendorBanner {
+  id String @id @default(dbgenerated("newid()")) @db.UniqueIdentifier
+
+  /// 業者詳細資訊 ID
+  vendorProfileId String @map("vendor_profile_id") @db.UniqueIdentifier
+
+  /// 圖片路徑
+  imageUrl String @map("image_url")
+
+  /// 排序
+  sortOrder Int @default(1) @map("sort_order")
+
+  /// 業者詳細資訊
+  vendorProfile VendorProfile @relation( fields: [vendorProfileId], references: [id], onDelete: Cascade)
+
+  @@index([vendorProfileId])
+  @@map("vendor_banner")
+}
+
+/// 問答分類
+model FaqCategory {
+  id String @id @default(dbgenerated("newid()")) @db.UniqueIdentifier
+
+  /// 業者詳細資訊 ID
+  vendorProfileId String @map("vendor_profile_id") @db.UniqueIdentifier
+
+  /// 分類標題
+  title String
+
+  /// 排序
+  sortOrder Int @default(1) @map("sort_order")
+
+  /// 啟用狀態
+  isActive Boolean @default(true) @map("is_active")
+
+  /// 所屬業者
+  vendorProfile VendorProfile @relation( fields: [vendorProfileId], references: [id], onDelete: Cascade)
+
+  /// 問答列表
+  faqs Faq[]
+
+  @@index([vendorProfileId])
+  @@map("faq_category")
+}
+
+/// 問答
+model Faq {
+  id String @id @default(dbgenerated("newid()")) @db.UniqueIdentifier
+
+  /// 問答分類 ID
+  categoryId String @map("category_id") @db.UniqueIdentifier
+
+  /// 標題
+  title String
+
+  /// 內容
+  content String
+
+  /// 排序
+  sortOrder Int @default(1) @map("sort_order")
+
+  /// 啟用狀態
+  isActive Boolean @default(true) @map("is_active")
+
+  /// 所屬分類
+  category FaqCategory @relation( fields: [categoryId], references: [id], onDelete: Cascade )
+
+  @@index([categoryId])
+  @@map("faq")
+}
+
+/// 營運條款
+model OperatingTerm {
+  id String @id @default(dbgenerated("newid()")) @db.UniqueIdentifier
+
+  /// 業者詳細資訊 ID
+  vendorProfileId String @map("vendor_profile_id") @db.UniqueIdentifier
+
+  /// 標題
+  title String
+
+  /// 內容
+  content String
+
+  /// 排序
+  sortOrder Int @default(1) @map("sort_order")
+
+  /// 啟用狀態
+  isActive Boolean @default(true) @map("is_active")
+
+  /// 所屬業者
+  vendorProfile VendorProfile @relation( fields: [vendorProfileId], references: [id], onDelete: Cascade )
+
+  @@index([vendorProfileId])
+  @@map("operating_term")
 }
