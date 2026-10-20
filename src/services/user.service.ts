@@ -1,4 +1,5 @@
 // src/services/user.service.ts
+
 import bcrypt from "bcrypt";
 import { plainToInstance } from "class-transformer";
 import type { PaginationRequestDto, PaginationResponseDto } from "../dtos/pagination.dto";
@@ -14,6 +15,9 @@ import type { IServiceContext } from "../types/service.context";
 export class UserService {
   constructor(private readonly ctx: IServiceContext) {}
 
+  /**
+   * 取得目前登入使用者
+   */
   private getCurrentUser() {
     const currentUser = this.ctx.currentUser;
 
@@ -25,15 +29,20 @@ export class UserService {
   }
 
   /**
+   * 取得實際操作的 Node ID
+   */
+  private getTargetNodeId(nodeId?: string): string {
+    const currentUser = this.getCurrentUser();
+
+    return currentUser.nodeType === "VENDOR" ? currentUser.nodeId : (nodeId ?? currentUser.nodeId);
+  }
+
+  /**
    * 建立使用者
    */
   public async createUser(data: CreateUserRequestDto): Promise<void> {
-    const currentUser = this.getCurrentUser();
     const { account, username, email, password, nodeId, roleId } = data;
-
-    // 業者只能操作自己的節點，營運可指定操作節點
-    const currentNodeId =
-      currentUser.nodeType === "VENDOR" ? currentUser.nodeId : (nodeId ?? currentUser.nodeId);
+    const targetNodeId = this.getTargetNodeId(nodeId);
 
     const user = await this.ctx.repos.user.findByEmail(email);
 
@@ -49,7 +58,7 @@ export class UserService {
         throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
       }
 
-      if (role.nodeId !== currentNodeId) {
+      if (role.nodeId !== targetNodeId) {
         throw new AppError(ErrorCode.REQUEST_DATA, "使用者與角色必須屬於相同節點");
       }
     }
@@ -62,7 +71,7 @@ export class UserService {
       username,
       email,
       password: hashedPassword,
-      nodeId: currentNodeId,
+      nodeId: targetNodeId,
       roleId,
     });
   }
@@ -88,18 +97,14 @@ export class UserService {
   public async getUsers(
     dto: PaginationRequestDto,
   ): Promise<PaginationResponseDto<UserResponseDto>> {
-    const currentUser = this.getCurrentUser();
     const { page, limit, nodeId } = dto;
     const skip = (page - 1) * limit;
-
-    // 業者只能操作自己的節點，營運可指定操作節點
-    const currentNodeId =
-      currentUser.nodeType === "VENDOR" ? currentUser.nodeId : (nodeId ?? currentUser.nodeId);
+    const targetNodeId = this.getTargetNodeId(nodeId);
 
     const [users, total] = await this.ctx.repos.user.findAndCount({
       skip,
       take: limit,
-      nodeId: currentNodeId,
+      nodeId: targetNodeId,
     });
 
     return {

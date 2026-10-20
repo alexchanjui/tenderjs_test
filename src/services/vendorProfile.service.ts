@@ -35,7 +35,7 @@ export class VendorProfileService {
 
     // 營運操作業者時必須指定 nodeId
     if (!nodeId) {
-      throw new AppError(ErrorCode.DATA_NOT_FOUND, "請指定業者");
+      throw new AppError(ErrorCode.REQUEST_DATA, "請指定業者");
     }
 
     return nodeId;

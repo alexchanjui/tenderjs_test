@@ -1,4 +1,5 @@
 // src/services/role.service.ts
+
 import { plainToInstance } from "class-transformer";
 import { invalidateRolePages } from "../caches/rolePage.cache";
 import type { PaginationRequestDto, PaginationResponseDto } from "../dtos/pagination.dto";
@@ -15,6 +16,9 @@ import type { IServiceContext } from "../types/service.context";
 export class RoleService {
   constructor(private readonly ctx: IServiceContext) {}
 
+  /**
+   * 取得目前登入使用者
+   */
   private getCurrentUser() {
     const currentUser = this.ctx.currentUser;
 
@@ -26,18 +30,32 @@ export class RoleService {
   }
 
   /**
+   * 取得實際操作的 Node ID
+   */
+  private getTargetNodeId(nodeId?: string): string {
+    const currentUser = this.getCurrentUser();
+
+    return currentUser.nodeType === "VENDOR" ? currentUser.nodeId : (nodeId ?? currentUser.nodeId);
+  }
+
+  /**
    * 建立角色
    */
   public async createRole(data: CreateRoleRequestDto): Promise<void> {
+    const targetNodeId = this.getTargetNodeId(data.nodeId);
+
     // 檢查同一節點內角色名稱是否重複
-    const role = await this.ctx.repos.role.findByName(data.name, data.nodeId);
+    const role = await this.ctx.repos.role.findByName(data.name, targetNodeId);
 
     if (role) {
       throw new AppError(ErrorCode.DUPLICATE, "角色名稱已存在");
     }
 
     // 建立角色
-    await this.ctx.repos.role.create(data);
+    await this.ctx.repos.role.create({
+      ...data,
+      nodeId: targetNodeId,
+    });
   }
 
   /**
@@ -46,18 +64,14 @@ export class RoleService {
   public async getRoles(
     dto: PaginationRequestDto,
   ): Promise<PaginationResponseDto<RoleResponseDto>> {
-    const currentUser = this.getCurrentUser();
     const { page, limit, nodeId } = dto;
     const skip = (page - 1) * limit;
-
-    // 業者只能操作自己的節點，營運可指定操作節點
-    const currentNodeId =
-      currentUser.nodeType === "VENDOR" ? currentUser.nodeId : (nodeId ?? currentUser.nodeId);
+    const targetNodeId = this.getTargetNodeId(nodeId);
 
     const [roles, total] = await this.ctx.repos.role.findAndCount({
       skip,
       take: limit,
-      nodeId: currentNodeId,
+      nodeId: targetNodeId,
     });
 
     const data = roles.map((role) => ({
@@ -117,7 +131,7 @@ export class RoleService {
       throw new AppError(ErrorCode.FAIL, "最高管理員角色不可修改");
     }
 
-    // 檢查同一所屬範圍內角色名稱是否重複
+    // 檢查同一節點內角色名稱是否重複
     if (data.name && data.name !== role.name) {
       const existingRole = await this.ctx.repos.role.findByName(data.name, role.nodeId);
 
@@ -134,7 +148,7 @@ export class RoleService {
    * 批次刪除角色
    */
   public async batchDeleteRole(ids: string[]): Promise<void> {
-    // 檢查是否包含業者最高管理員角色
+    // 檢查是否包含最高管理員角色
     const roles = await this.ctx.repos.role.findByIds(ids);
 
     const adminRole = roles.find((role) => role.name === "superAdmin" || role.isVendorAdmin);
