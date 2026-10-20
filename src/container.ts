@@ -11,6 +11,7 @@ import { PermissionPrismaRepository } from "./repositories/prisma/permission.pri
 import { PagePrismaRepository } from "./repositories/prisma/page.prisma.repository";
 import { VendorPrismaRepository } from "./repositories/prisma/vendor.prisma.repository";
 import { OptionsPrismaRepository } from "./repositories/prisma/options.prisma.repository";
+import { VendorProfilePrismaRepository } from "./repositories/prisma/vendorProfile.prisma.repository";
 
 // Services
 import { HealthService } from "./services/health.service";
@@ -21,6 +22,7 @@ import { PermissionService } from "./services/permission.service";
 import { PageService } from "./services/page.service";
 import { VendorService } from "./services/vendor.service";
 import { OptionsService } from "./services/options.service";
+import { VendorProfileService } from "./services/vendorProfile.service";
 
 // Controllers
 import type { IController } from "./controllers/interface/controller.interface";
@@ -32,6 +34,7 @@ import { PermissionController } from "./controllers/permission.controller";
 import { PageController } from "./controllers/page.controller";
 import { VendorController } from "./controllers/vendor.controller";
 import { OptionsController } from "./controllers/options.controller";
+import { VendorProfileController } from "./controllers/vendorProfile.controller";
 
 // Types
 import type { IServiceContext } from "./types/service.context";
@@ -45,9 +48,6 @@ import type { IDbContext } from "./types/db.context";
  * Tip: 這裡只在 App 啟動時執行一次。
  */
 export class AppContainer {
-  /**
-   * 取得所有 Controller
-   */
   public getControllers(): IController[] {
     /**
      * 建立 Repository Context (DB Context)
@@ -66,6 +66,7 @@ export class AppContainer {
     const pageRepo = new PagePrismaRepository(dbContext);
     const vendorRepo = new VendorPrismaRepository(dbContext);
     const optionsRepo = new OptionsPrismaRepository(dbContext);
+    const vendorProfileRepo = new VendorProfilePrismaRepository(dbContext);
 
     /**
      * 建立 Service 共用依賴
@@ -81,6 +82,7 @@ export class AppContainer {
         page: pageRepo,
         vendor: vendorRepo,
         options: optionsRepo,
+        vendorProfile: vendorProfileRepo,
       },
       get currentUser() {
         return requestContextStorage.getStore();
@@ -98,6 +100,7 @@ export class AppContainer {
     const pageService = new PageService(ctx);
     const vendorService = new VendorService(ctx);
     const optionsService = new OptionsService(ctx);
+    const vendorProfileService = new VendorProfileService(ctx);
 
     /**
      * 組裝 Controllers
@@ -111,6 +114,7 @@ export class AppContainer {
       new PageController(pageService),
       new VendorController(vendorService),
       new OptionsController(optionsService),
+      new VendorProfileController(vendorProfileService),
     ];
   }
 }

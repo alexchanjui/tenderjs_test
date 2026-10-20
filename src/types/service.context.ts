@@ -9,6 +9,7 @@ import { IPermissionRepository } from "../repositories/interface/permission.repo
 import type { IPageRepository } from "../repositories/interface/page.repository.interface";
 import type { IVendorRepository } from "../repositories/interface/vendor.repository.interface";
 import type { IOptionsRepository } from "../repositories/interface/options.repository.interface";
+import type { IVendorProfileRepository } from "../repositories/interface/vendorProfile.repository.interface";
 
 /**
  * 目前登入的使用者資訊
@@ -30,6 +31,7 @@ export interface IRepositoryContext {
   page: IPageRepository;
   vendor: IVendorRepository;
   options: IOptionsRepository;
+  vendorProfile: IVendorProfileRepository;
 }
 
 /**
