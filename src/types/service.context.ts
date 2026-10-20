@@ -10,6 +10,7 @@ import type { IPageRepository } from "../repositories/interface/page.repository.
 import type { IVendorRepository } from "../repositories/interface/vendor.repository.interface";
 import type { IOptionsRepository } from "../repositories/interface/options.repository.interface";
 import type { IVendorProfileRepository } from "../repositories/interface/vendorProfile.repository.interface";
+import type { IFaqRepository } from "../repositories/interface/faq.repository.interface";
 
 /**
  * 目前登入的使用者資訊
@@ -32,6 +33,7 @@ export interface IRepositoryContext {
   vendor: IVendorRepository;
   options: IOptionsRepository;
   vendorProfile: IVendorProfileRepository;
+  faq: IFaqRepository;
 }
 
 /**

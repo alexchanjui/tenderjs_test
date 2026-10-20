@@ -12,6 +12,7 @@ import { PagePrismaRepository } from "./repositories/prisma/page.prisma.reposito
 import { VendorPrismaRepository } from "./repositories/prisma/vendor.prisma.repository";
 import { OptionsPrismaRepository } from "./repositories/prisma/options.prisma.repository";
 import { VendorProfilePrismaRepository } from "./repositories/prisma/vendorProfile.prisma.repository";
+import { FaqPrismaRepository } from "./repositories/prisma/faq.prisma.repository";
 
 // Services
 import { HealthService } from "./services/health.service";
@@ -23,6 +24,7 @@ import { PageService } from "./services/page.service";
 import { VendorService } from "./services/vendor.service";
 import { OptionsService } from "./services/options.service";
 import { VendorProfileService } from "./services/vendorProfile.service";
+import { FaqService } from "./services/faq.service";
 
 // Controllers
 import type { IController } from "./controllers/interface/controller.interface";
@@ -35,6 +37,7 @@ import { PageController } from "./controllers/page.controller";
 import { VendorController } from "./controllers/vendor.controller";
 import { OptionsController } from "./controllers/options.controller";
 import { VendorProfileController } from "./controllers/vendorProfile.controller";
+import { FaqController } from "./controllers/faq.controller";
 
 // Types
 import type { IServiceContext } from "./types/service.context";
@@ -67,6 +70,7 @@ export class AppContainer {
     const vendorRepo = new VendorPrismaRepository(dbContext);
     const optionsRepo = new OptionsPrismaRepository(dbContext);
     const vendorProfileRepo = new VendorProfilePrismaRepository(dbContext);
+    const faqRepo = new FaqPrismaRepository(dbContext);
 
     /**
      * 建立 Service 共用依賴
@@ -83,6 +87,7 @@ export class AppContainer {
         vendor: vendorRepo,
         options: optionsRepo,
         vendorProfile: vendorProfileRepo,
+        faq: faqRepo,
       },
       get currentUser() {
         return requestContextStorage.getStore();
@@ -101,6 +106,7 @@ export class AppContainer {
     const vendorService = new VendorService(ctx);
     const optionsService = new OptionsService(ctx);
     const vendorProfileService = new VendorProfileService(ctx);
+    const faqService = new FaqService(ctx);
 
     /**
      * 組裝 Controllers
@@ -115,6 +121,7 @@ export class AppContainer {
       new VendorController(vendorService),
       new OptionsController(optionsService),
       new VendorProfileController(vendorProfileService),
+      new FaqController(faqService),
     ];
   }
 }
