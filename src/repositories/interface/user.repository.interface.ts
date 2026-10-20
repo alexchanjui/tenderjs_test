@@ -10,6 +10,7 @@ export type UserWithRole = User & {
         rolePages: (RolePage & {
           page: {
             pageCode: number;
+            isActive: boolean;
           };
         })[];
       })

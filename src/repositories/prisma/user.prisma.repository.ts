@@ -28,6 +28,7 @@ export class UserPrismaRepository implements IUserRepository {
                 page: {
                   select: {
                     pageCode: true,
+                    isActive: true,
                   },
                 },
               },
@@ -61,6 +62,7 @@ export class UserPrismaRepository implements IUserRepository {
                 page: {
                   select: {
                     pageCode: true,
+                    isActive: true,
                   },
                 },
               },
@@ -94,6 +96,7 @@ export class UserPrismaRepository implements IUserRepository {
                 page: {
                   select: {
                     pageCode: true,
+                    isActive: true,
                   },
                 },
               },
@@ -143,6 +146,7 @@ export class UserPrismaRepository implements IUserRepository {
                   page: {
                     select: {
                       pageCode: true,
+                      isActive: true,
                     },
                   },
                 },

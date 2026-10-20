@@ -5,6 +5,7 @@ import type { PaginationRequestDto, PaginationResponseDto } from "../dtos/pagina
 import { AppError } from "../errors/app.error";
 import { ErrorCode } from "../errors/error.codes";
 import type { IServiceContext } from "../types/service.context";
+import { invalidateAllRolePages } from "../caches/rolePage.cache";
 
 export class PageService {
   constructor(private readonly ctx: IServiceContext) {}
@@ -80,6 +81,11 @@ export class PageService {
     }
 
     await this.ctx.repos.page.update(id, data);
+
+    // 頁面啟用狀態異動時清除角色權限快取
+    if (data.isActive !== undefined) {
+      await invalidateAllRolePages();
+    }
   }
 
   /**

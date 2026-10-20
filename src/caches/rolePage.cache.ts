@@ -29,6 +29,9 @@ export const getRolePageIds = async (roleId: string): Promise<number[]> => {
   const rolePages = await prismaInstance.client.rolePage.findMany({
     where: {
       roleId,
+      page: {
+        isActive: true,
+      },
     },
     select: {
       pageId: true,

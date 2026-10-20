@@ -39,6 +39,11 @@ export class OptionsPrismaRepository implements IOptionsRepository {
       },
       include: {
         nodePages: {
+          where: {
+            page: {
+              isActive: true,
+            },
+          },
           include: {
             page: {
               select: {

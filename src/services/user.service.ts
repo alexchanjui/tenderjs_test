@@ -176,7 +176,10 @@ export class UserService {
       throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);
     }
 
-    const pageCodes = user.role?.rolePages.map((rolePage) => rolePage.page.pageCode) ?? [];
+    const pageCodes =
+      user.role?.rolePages
+        .filter((rolePage) => rolePage.page.isActive)
+        .map((rolePage) => rolePage.page.pageCode) ?? [];
 
     return plainToInstance(
       UserResponseDto,
