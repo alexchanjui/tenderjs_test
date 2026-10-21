@@ -56,11 +56,8 @@ export class VendorProfileService {
   /**
    * 更新業者詳細資訊
    */
-  public async updateVendorProfile(
-    nodeId: string | undefined,
-    data: UpdateVendorProfileRequestDto,
-  ): Promise<void> {
-    const targetNodeId = this.getTargetNodeId(nodeId);
+  public async updateVendorProfile(data: UpdateVendorProfileRequestDto): Promise<void> {
+    const targetNodeId = this.getTargetNodeId(data.nodeId);
 
     await this.ctx.repos.vendorProfile.upsert(targetNodeId, data);
   }

@@ -44,11 +44,9 @@ export class VendorProfileController implements IController {
    * 更新業者詳細資訊
    */
   private updateVendorProfile = async (req: Request, res: Response): Promise<void> => {
-    const nodeId = req.query.nodeId as string | undefined;
-
     const dto = plainToInstance(UpdateVendorProfileRequestDto, req.body);
 
-    await this.vendorProfileService.updateVendorProfile(nodeId, dto);
+    await this.vendorProfileService.updateVendorProfile(dto);
 
     R.success(res);
   };

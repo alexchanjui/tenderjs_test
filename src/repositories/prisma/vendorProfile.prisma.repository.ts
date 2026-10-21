@@ -34,7 +34,7 @@ export class VendorProfilePrismaRepository implements IVendorProfileRepository {
     nodeId: string,
     data: UpdateVendorProfileRequestDto,
   ): Promise<VendorProfileWithBanners> {
-    const { banners, ...profileData } = data;
+    const { nodeId: _nodeId, banners, ...profileData } = data;
 
     return this.ctx.prisma.$transaction(async (tx) => {
       // 新增或更新業者詳細資訊

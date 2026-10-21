@@ -12,7 +12,7 @@
  *       - in: query
  *         name: nodeId
  *         required: false
- *         description: 節點 ID，營運可指定操作節點；未指定則操作自己的節點
+ *         description: 節點 ID，營運可指定查詢節點；未指定則查詢自己的節點
  *         schema:
  *           type: string
  *           format: uuid
@@ -22,17 +22,9 @@
  *
  *   put:
  *     tags: [Vendor Profile]
- *     summary: 更新業者詳細資訊
+ *     summary: 新增或更新業者詳細資訊
  *     security:
  *       - BearerAuth: []
- *     parameters:
- *       - in: query
- *         name: nodeId
- *         required: false
- *         description: 節點 ID，營運可指定操作節點；未指定則操作自己的節點
- *         schema:
- *           type: string
- *           format: uuid
  *     requestBody:
  *       required: true
  *       content:
@@ -40,9 +32,15 @@
  *           schema:
  *             type: object
  *             required:
+ *               - nodeId
  *               - brandName
  *               - banners
  *             properties:
+ *               nodeId:
+ *                 type: string
+ *                 format: uuid
+ *                 description: 業者所屬節點 ID
+ *                 example: "550e8400-e29b-41d4-a716-446655440000"
  *               brandName:
  *                 type: string
  *                 example: 測試品牌
@@ -78,5 +76,5 @@
  *                       example: 1
  *     responses:
  *       200:
- *         description: 更新成功
+ *         description: 成功
  */
