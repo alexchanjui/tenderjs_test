@@ -27,7 +27,7 @@
  *       - in: query
  *         name: nodeId
  *         required: false
- *         description: 節點 ID，營運可指定操作節點；未指定則操作自己的節點
+ *         description: 節點 ID，營運可指定查詢節點；未指定則查詢自己的節點
  *         schema:
  *           type: string
  *           format: uuid
@@ -48,20 +48,22 @@
  *             type: object
  *             required:
  *               - name
+ *               - nodeId
  *             properties:
  *               name:
  *                 type: string
  *                 minLength: 2
  *                 maxLength: 50
- *                 example: Admin
+ *                 example: "管理員"
  *               description:
  *                 type: string
  *                 maxLength: 200
- *                 example: 系統管理員
+ *                 example: "管理員角色"
  *               nodeId:
  *                 type: string
  *                 format: uuid
- *                 description: 節點 ID，營運可指定操作節點；未指定則操作自己的節點
+ *                 description: 角色所屬節點 ID
+ *                 example: "550e8400-e29b-41d4-a716-446655440000"
  *     responses:
  *       200:
  *         description: 成功
@@ -82,13 +84,6 @@
  *         schema:
  *           type: string
  *           format: uuid
- *       - in: query
- *         name: nodeId
- *         required: false
- *         description: 節點 ID，營運可指定操作節點；未指定則操作自己的節點
- *         schema:
- *           type: string
- *           format: uuid
  *     responses:
  *       200:
  *         description: 成功
@@ -105,13 +100,6 @@
  *         schema:
  *           type: string
  *           format: uuid
- *       - in: query
- *         name: nodeId
- *         required: false
- *         description: 節點 ID，營運可指定操作節點；未指定則操作自己的節點
- *         schema:
- *           type: string
- *           format: uuid
  *     requestBody:
  *       required: true
  *       content:
@@ -123,11 +111,11 @@
  *                 type: string
  *                 minLength: 2
  *                 maxLength: 50
- *                 example: Manager
+ *                 example: "一般管理員"
  *               description:
  *                 type: string
  *                 maxLength: 200
- *                 example: 管理者
+ *                 example: "一般管理員角色"
  *               isActive:
  *                 type: boolean
  *                 example: true
@@ -144,14 +132,6 @@
  *     summary: 批次刪除角色
  *     security:
  *       - BearerAuth: []
- *     parameters:
- *       - in: query
- *         name: nodeId
- *         required: false
- *         description: 節點 ID，營運可指定操作節點；未指定則操作自己的節點
- *         schema:
- *           type: string
- *           format: uuid
  *     requestBody:
  *       required: true
  *       content:
@@ -166,7 +146,9 @@
  *                 minItems: 1
  *                 items:
  *                   type: string
- *                   format: uuid
+ *                 example:
+ *                   - "550e8400-e29b-41d4-a716-446655440001"
+ *                   - "550e8400-e29b-41d4-a716-446655440002"
  *     responses:
  *       200:
  *         description: 成功
@@ -177,20 +159,13 @@
  * /roles/{id}/pages:
  *   put:
  *     tags: [Roles]
- *     summary: 更新角色頁面使用
+ *     summary: 更新角色頁面權限
  *     security:
  *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         schema:
- *           type: string
- *           format: uuid
- *       - in: query
- *         name: nodeId
- *         required: false
- *         description: 節點 ID，營運可指定操作節點；未指定則操作自己的節點
  *         schema:
  *           type: string
  *           format: uuid
@@ -205,10 +180,12 @@
  *             properties:
  *               pageCodes:
  *                 type: array
- *                 description: 角色可使用的頁面代碼；空陣列代表無任何頁面權限
  *                 items:
  *                   type: integer
- *                 example: [100, 200, 300]
+ *                 example:
+ *                   - 100
+ *                   - 200
+ *                   - 300
  *     responses:
  *       200:
  *         description: 成功

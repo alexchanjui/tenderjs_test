@@ -2,17 +2,17 @@
 import { plainToInstance } from "class-transformer";
 import { Router } from "express";
 import type { Request, Response } from "express";
+import { BatchDeleteStringIdsDto } from "../dtos/common.dto";
+import { PaginationRequestDto } from "../dtos/pagination.dto";
 import {
   CreateRoleRequestDto,
   UpdateRolePagesRequestDto,
   UpdateRoleRequestDto,
 } from "../dtos/role.dto";
-import { PaginationRequestDto } from "../dtos/pagination.dto";
 import { validationMiddleware } from "../middlewares/validation.middleware";
 import type { RoleService } from "../services/role.service";
 import * as R from "../utils/response";
 import type { IController } from "./interface/controller.interface";
-import { BatchDeleteStringIdsDto } from "../dtos/common.dto";
 
 export class RoleController implements IController {
   public path = "/roles";
@@ -68,9 +68,9 @@ export class RoleController implements IController {
    * 取得角色詳細資訊
    */
   private getRoleById = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
-    const nodeId = req.query.nodeId as string | undefined;
+    const { id } = req.params;
 
-    const result = await this.roleService.getRoleById(req.params.id, nodeId);
+    const result = await this.roleService.getRoleById(id);
 
     R.success(res, result);
   };
@@ -80,11 +80,9 @@ export class RoleController implements IController {
    */
   private updateRole = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
     const { id } = req.params;
-    const nodeId = req.query.nodeId as string | undefined;
-
     const dto = plainToInstance(UpdateRoleRequestDto, req.body);
 
-    await this.roleService.updateRole(id, nodeId, dto);
+    await this.roleService.updateRole(id, dto);
 
     R.success(res);
   };
@@ -93,25 +91,21 @@ export class RoleController implements IController {
    * 批次刪除角色
    */
   private batchDeleteRole = async (req: Request, res: Response): Promise<void> => {
-    const nodeId = req.query.nodeId as string | undefined;
-
     const dto = plainToInstance(BatchDeleteStringIdsDto, req.body);
 
-    await this.roleService.batchDeleteRole(dto.ids, nodeId);
+    await this.roleService.batchDeleteRole(dto);
 
     R.success(res);
   };
 
   /**
-   * 更新角色頁面使用
+   * 更新角色頁面權限
    */
   private updateRolePages = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
     const { id } = req.params;
-    const nodeId = req.query.nodeId as string | undefined;
-
     const dto = plainToInstance(UpdateRolePagesRequestDto, req.body);
 
-    await this.roleService.updateRolePages(id, nodeId, dto);
+    await this.roleService.updateRolePages(id, dto);
 
     R.success(res);
   };

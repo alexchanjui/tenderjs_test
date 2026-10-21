@@ -1,6 +1,7 @@
 // src/services/role.service.ts
 import { plainToInstance } from "class-transformer";
 import { invalidateRolePages } from "../caches/rolePage.cache";
+import type { BatchDeleteStringIdsDto } from "../dtos/common.dto";
 import type { PaginationRequestDto, PaginationResponseDto } from "../dtos/pagination.dto";
 import {
   CreateRoleRequestDto,
@@ -101,11 +102,16 @@ export class RoleService {
   /**
    * 取得角色詳細資訊
    */
-  public async getRoleById(id: string, nodeId?: string): Promise<RoleResponseDto> {
-    const targetNodeId = this.getTargetNodeId(nodeId);
+  public async getRoleById(id: string): Promise<RoleResponseDto> {
+    const currentUser = this.getCurrentUser();
     const role = await this.ctx.repos.role.findById(id);
 
-    if (!role || role.nodeId !== targetNodeId) {
+    if (!role) {
+      throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
+    }
+
+    // 業者只能操作自己的角色
+    if (currentUser.nodeType === "VENDOR" && role.nodeId !== currentUser.nodeId) {
       throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
     }
 
@@ -125,15 +131,16 @@ export class RoleService {
   /**
    * 更新角色
    */
-  public async updateRole(
-    id: string,
-    nodeId: string | undefined,
-    data: UpdateRoleRequestDto,
-  ): Promise<void> {
-    const targetNodeId = this.getTargetNodeId(nodeId);
+  public async updateRole(id: string, data: UpdateRoleRequestDto): Promise<void> {
+    const currentUser = this.getCurrentUser();
     const role = await this.ctx.repos.role.findById(id);
 
-    if (!role || role.nodeId !== targetNodeId) {
+    if (!role) {
+      throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
+    }
+
+    // 業者只能操作自己的角色
+    if (currentUser.nodeType === "VENDOR" && role.nodeId !== currentUser.nodeId) {
       throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
     }
 
@@ -144,7 +151,7 @@ export class RoleService {
 
     // 檢查同一節點內角色名稱是否重複
     if (data.name && data.name !== role.name) {
-      const existingRole = await this.ctx.repos.role.findByName(data.name, targetNodeId);
+      const existingRole = await this.ctx.repos.role.findByName(data.name, role.nodeId);
 
       if (existingRole) {
         throw new AppError(ErrorCode.DUPLICATE, "角色名稱已存在");
@@ -158,13 +165,22 @@ export class RoleService {
   /**
    * 批次刪除角色
    */
-  public async batchDeleteRole(ids: string[], nodeId?: string): Promise<void> {
-    const targetNodeId = this.getTargetNodeId(nodeId);
+  public async batchDeleteRole(dto: BatchDeleteStringIdsDto): Promise<void> {
+    const { ids } = dto;
+    const currentUser = this.getCurrentUser();
 
     const roles = await this.ctx.repos.role.findByIds(ids);
 
-    // 確認角色皆存在且屬於操作節點
-    if (roles.length !== ids.length || roles.some((role) => role.nodeId !== targetNodeId)) {
+    // 確認角色皆存在
+    if (roles.length !== ids.length) {
+      throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
+    }
+
+    // 業者只能操作自己的角色
+    if (
+      currentUser.nodeType === "VENDOR" &&
+      roles.some((role) => role.nodeId !== currentUser.nodeId)
+    ) {
       throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
     }
 
@@ -189,17 +205,18 @@ export class RoleService {
   /**
    * 更新角色頁面權限
    */
-  public async updateRolePages(
-    roleId: string,
-    nodeId: string | undefined,
-    dto: UpdateRolePagesRequestDto,
-  ): Promise<void> {
-    const targetNodeId = this.getTargetNodeId(nodeId);
+  public async updateRolePages(roleId: string, dto: UpdateRolePagesRequestDto): Promise<void> {
+    const currentUser = this.getCurrentUser();
 
-    // 確認角色存在且屬於操作節點
+    // 確認角色存在
     const role = await this.ctx.repos.role.findById(roleId);
 
-    if (!role || role.nodeId !== targetNodeId) {
+    if (!role) {
+      throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
+    }
+
+    // 業者只能操作自己的角色
+    if (currentUser.nodeType === "VENDOR" && role.nodeId !== currentUser.nodeId) {
       throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
     }
 
@@ -225,7 +242,7 @@ export class RoleService {
     }
 
     // 角色只能設定所屬節點已授權的頁面
-    const node = await this.ctx.repos.vendor.findById(targetNodeId);
+    const node = await this.ctx.repos.vendor.findById(role.nodeId);
 
     if (!node) {
       throw new AppError(ErrorCode.DATA_NOT_FOUND, "組織節點不存在");
