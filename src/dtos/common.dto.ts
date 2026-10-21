@@ -1,5 +1,5 @@
 // src/dtos/common.dto.ts
-import { IsArray, ArrayMinSize, IsString, IsInt } from "class-validator";
+import { ArrayMinSize, IsArray, IsInt, IsString } from "class-validator";
 
 /**
  * 批次刪除字串 ID 的 DTO

@@ -44,18 +44,18 @@ export class UpdateUserRequestDto {
   @Length(2, 20, {
     message: "使用者名稱長度需介於 2~20 字元",
   })
-  account!: string;
+  account?: string;
 
   @IsOptional()
   @IsString({ message: "暱稱必須為字串" })
   @Length(2, 20, {
     message: "暱稱長度需介於 2~20 字元",
   })
-  username!: string;
+  username?: string;
 
   @IsOptional()
   @IsEmail({}, { message: "Email 格式錯誤" })
-  email!: string;
+  email?: string;
 
   @IsOptional()
   @IsUUID("4", { message: "角色 ID 格式錯誤" })

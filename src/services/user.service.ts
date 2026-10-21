@@ -1,6 +1,7 @@
 // src/services/user.service.ts
 import bcrypt from "bcrypt";
 import { plainToInstance } from "class-transformer";
+import type { BatchDeleteStringIdsDto } from "../dtos/common.dto";
 import type { PaginationRequestDto, PaginationResponseDto } from "../dtos/pagination.dto";
 import {
   UserResponseDto,
@@ -84,11 +85,15 @@ export class UserService {
   /**
    * 取得使用者詳細資訊
    */
-  public async getUserById(id: string, nodeId?: string): Promise<UserResponseDto> {
-    const targetNodeId = this.getTargetNodeId(nodeId);
+  public async getUserById(id: string): Promise<UserResponseDto> {
+    const currentUser = this.getCurrentUser();
     const user = await this.ctx.repos.user.findById(id);
 
-    if (!user || user.nodeId !== targetNodeId) {
+    if (!user) {
+      throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);
+    }
+
+    if (currentUser.nodeType === "VENDOR" && user.nodeId !== currentUser.nodeId) {
       throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);
     }
 
@@ -129,41 +134,40 @@ export class UserService {
   /**
    * 更新使用者
    */
-  public async updateUser(
-    id: string,
-    nodeId: string | undefined,
-    data: UpdateUserRequestDto,
-  ): Promise<void> {
-    const targetNodeId = this.getTargetNodeId(nodeId);
+  public async updateUser(id: string, dto: UpdateUserRequestDto): Promise<void> {
+    const currentUser = this.getCurrentUser();
     const user = await this.ctx.repos.user.findById(id);
 
-    if (!user || user.nodeId !== targetNodeId) {
+    if (!user) {
       throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);
     }
 
-    // 確認角色存在且與使用者屬於相同節點
-    if (data.roleId) {
-      const role = await this.ctx.repos.role.findById(data.roleId);
+    if (currentUser.nodeType === "VENDOR" && user.nodeId !== currentUser.nodeId) {
+      throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);
+    }
+
+    if (dto.roleId) {
+      const role = await this.ctx.repos.role.findById(dto.roleId);
 
       if (!role) {
         throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
       }
 
-      if (role.nodeId !== targetNodeId) {
+      // 要跟「被編輯的 User」同 Node
+      if (role.nodeId !== user.nodeId) {
         throw new AppError(ErrorCode.REQUEST_DATA, "使用者與角色必須屬於相同節點");
       }
     }
 
-    // 更新使用者
-    await this.ctx.repos.user.update(id, data);
+    await this.ctx.repos.user.update(id, dto);
   }
 
   /**
    * 批次刪除使用者
    */
-  public async batchDeleteUser(ids: string[], nodeId?: string): Promise<void> {
+  public async batchDeleteUser(dto: BatchDeleteStringIdsDto): Promise<void> {
+    const { ids } = dto;
     const currentUser = this.getCurrentUser();
-    const targetNodeId = this.getTargetNodeId(nodeId);
 
     if (ids.includes(currentUser.id)) {
       throw new AppError(ErrorCode.REQUEST_DATA, "無法刪除自己");
@@ -171,7 +175,14 @@ export class UserService {
 
     const users = await this.ctx.repos.user.findByIds(ids);
 
-    if (users.length !== ids.length || users.some((user) => user.nodeId !== targetNodeId)) {
+    if (users.length !== ids.length) {
+      throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);
+    }
+
+    if (
+      currentUser.nodeType === "VENDOR" &&
+      users.some((user) => user.nodeId !== currentUser.nodeId)
+    ) {
       throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);
     }
 

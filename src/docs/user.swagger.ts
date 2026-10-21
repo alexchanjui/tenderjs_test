@@ -27,7 +27,7 @@
  *       - in: query
  *         name: nodeId
  *         required: false
- *         description: 節點 ID，營運可指定操作節點；未指定則操作自己的節點
+ *         description: 節點 ID，營運可指定查詢節點；未指定則查詢自己的節點
  *         schema:
  *           type: string
  *           format: uuid
@@ -51,13 +51,18 @@
  *               - username
  *               - email
  *               - password
+ *               - nodeId
  *             properties:
- *               username:
- *                 type: string
- *                 example: "測試人員"
  *               account:
  *                 type: string
+ *                 minLength: 2
+ *                 maxLength: 20
  *                 example: test
+ *               username:
+ *                 type: string
+ *                 minLength: 2
+ *                 maxLength: 20
+ *                 example: "測試人員"
  *               email:
  *                 type: string
  *                 format: email
@@ -70,11 +75,11 @@
  *               roleId:
  *                 type: string
  *                 format: uuid
- *                 example: 5a07d8e0-ae57-4887-b6a1-b9dfd6bf5a6c
+ *                 example: "5a07d8e0-ae57-4887-b6a1-b9dfd6bf5a6c"
  *               nodeId:
  *                 type: string
  *                 format: uuid
- *                 description: 節點 ID，營運可指定操作節點；未指定則操作自己的節點
+ *                 description: 使用者所屬節點 ID
  *                 example: "550e8400-e29b-41d4-a716-446655440000"
  *     responses:
  *       200:
@@ -93,13 +98,6 @@
  *       - in: path
  *         name: id
  *         required: true
- *         schema:
- *           type: string
- *           format: uuid
- *       - in: query
- *         name: nodeId
- *         required: false
- *         description: 節點 ID，營運可指定操作節點；未指定則操作自己的節點
  *         schema:
  *           type: string
  *           format: uuid
@@ -136,13 +134,6 @@
  *         schema:
  *           type: string
  *           format: uuid
- *       - in: query
- *         name: nodeId
- *         required: false
- *         description: 節點 ID，營運可指定操作節點；未指定則操作自己的節點
- *         schema:
- *           type: string
- *           format: uuid
  *     requestBody:
  *       required: true
  *       content:
@@ -152,9 +143,13 @@
  *             properties:
  *               account:
  *                 type: string
+ *                 minLength: 2
+ *                 maxLength: 20
  *                 example: test
  *               username:
  *                 type: string
+ *                 minLength: 2
+ *                 maxLength: 20
  *                 example: "測試人員"
  *               email:
  *                 type: string
@@ -163,7 +158,7 @@
  *               roleId:
  *                 type: string
  *                 format: uuid
- *                 example: 5a07d8e0-ae57-4887-b6a1-b9dfd6bf5a6c
+ *                 example: "5a07d8e0-ae57-4887-b6a1-b9dfd6bf5a6c"
  *               isActive:
  *                 type: boolean
  *                 example: true
@@ -180,14 +175,6 @@
  *     summary: 批次刪除使用者
  *     security:
  *       - BearerAuth: []
- *     parameters:
- *       - in: query
- *         name: nodeId
- *         required: false
- *         description: 節點 ID，營運可指定操作節點；未指定則操作自己的節點
- *         schema:
- *           type: string
- *           format: uuid
  *     requestBody:
  *       required: true
  *       content:
@@ -199,9 +186,12 @@
  *             properties:
  *               ids:
  *                 type: array
+ *                 minItems: 1
  *                 items:
  *                   type: string
- *                   format: uuid
+ *                 example:
+ *                   - "550e8400-e29b-41d4-a716-446655440001"
+ *                   - "550e8400-e29b-41d4-a716-446655440002"
  *     responses:
  *       200:
  *         description: 成功
