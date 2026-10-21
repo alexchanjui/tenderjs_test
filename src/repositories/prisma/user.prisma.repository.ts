@@ -49,6 +49,19 @@ export class UserPrismaRepository implements IUserRepository {
   }
 
   /**
+   * 根據 ID 列表取得使用者
+   */
+  public async findByIds(ids: string[]): Promise<User[]> {
+    return this.ctx.prisma.user.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+    });
+  }
+
+  /**
    * 根據 Email 取得使用者
    */
   public async findByEmail(email: string): Promise<UserWithRole | null> {

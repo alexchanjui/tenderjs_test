@@ -26,10 +26,11 @@
  *         example: 20
  *       - in: query
  *         name: nodeId
+ *         required: false
+ *         description: 節點 ID，營運可指定操作節點；未指定則操作自己的節點
  *         schema:
  *           type: string
  *           format: uuid
- *         required: false
  *     responses:
  *       200:
  *         description: 成功
@@ -37,7 +38,6 @@
  *   post:
  *     tags: [Roles]
  *     summary: 建立角色
- *     description: 如果指定了 vendorId，則角色將屬於該業者；否則為營運角色
  *     security:
  *       - BearerAuth: []
  *     requestBody:
@@ -58,11 +58,10 @@
  *                 type: string
  *                 maxLength: 200
  *                 example: 系統管理員
- *               vendorId:
+ *               nodeId:
  *                 type: string
  *                 format: uuid
- *                 nullable: true
- *                 example: 550e8400-e29b-41d4-a716-446655440000
+ *                 description: 節點 ID，營運可指定操作節點；未指定則操作自己的節點
  *     responses:
  *       200:
  *         description: 成功
@@ -83,6 +82,13 @@
  *         schema:
  *           type: string
  *           format: uuid
+ *       - in: query
+ *         name: nodeId
+ *         required: false
+ *         description: 節點 ID，營運可指定操作節點；未指定則操作自己的節點
+ *         schema:
+ *           type: string
+ *           format: uuid
  *     responses:
  *       200:
  *         description: 成功
@@ -96,6 +102,13 @@
  *       - in: path
  *         name: id
  *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *       - in: query
+ *         name: nodeId
+ *         required: false
+ *         description: 節點 ID，營運可指定操作節點；未指定則操作自己的節點
  *         schema:
  *           type: string
  *           format: uuid
@@ -131,6 +144,14 @@
  *     summary: 批次刪除角色
  *     security:
  *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: nodeId
+ *         required: false
+ *         description: 節點 ID，營運可指定操作節點；未指定則操作自己的節點
+ *         schema:
+ *           type: string
+ *           format: uuid
  *     requestBody:
  *       required: true
  *       content:
@@ -163,6 +184,13 @@
  *       - in: path
  *         name: id
  *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *       - in: query
+ *         name: nodeId
+ *         required: false
+ *         description: 節點 ID，營運可指定操作節點；未指定則操作自己的節點
  *         schema:
  *           type: string
  *           format: uuid

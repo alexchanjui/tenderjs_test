@@ -12,7 +12,7 @@
  *       - in: query
  *         name: nodeId
  *         required: false
- *         description: 業者節點 ID，營運操作指定業者時使用
+ *         description: 節點 ID，營運可指定操作節點；未指定則操作自己的節點
  *         schema:
  *           type: string
  *           format: uuid
@@ -29,7 +29,7 @@
  *       - in: query
  *         name: nodeId
  *         required: false
- *         description: 業者節點 ID，營運操作指定業者時使用
+ *         description: 節點 ID，營運可指定操作節點；未指定則操作自己的節點
  *         schema:
  *           type: string
  *           format: uuid

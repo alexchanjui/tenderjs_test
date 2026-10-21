@@ -1,5 +1,4 @@
 // src/services/user.service.ts
-
 import bcrypt from "bcrypt";
 import { plainToInstance } from "class-transformer";
 import type { PaginationRequestDto, PaginationResponseDto } from "../dtos/pagination.dto";
@@ -34,7 +33,13 @@ export class UserService {
   private getTargetNodeId(nodeId?: string): string {
     const currentUser = this.getCurrentUser();
 
-    return currentUser.nodeType === "VENDOR" ? currentUser.nodeId : (nodeId ?? currentUser.nodeId);
+    // 業者只能操作自己的資料
+    if (currentUser.nodeType === "VENDOR") {
+      return currentUser.nodeId;
+    }
+
+    // 營運可指定 Node，未指定則操作自己的 Node
+    return nodeId ?? currentUser.nodeId;
   }
 
   /**
@@ -79,10 +84,11 @@ export class UserService {
   /**
    * 取得使用者詳細資訊
    */
-  public async getUserById(id: string): Promise<UserResponseDto> {
+  public async getUserById(id: string, nodeId?: string): Promise<UserResponseDto> {
+    const targetNodeId = this.getTargetNodeId(nodeId);
     const user = await this.ctx.repos.user.findById(id);
 
-    if (!user) {
+    if (!user || user.nodeId !== targetNodeId) {
       throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);
     }
 
@@ -123,10 +129,15 @@ export class UserService {
   /**
    * 更新使用者
    */
-  public async updateUser(id: string, data: UpdateUserRequestDto): Promise<void> {
+  public async updateUser(
+    id: string,
+    nodeId: string | undefined,
+    data: UpdateUserRequestDto,
+  ): Promise<void> {
+    const targetNodeId = this.getTargetNodeId(nodeId);
     const user = await this.ctx.repos.user.findById(id);
 
-    if (!user) {
+    if (!user || user.nodeId !== targetNodeId) {
       throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);
     }
 
@@ -138,7 +149,7 @@ export class UserService {
         throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
       }
 
-      if (role.nodeId !== user.nodeId) {
+      if (role.nodeId !== targetNodeId) {
         throw new AppError(ErrorCode.REQUEST_DATA, "使用者與角色必須屬於相同節點");
       }
     }
@@ -150,11 +161,18 @@ export class UserService {
   /**
    * 批次刪除使用者
    */
-  public async batchDeleteUser(ids: string[]): Promise<void> {
+  public async batchDeleteUser(ids: string[], nodeId?: string): Promise<void> {
     const currentUser = this.getCurrentUser();
+    const targetNodeId = this.getTargetNodeId(nodeId);
 
     if (ids.includes(currentUser.id)) {
       throw new AppError(ErrorCode.REQUEST_DATA, "無法刪除自己");
+    }
+
+    const users = await this.ctx.repos.user.findByIds(ids);
+
+    if (users.length !== ids.length || users.some((user) => user.nodeId !== targetNodeId)) {
+      throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);
     }
 
     const count = await this.ctx.repos.user.batchDelete(ids);

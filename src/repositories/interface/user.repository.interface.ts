@@ -28,6 +28,7 @@ export type UserWithRole = User & {
 export interface IUserRepository {
   create(data: CreateUserRequestDto): Promise<User>;
   findById(id: string): Promise<UserWithRole | null>;
+  findByIds(ids: string[]): Promise<User[]>;
   findByEmail(email: string): Promise<UserWithRole | null>;
   findByAccount(account: string): Promise<UserWithRole | null>;
   findAndCount(params: {

@@ -48,9 +48,9 @@ export class RoleController implements IController {
   private createRole = async (req: Request, res: Response): Promise<void> => {
     const dto = plainToInstance(CreateRoleRequestDto, req.body);
 
-    const result = await this.roleService.createRole(dto);
+    await this.roleService.createRole(dto);
 
-    R.success(res, result);
+    R.success(res);
   };
 
   /**
@@ -68,7 +68,9 @@ export class RoleController implements IController {
    * 取得角色詳細資訊
    */
   private getRoleById = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
-    const result = await this.roleService.getRoleById(req.params.id);
+    const nodeId = req.query.nodeId as string | undefined;
+
+    const result = await this.roleService.getRoleById(req.params.id, nodeId);
 
     R.success(res, result);
   };
@@ -78,10 +80,11 @@ export class RoleController implements IController {
    */
   private updateRole = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
     const { id } = req.params;
+    const nodeId = req.query.nodeId as string | undefined;
 
     const dto = plainToInstance(UpdateRoleRequestDto, req.body);
 
-    await this.roleService.updateRole(id, dto);
+    await this.roleService.updateRole(id, nodeId, dto);
 
     R.success(res);
   };
@@ -90,9 +93,11 @@ export class RoleController implements IController {
    * 批次刪除角色
    */
   private batchDeleteRole = async (req: Request, res: Response): Promise<void> => {
+    const nodeId = req.query.nodeId as string | undefined;
+
     const dto = plainToInstance(BatchDeleteStringIdsDto, req.body);
 
-    await this.roleService.batchDeleteRole(dto.ids);
+    await this.roleService.batchDeleteRole(dto.ids, nodeId);
 
     R.success(res);
   };
@@ -102,10 +107,11 @@ export class RoleController implements IController {
    */
   private updateRolePages = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
     const { id } = req.params;
+    const nodeId = req.query.nodeId as string | undefined;
 
     const dto = plainToInstance(UpdateRolePagesRequestDto, req.body);
 
-    await this.roleService.updateRolePages(id, dto);
+    await this.roleService.updateRolePages(id, nodeId, dto);
 
     R.success(res);
   };

@@ -1,5 +1,4 @@
 // src/services/vendorProfile.service.ts
-
 import { plainToInstance } from "class-transformer";
 import { UpdateVendorProfileRequestDto, VendorProfileResponseDto } from "../dtos/vendorProfile.dto";
 import { AppError } from "../errors/app.error";
@@ -33,12 +32,8 @@ export class VendorProfileService {
       return currentUser.nodeId;
     }
 
-    // 營運操作業者時必須指定 nodeId
-    if (!nodeId) {
-      throw new AppError(ErrorCode.REQUEST_DATA, "請指定業者");
-    }
-
-    return nodeId;
+    // 營運可指定 Node，未指定則操作自己的 Node
+    return nodeId ?? currentUser.nodeId;
   }
 
   /**

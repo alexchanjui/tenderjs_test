@@ -15,7 +15,7 @@ export class RolePrismaRepository implements IRoleRepository {
   }
 
   /**
-   * 根據 ID 查找角色
+   * 根據 ID 取得角色
    */
   public async findById(id: string): Promise<RoleWithPages | null> {
     return this.ctx.prisma.role.findUnique({
@@ -40,7 +40,7 @@ export class RolePrismaRepository implements IRoleRepository {
   }
 
   /**
-   * 根據 ID 批次取得角色
+   * 根據 ID 列表取得角色
    */
   public async findByIds(ids: string[]): Promise<Role[]> {
     return this.ctx.prisma.role.findMany({

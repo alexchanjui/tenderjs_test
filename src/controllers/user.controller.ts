@@ -50,7 +50,9 @@ export class UserController implements IController {
    * 取得使用者詳細資訊
    */
   private getUserById = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
-    const result = await this.userService.getUserById(req.params.id);
+    const nodeId = req.query.nodeId as string | undefined;
+
+    const result = await this.userService.getUserById(req.params.id, nodeId);
 
     R.success(res, result);
   };
@@ -71,10 +73,11 @@ export class UserController implements IController {
    */
   private updateUser = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
     const { id } = req.params;
+    const nodeId = req.query.nodeId as string | undefined;
 
     const dto = plainToInstance(UpdateUserRequestDto, req.body);
 
-    await this.userService.updateUser(id, dto);
+    await this.userService.updateUser(id, nodeId, dto);
 
     R.success(res);
   };
@@ -83,9 +86,11 @@ export class UserController implements IController {
    * 批次刪除使用者
    */
   private batchDeleteUser = async (req: Request, res: Response): Promise<void> => {
+    const nodeId = req.query.nodeId as string | undefined;
+
     const dto = plainToInstance(BatchDeleteStringIdsDto, req.body);
 
-    await this.userService.batchDeleteUser(dto.ids);
+    await this.userService.batchDeleteUser(dto.ids, nodeId);
 
     R.success(res);
   };
