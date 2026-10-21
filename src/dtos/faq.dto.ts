@@ -1,11 +1,14 @@
 // src/dtos/faq.dto.ts
 import { Expose } from "class-transformer";
-import { IsBoolean, IsInt, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsBoolean, IsInt, IsNotEmpty, IsOptional, IsString, IsUUID } from "class-validator";
 
 /**
  * 新增問答分類 Request DTO
  */
 export class CreateFaqCategoryRequestDto {
+  @IsUUID("4", { message: "節點 ID 格式錯誤" })
+  nodeId!: string;
+
   @IsString()
   @IsNotEmpty()
   title!: string;
@@ -58,6 +61,9 @@ export class FaqCategoryResponseDto {
  * 新增問答 Request DTO
  */
 export class CreateFaqRequestDto {
+  @IsUUID("4", { message: "節點 ID 格式錯誤" })
+  nodeId!: string;
+
   @IsString()
   @IsNotEmpty()
   categoryId!: string;

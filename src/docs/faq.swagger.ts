@@ -12,7 +12,7 @@
  *       - in: query
  *         name: nodeId
  *         required: false
- *         description: 節點 ID，營運操作指定節點時使用
+ *         description: 節點 ID，營運可指定查詢節點；未指定則查詢自己的節點
  *         schema:
  *           type: string
  *           format: uuid
@@ -25,14 +25,6 @@
  *     summary: 新增問答分類
  *     security:
  *       - BearerAuth: []
- *     parameters:
- *       - in: query
- *         name: nodeId
- *         required: false
- *         description: 節點 ID，營運操作指定節點時使用
- *         schema:
- *           type: string
- *           format: uuid
  *     requestBody:
  *       required: true
  *       content:
@@ -40,8 +32,14 @@
  *           schema:
  *             type: object
  *             required:
+ *               - nodeId
  *               - title
  *             properties:
+ *               nodeId:
+ *                 type: string
+ *                 format: uuid
+ *                 description: 業者所屬節點 ID
+ *                 example: "550e8400-e29b-41d4-a716-446655440000"
  *               title:
  *                 type: string
  *                 example: 常見問題
@@ -65,13 +63,6 @@
  *       - in: path
  *         name: id
  *         required: true
- *         schema:
- *           type: string
- *           format: uuid
- *       - in: query
- *         name: nodeId
- *         required: false
- *         description: 節點 ID，營運操作指定節點時使用
  *         schema:
  *           type: string
  *           format: uuid
@@ -107,13 +98,6 @@
  *         schema:
  *           type: string
  *           format: uuid
- *       - in: query
- *         name: nodeId
- *         required: false
- *         description: 節點 ID，營運操作指定節點時使用
- *         schema:
- *           type: string
- *           format: uuid
  *     responses:
  *       200:
  *         description: 刪除成功
@@ -128,7 +112,7 @@
  *       - in: query
  *         name: nodeId
  *         required: false
- *         description: 節點 ID，營運操作指定節點時使用
+ *         description: 節點 ID，營運可指定查詢節點；未指定則查詢自己的節點
  *         schema:
  *           type: string
  *           format: uuid
@@ -148,14 +132,6 @@
  *     summary: 新增問答
  *     security:
  *       - BearerAuth: []
- *     parameters:
- *       - in: query
- *         name: nodeId
- *         required: false
- *         description: 節點 ID，營運操作指定節點時使用
- *         schema:
- *           type: string
- *           format: uuid
  *     requestBody:
  *       required: true
  *       content:
@@ -163,10 +139,16 @@
  *           schema:
  *             type: object
  *             required:
+ *               - nodeId
  *               - categoryId
  *               - title
  *               - content
  *             properties:
+ *               nodeId:
+ *                 type: string
+ *                 format: uuid
+ *                 description: 業者所屬節點 ID
+ *                 example: "550e8400-e29b-41d4-a716-446655440000"
  *               categoryId:
  *                 type: string
  *                 format: uuid
@@ -196,13 +178,6 @@
  *       - in: path
  *         name: id
  *         required: true
- *         schema:
- *           type: string
- *           format: uuid
- *       - in: query
- *         name: nodeId
- *         required: false
- *         description: 節點 ID，營運操作指定節點時使用
  *         schema:
  *           type: string
  *           format: uuid
@@ -241,13 +216,6 @@
  *       - in: path
  *         name: id
  *         required: true
- *         schema:
- *           type: string
- *           format: uuid
- *       - in: query
- *         name: nodeId
- *         required: false
- *         description: 節點 ID，營運操作指定節點時使用
  *         schema:
  *           type: string
  *           format: uuid

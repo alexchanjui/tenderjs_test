@@ -1,3 +1,5 @@
+// src/controllers/faq.controller.ts
+
 import { plainToInstance } from "class-transformer";
 import { Request, Response, Router } from "express";
 import {
@@ -59,10 +61,9 @@ export class FaqController implements IController {
    * 新增問答分類
    */
   private createCategory = async (req: Request, res: Response): Promise<void> => {
-    const nodeId = req.query.nodeId as string | undefined;
     const dto = plainToInstance(CreateFaqCategoryRequestDto, req.body);
 
-    await this.faqService.createCategory(nodeId, dto);
+    await this.faqService.createCategory(dto);
 
     R.success(res);
   };
@@ -72,10 +73,9 @@ export class FaqController implements IController {
    */
   private updateCategory = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
     const { id } = req.params;
-    const nodeId = req.query.nodeId as string | undefined;
     const dto = plainToInstance(UpdateFaqCategoryRequestDto, req.body);
 
-    await this.faqService.updateCategory(id, nodeId, dto);
+    await this.faqService.updateCategory(id, dto);
 
     R.success(res);
   };
@@ -85,9 +85,8 @@ export class FaqController implements IController {
    */
   private deleteCategory = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
     const { id } = req.params;
-    const nodeId = req.query.nodeId as string | undefined;
 
-    await this.faqService.deleteCategory(id, nodeId);
+    await this.faqService.deleteCategory(id);
 
     R.success(res);
   };
@@ -108,10 +107,9 @@ export class FaqController implements IController {
    * 新增問答
    */
   private createQa = async (req: Request, res: Response): Promise<void> => {
-    const nodeId = req.query.nodeId as string | undefined;
     const dto = plainToInstance(CreateFaqRequestDto, req.body);
 
-    await this.faqService.createQa(nodeId, dto);
+    await this.faqService.createQa(dto);
 
     R.success(res);
   };
@@ -121,10 +119,9 @@ export class FaqController implements IController {
    */
   private updateQa = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
     const { id } = req.params;
-    const nodeId = req.query.nodeId as string | undefined;
     const dto = plainToInstance(UpdateFaqRequestDto, req.body);
 
-    await this.faqService.updateQa(id, nodeId, dto);
+    await this.faqService.updateQa(id, dto);
 
     R.success(res);
   };
@@ -134,9 +131,8 @@ export class FaqController implements IController {
    */
   private deleteQa = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
     const { id } = req.params;
-    const nodeId = req.query.nodeId as string | undefined;
 
-    await this.faqService.deleteQa(id, nodeId);
+    await this.faqService.deleteQa(id);
 
     R.success(res);
   };
