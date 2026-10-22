@@ -14,10 +14,6 @@ export class CreateFaqCategoryRequestDto {
   title!: string;
 
   @IsOptional()
-  @IsInt()
-  sortOrder?: number;
-
-  @IsOptional()
   @IsBoolean()
   isActive?: boolean;
 }

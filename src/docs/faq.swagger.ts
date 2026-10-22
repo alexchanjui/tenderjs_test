@@ -43,9 +43,6 @@
  *               title:
  *                 type: string
  *                 example: 常見問題
- *               sortOrder:
- *                 type: integer
- *                 example: 1
  *               isActive:
  *                 type: boolean
  *                 example: true

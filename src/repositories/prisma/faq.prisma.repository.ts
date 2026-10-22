@@ -24,7 +24,6 @@ export class FaqPrismaRepository implements IFaqRepository {
       data: {
         vendorProfileId,
         title: data.title,
-        sortOrder: data.sortOrder,
         isActive: data.isActive,
       },
     });
