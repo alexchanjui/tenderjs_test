@@ -374,7 +374,7 @@ model VendorProfile {
 
 /// 業者主視覺橫幅
 model VendorBanner {
-  id String @id @default(dbgenerated("newid()")) @db.UniqueIdentifier
+  id Int @id @default(autoincrement())
 
   /// 業者詳細資訊 ID
   vendorProfileId String @map("vendor_profile_id") @db.UniqueIdentifier
@@ -394,7 +394,7 @@ model VendorBanner {
 
 /// 問答分類
 model FaqCategory {
-  id String @id @default(dbgenerated("newid()")) @db.UniqueIdentifier
+  id Int @id @default(autoincrement())
 
   /// 業者詳細資訊 ID
   vendorProfileId String @map("vendor_profile_id") @db.UniqueIdentifier
@@ -420,10 +420,10 @@ model FaqCategory {
 
 /// 問答
 model Faq {
-  id String @id @default(dbgenerated("newid()")) @db.UniqueIdentifier
+  id Int @id @default(autoincrement())
 
   /// 問答分類 ID
-  categoryId String @map("category_id") @db.UniqueIdentifier
+  categoryId Int @map("category_id")
 
   /// 標題
   title String
@@ -438,7 +438,7 @@ model Faq {
   isActive Boolean @default(true) @map("is_active")
 
   /// 所屬分類
-  category FaqCategory @relation( fields: [categoryId], references: [id], onDelete: Cascade )
+  category FaqCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   @@index([categoryId])
   @@map("faq")
@@ -446,7 +446,7 @@ model Faq {
 
 /// 營運條款
 model OperatingTerm {
-  id String @id @default(dbgenerated("newid()")) @db.UniqueIdentifier
+  id Int @id @default(autoincrement())
 
   /// 業者詳細資訊 ID
   vendorProfileId String @map("vendor_profile_id") @db.UniqueIdentifier
@@ -464,7 +464,7 @@ model OperatingTerm {
   isActive Boolean @default(true) @map("is_active")
 
   /// 所屬業者
-  vendorProfile VendorProfile @relation( fields: [vendorProfileId], references: [id], onDelete: Cascade )
+  vendorProfile VendorProfile @relation(fields: [vendorProfileId], references: [id], onDelete: Cascade)
 
   @@index([vendorProfileId])
   @@map("operating_term")

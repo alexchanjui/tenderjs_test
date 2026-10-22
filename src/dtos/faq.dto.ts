@@ -45,7 +45,7 @@ export class UpdateFaqCategoryRequestDto {
  */
 export class FaqCategoryResponseDto {
   @Expose()
-  id!: string;
+  id!: number;
 
   @Expose()
   title!: string;
@@ -64,9 +64,8 @@ export class CreateFaqRequestDto {
   @IsUUID("4", { message: "節點 ID 格式錯誤" })
   nodeId!: string;
 
-  @IsString()
-  @IsNotEmpty()
-  categoryId!: string;
+  @IsInt()
+  categoryId!: number;
 
   @IsString()
   @IsNotEmpty()
@@ -90,9 +89,8 @@ export class CreateFaqRequestDto {
  */
 export class UpdateFaqRequestDto {
   @IsOptional()
-  @IsString()
-  @IsNotEmpty()
-  categoryId?: string;
+  @IsInt()
+  categoryId?: number;
 
   @IsOptional()
   @IsString()
@@ -118,10 +116,10 @@ export class UpdateFaqRequestDto {
  */
 export class FaqResponseDto {
   @Expose()
-  id!: string;
+  id!: number;
 
   @Expose()
-  categoryId!: string;
+  categoryId!: number;
 
   @Expose()
   title!: string;

@@ -75,7 +75,7 @@ export class FaqController implements IController {
     const { id } = req.params;
     const dto = plainToInstance(UpdateFaqCategoryRequestDto, req.body);
 
-    await this.faqService.updateCategory(id, dto);
+    await this.faqService.updateCategory(Number(id), dto);
 
     R.success(res);
   };
@@ -86,7 +86,7 @@ export class FaqController implements IController {
   private deleteCategory = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
     const { id } = req.params;
 
-    await this.faqService.deleteCategory(id);
+    await this.faqService.deleteCategory(Number(id));
 
     R.success(res);
   };
@@ -96,7 +96,7 @@ export class FaqController implements IController {
    */
   private getQaList = async (req: Request, res: Response): Promise<void> => {
     const nodeId = req.query.nodeId as string | undefined;
-    const categoryId = req.query.categoryId as string;
+    const categoryId = Number(req.query.categoryId);
 
     const result = await this.faqService.getQaList(categoryId, nodeId);
 
@@ -121,7 +121,7 @@ export class FaqController implements IController {
     const { id } = req.params;
     const dto = plainToInstance(UpdateFaqRequestDto, req.body);
 
-    await this.faqService.updateQa(id, dto);
+    await this.faqService.updateQa(Number(id), dto);
 
     R.success(res);
   };
@@ -132,7 +132,7 @@ export class FaqController implements IController {
   private deleteQa = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
     const { id } = req.params;
 
-    await this.faqService.deleteQa(id);
+    await this.faqService.deleteQa(Number(id));
 
     R.success(res);
   };

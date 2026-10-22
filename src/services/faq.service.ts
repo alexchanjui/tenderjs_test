@@ -1,6 +1,5 @@
 // src/services/faq.service.ts
 import { plainToInstance } from "class-transformer";
-
 import {
   CreateFaqCategoryRequestDto,
   CreateFaqRequestDto,
@@ -49,7 +48,6 @@ export class FaqService {
    */
   private async getVendorProfile(nodeId?: string) {
     const targetNodeId = this.getTargetNodeId(nodeId);
-
     const profile = await this.ctx.repos.vendorProfile.findByNodeId(targetNodeId);
 
     if (!profile) {
@@ -60,58 +58,10 @@ export class FaqService {
   }
 
   /**
-   * 檢查問答分類操作權限
-   */
-  private async validateCategoryAccess(id: string) {
-    const category = await this.ctx.repos.faq.findCategoryById(id);
-
-    if (!category) {
-      throw new AppError(ErrorCode.DATA_NOT_FOUND, "問答分類不存在");
-    }
-
-    const currentUser = this.getCurrentUser();
-
-    if (currentUser.nodeType === "VENDOR") {
-      const profile = await this.ctx.repos.vendorProfile.findByNodeId(currentUser.nodeId);
-
-      if (!profile || category.vendorProfileId !== profile.id) {
-        throw new AppError(ErrorCode.DATA_NOT_FOUND, "問答分類不存在");
-      }
-    }
-
-    return category;
-  }
-
-  /**
-   * 檢查問答操作權限
-   */
-  private async validateQaAccess(id: string) {
-    const qa = await this.ctx.repos.faq.findQaById(id);
-
-    if (!qa) {
-      throw new AppError(ErrorCode.DATA_NOT_FOUND, "問答不存在");
-    }
-
-    const currentUser = this.getCurrentUser();
-
-    if (currentUser.nodeType === "VENDOR") {
-      const profile = await this.ctx.repos.vendorProfile.findByNodeId(currentUser.nodeId);
-      const category = await this.ctx.repos.faq.findCategoryById(qa.categoryId);
-
-      if (!profile || !category || category.vendorProfileId !== profile.id) {
-        throw new AppError(ErrorCode.DATA_NOT_FOUND, "問答不存在");
-      }
-    }
-
-    return qa;
-  }
-
-  /**
    * 取得問答分類列表
    */
   public async getCategories(nodeId?: string): Promise<FaqCategoryResponseDto[]> {
     const profile = await this.getVendorProfile(nodeId);
-
     const categories = await this.ctx.repos.faq.findAllCategories(profile.id);
 
     return plainToInstance(FaqCategoryResponseDto, categories, {
@@ -131,25 +81,21 @@ export class FaqService {
   /**
    * 更新問答分類
    */
-  public async updateCategory(id: string, data: UpdateFaqCategoryRequestDto): Promise<void> {
-    await this.validateCategoryAccess(id);
-
+  public async updateCategory(id: number, data: UpdateFaqCategoryRequestDto): Promise<void> {
     await this.ctx.repos.faq.updateCategory(id, data);
   }
 
   /**
    * 刪除問答分類
    */
-  public async deleteCategory(id: string): Promise<void> {
-    await this.validateCategoryAccess(id);
-
+  public async deleteCategory(id: number): Promise<void> {
     await this.ctx.repos.faq.deleteCategory(id);
   }
 
   /**
    * 取得問答列表
    */
-  public async getQaList(categoryId: string, nodeId?: string): Promise<FaqResponseDto[]> {
+  public async getQaList(categoryId: number, nodeId?: string): Promise<FaqResponseDto[]> {
     const profile = await this.getVendorProfile(nodeId);
     const category = await this.ctx.repos.faq.findCategoryById(categoryId);
 
@@ -181,42 +127,14 @@ export class FaqService {
   /**
    * 更新問答
    */
-  public async updateQa(id: string, data: UpdateFaqRequestDto): Promise<void> {
-    const qa = await this.validateQaAccess(id);
-
-    if (data.categoryId) {
-      const category = await this.ctx.repos.faq.findCategoryById(data.categoryId);
-
-      if (!category) {
-        throw new AppError(ErrorCode.DATA_NOT_FOUND, "問答不存在");
-      }
-
-      const currentUser = this.getCurrentUser();
-
-      if (currentUser.nodeType === "VENDOR") {
-        const profile = await this.ctx.repos.vendorProfile.findByNodeId(currentUser.nodeId);
-
-        if (!profile || category.vendorProfileId !== profile.id) {
-          throw new AppError(ErrorCode.DATA_NOT_FOUND, "問答不存在");
-        }
-      } else {
-        const originalCategory = await this.ctx.repos.faq.findCategoryById(qa.categoryId);
-
-        if (!originalCategory || category.vendorProfileId !== originalCategory.vendorProfileId) {
-          throw new AppError(ErrorCode.DATA_NOT_FOUND, "問答不存在");
-        }
-      }
-    }
-
+  public async updateQa(id: number, data: UpdateFaqRequestDto): Promise<void> {
     await this.ctx.repos.faq.updateQa(id, data);
   }
 
   /**
    * 刪除問答
    */
-  public async deleteQa(id: string): Promise<void> {
-    await this.validateQaAccess(id);
-
+  public async deleteQa(id: number): Promise<void> {
     await this.ctx.repos.faq.deleteQa(id);
   }
 }

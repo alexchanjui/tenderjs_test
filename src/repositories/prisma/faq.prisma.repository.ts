@@ -47,7 +47,7 @@ export class FaqPrismaRepository implements IFaqRepository {
   /**
    * 取得問答分類
    */
-  public async findCategoryById(id: string): Promise<FaqCategory | null> {
+  public async findCategoryById(id: number): Promise<FaqCategory | null> {
     return this.ctx.prisma.faqCategory.findUnique({
       where: {
         id,
@@ -58,7 +58,7 @@ export class FaqPrismaRepository implements IFaqRepository {
   /**
    * 更新問答分類
    */
-  public async updateCategory(id: string, data: UpdateFaqCategoryRequestDto): Promise<void> {
+  public async updateCategory(id: number, data: UpdateFaqCategoryRequestDto): Promise<void> {
     await this.ctx.prisma.faqCategory.update({
       where: {
         id,
@@ -70,7 +70,7 @@ export class FaqPrismaRepository implements IFaqRepository {
   /**
    * 刪除問答分類
    */
-  public async deleteCategory(id: string): Promise<void> {
+  public async deleteCategory(id: number): Promise<void> {
     await this.ctx.prisma.faqCategory.delete({
       where: {
         id,
@@ -96,7 +96,7 @@ export class FaqPrismaRepository implements IFaqRepository {
   /**
    * 取得問答列表
    */
-  public async findAllQa(categoryId: string): Promise<Faq[]> {
+  public async findAllQa(categoryId: number): Promise<Faq[]> {
     return this.ctx.prisma.faq.findMany({
       where: {
         categoryId,
@@ -110,7 +110,7 @@ export class FaqPrismaRepository implements IFaqRepository {
   /**
    * 取得問答
    */
-  public async findQaById(id: string): Promise<Faq | null> {
+  public async findQaById(id: number): Promise<Faq | null> {
     return this.ctx.prisma.faq.findUnique({
       where: {
         id,
@@ -121,7 +121,7 @@ export class FaqPrismaRepository implements IFaqRepository {
   /**
    * 更新問答
    */
-  public async updateQa(id: string, data: UpdateFaqRequestDto): Promise<void> {
+  public async updateQa(id: number, data: UpdateFaqRequestDto): Promise<void> {
     await this.ctx.prisma.faq.update({
       where: {
         id,
@@ -133,7 +133,7 @@ export class FaqPrismaRepository implements IFaqRepository {
   /**
    * 刪除問答
    */
-  public async deleteQa(id: string): Promise<void> {
+  public async deleteQa(id: number): Promise<void> {
     await this.ctx.prisma.faq.delete({
       where: {
         id,

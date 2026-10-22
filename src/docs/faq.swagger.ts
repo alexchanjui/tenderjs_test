@@ -64,8 +64,8 @@
  *         name: id
  *         required: true
  *         schema:
- *           type: string
- *           format: uuid
+ *           type: integer
+ *           example: 1
  *     requestBody:
  *       required: true
  *       content:
@@ -96,8 +96,8 @@
  *         name: id
  *         required: true
  *         schema:
- *           type: string
- *           format: uuid
+ *           type: integer
+ *           example: 1
  *     responses:
  *       200:
  *         description: 刪除成功
@@ -121,8 +121,8 @@
  *         required: true
  *         description: 問答分類 ID
  *         schema:
- *           type: string
- *           format: uuid
+ *           type: integer
+ *           example: 1
  *     responses:
  *       200:
  *         description: 成功
@@ -150,8 +150,8 @@
  *                 description: 業者所屬節點 ID
  *                 example: "550e8400-e29b-41d4-a716-446655440000"
  *               categoryId:
- *                 type: string
- *                 format: uuid
+ *                 type: integer
+ *                 example: 1
  *               title:
  *                 type: string
  *                 example: 如何購買票券？
@@ -179,8 +179,8 @@
  *         name: id
  *         required: true
  *         schema:
- *           type: string
- *           format: uuid
+ *           type: integer
+ *           example: 1
  *     requestBody:
  *       required: true
  *       content:
@@ -189,8 +189,8 @@
  *             type: object
  *             properties:
  *               categoryId:
- *                 type: string
- *                 format: uuid
+ *                 type: integer
+ *                 example: 1
  *               title:
  *                 type: string
  *                 example: 如何購買票券？
@@ -217,8 +217,8 @@
  *         name: id
  *         required: true
  *         schema:
- *           type: string
- *           format: uuid
+ *           type: integer
+ *           example: 1
  *     responses:
  *       200:
  *         description: 刪除成功
