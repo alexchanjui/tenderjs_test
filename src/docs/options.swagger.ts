@@ -41,3 +41,17 @@
  *       200:
  *         description: 查詢成功
  */
+
+/**
+ * @openapi
+ * /options/faq-categories:
+ *   get:
+ *     tags:
+ *       - Options
+ *     summary: 取得問題分類選項
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: 查詢成功
+ */

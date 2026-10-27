@@ -42,7 +42,7 @@
  *                 example: "550e8400-e29b-41d4-a716-446655440000"
  *               title:
  *                 type: string
- *                 example: 常見問題
+ *                 example: 問題
  *               isActive:
  *                 type: boolean
  *                 example: true
@@ -72,7 +72,7 @@
  *             properties:
  *               title:
  *                 type: string
- *                 example: 常見問題
+ *                 example: 問題
  *               sortOrder:
  *                 type: integer
  *                 example: 1

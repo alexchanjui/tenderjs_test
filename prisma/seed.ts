@@ -43,9 +43,9 @@ const pagesData = [
   },
   {
     pageCode: 500,
-    name: "問答管理",
-    description: "管理常見問答",
-    routePath: "/faqs",
+    name: "業者資訊",
+    description: "管理業者詳細資訊",
+    routePath: "/vendor-profile",
     isActive: true,
   },
 ];
@@ -311,78 +311,15 @@ const permissionsData = [
     description: "更新業者頁面權限",
   },
 
-  // 500 - 問答管理
+  // 500 - 業者資訊
   {
     pageCode: 500,
-    name: "faq-category:list",
-    apiPath: "/api/faq-categories",
+    name: "vendor-profile",
+    apiPath: "/api/vendor-profile",
     actionType: 0, // GET
     isRequired: true,
     isActive: true,
-    description: "查詢問答分類列表",
-  },
-  {
-    pageCode: 500,
-    name: "faq-category:create",
-    apiPath: "/api/faq-categories",
-    actionType: 1, // POST
-    isRequired: true,
-    isActive: true,
-    description: "新增問答分類",
-  },
-  {
-    pageCode: 500,
-    name: "faq-category:update",
-    apiPath: "/api/faq-categories/:id",
-    actionType: 2, // PUT
-    isRequired: true,
-    isActive: true,
-    description: "更新問答分類",
-  },
-  {
-    pageCode: 500,
-    name: "faq-category:delete",
-    apiPath: "/api/faq-categories/:id",
-    actionType: 3, // DELETE
-    isRequired: true,
-    isActive: true,
-    description: "刪除問答分類",
-  },
-  {
-    pageCode: 500,
-    name: "faq:list",
-    apiPath: "/api/faqs",
-    actionType: 0, // GET
-    isRequired: true,
-    isActive: true,
-    description: "查詢問答列表",
-  },
-  {
-    pageCode: 500,
-    name: "faq:create",
-    apiPath: "/api/faqs",
-    actionType: 1, // POST
-    isRequired: true,
-    isActive: true,
-    description: "新增問答",
-  },
-  {
-    pageCode: 500,
-    name: "faq:update",
-    apiPath: "/api/faqs/:id",
-    actionType: 2, // PUT
-    isRequired: true,
-    isActive: true,
-    description: "更新問答",
-  },
-  {
-    pageCode: 500,
-    name: "faq:delete",
-    apiPath: "/api/faqs/:id",
-    actionType: 3, // DELETE
-    isRequired: true,
-    isActive: true,
-    description: "刪除問答",
+    description: "查詢業者詳細資訊",
   },
 ];
 

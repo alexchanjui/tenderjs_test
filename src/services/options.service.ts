@@ -43,4 +43,16 @@ export class OptionsService {
       pageCodes: node.nodePages.map((nodePage) => nodePage.page.pageCode),
     }));
   }
+
+  /**
+   * 取得問題分類選項
+   */
+  public async getFaqCategoryOptions() {
+    const categories = await this.ctx.repos.options.findAllFaqCategories();
+
+    return categories.map((category) => ({
+      label: category.title,
+      value: category.id,
+    }));
+  }
 }

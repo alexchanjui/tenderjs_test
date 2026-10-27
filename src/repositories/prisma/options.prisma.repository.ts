@@ -1,5 +1,5 @@
 // src/repositories/prisma/options.prisma.repository.ts
-import type { Page, Role } from "@prisma/client";
+import type { Page, Role, FaqCategory } from "@prisma/client";
 
 import type { IDbContext } from "../../types/db.context";
 import type { IOptionsRepository, NodeWithPages } from "../interface/options.repository.interface";
@@ -54,5 +54,12 @@ export class OptionsPrismaRepository implements IOptionsRepository {
         },
       },
     });
+  }
+
+  /**
+   * 取得所有問題分類
+   */
+  public async findAllFaqCategories(): Promise<FaqCategory[]> {
+    return this.ctx.prisma.faqCategory.findMany();
   }
 }
