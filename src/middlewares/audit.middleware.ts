@@ -2,7 +2,6 @@
 import type { NextFunction, Request, Response } from "express";
 import logger from "../utils/logger";
 import prismaInstance from "../utils/prisma";
-import { requestContextStorage } from "../utils/request-context";
 
 /**
  * API 稽核日誌 Middleware
@@ -29,10 +28,9 @@ export const auditLogMiddleware = (req: Request, res: Response, next: NextFuncti
       const duration = Date.now() - startTime;
       const statusCode = res.statusCode;
 
-      // 取得目前 Request Context
-      const requestContext = requestContextStorage.getStore();
-      const userId = requestContext?.currentUser.id ?? null;
-      const currentNodeId = requestContext?.currentNodeId ?? null;
+      // 取得 Audit Context
+      const userId = req.auditContext?.userId ?? null;
+      const currentNodeId = req.auditContext?.currentNodeId ?? null;
 
       // Request Body
       const reqBody = {

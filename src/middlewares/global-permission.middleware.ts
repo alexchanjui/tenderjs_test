@@ -45,18 +45,24 @@ export const globalPermissionGuard = async (
     const requestedNodeId = Array.isArray(headerNodeId) ? headerNodeId[0] : headerNodeId;
     const currentNodeId = requestedNodeId || currentUser.nodeId;
 
-    // 6. 業者只能操作自己的 Node
+    // 6. 設定 Audit Context
+    req.auditContext = {
+      userId: currentUser.id,
+      currentNodeId,
+    };
+
+    // 7. 業者只能操作自己的 Node
     if (currentUser.nodeType === "VENDOR" && currentNodeId !== currentUser.nodeId) {
       throw new AppError(ErrorCode.PERMISSION);
     }
 
-    // 7. 建立 Request Context
+    // 8. 建立 Request Context
     const requestContext: RequestContext = {
       currentUser,
       currentNodeId,
     };
 
-    // 8. 未設定權限規則，只驗證登入身分
+    // 9. 未設定權限規則，只驗證登入身分
     if (!rule || rule.pageId === null) {
       requestContextStorage.run(requestContext, () => {
         next();
@@ -65,23 +71,23 @@ export const globalPermissionGuard = async (
       return;
     }
 
-    // 9. 沒有角色代表沒有權限
+    // 10. 沒有角色代表沒有權限
     if (!currentUser.roleId) {
       throw new AppError(ErrorCode.PERMISSION);
     }
 
-    // 10. 取得目前操作環境的頁面權限
+    // 11. 取得目前操作環境的頁面權限
     const pageIds =
       currentNodeId === currentUser.nodeId
         ? await getRolePageIds(currentUser.roleId)
         : await getNodePageIds(currentNodeId);
 
-    // 11. 確認是否具有目前 API 所屬頁面的權限
+    // 12. 確認是否具有目前 API 所屬頁面的權限
     if (!pageIds.includes(rule.pageId)) {
       throw new AppError(ErrorCode.PERMISSION);
     }
 
-    // 12. 建立 Request Context
+    // 13. 建立 Request Context
     requestContextStorage.run(requestContext, () => {
       next();
     });

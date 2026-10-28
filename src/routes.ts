@@ -6,6 +6,7 @@ import { globalPermissionGuard } from "./middlewares/global-permission.middlewar
 import { requestLogger } from "./middlewares/request-logger.middleware";
 import { AppError } from "./errors/app.error";
 import { ErrorCode } from "./errors/error.codes";
+import { auditLogMiddleware } from "./middlewares/audit.middleware";
 
 /**
  * 註冊應用程式路由
@@ -16,6 +17,7 @@ export function registerRoutes(app: Application): void {
   const apiPrefix = "/api";
 
   app.use(requestLogger);
+  app.use(apiPrefix, auditLogMiddleware);
   app.use(apiPrefix, globalPermissionGuard);
 
   controllers.forEach((controller) => {

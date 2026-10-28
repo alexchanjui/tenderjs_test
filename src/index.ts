@@ -6,7 +6,6 @@ import express from "express";
 import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./configs/swagger.config";
 import { loggerConfigService } from "./configs/logger.config";
-import { auditLogMiddleware } from "./middlewares/audit.middleware";
 import { errorMiddleware } from "./middlewares/error.middleware";
 import { registerRoutes } from "./routes";
 import cacheInitService from "./services/cache-init.service";
@@ -69,22 +68,17 @@ const bootstrap = async (): Promise<void> => {
     await cacheInitService.initialize();
 
     /**
-     * 4. API 稽核日誌
-     */
-    app.use(auditLogMiddleware);
-
-    /**
-     * 5. 註冊 API Routes
+     * 4. 註冊 API Routes
      */
     registerRoutes(app);
 
     /**
-     * 6. 全域錯誤處理
+     * 5. 全域錯誤處理
      */
     app.use(errorMiddleware);
 
     /**
-     * 7. 啟動 Server
+     * 6. 啟動 Server
      */
     app.listen(port, () => {
       logger.info("=================================");
