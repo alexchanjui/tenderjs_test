@@ -1,5 +1,4 @@
 // src/types/service.context.ts
-
 import type { PrismaClient } from "@prisma/client";
 import type Redis from "ioredis";
 import type { LoggerService } from "../utils/logger";
@@ -20,6 +19,14 @@ export interface CurrentUser {
   roleId: string | null;
   nodeId: string;
   nodeType: "OPERATOR" | "VENDOR";
+}
+
+/**
+ * Request Context
+ */
+export interface RequestContext {
+  currentUser: CurrentUser;
+  currentNodeId: string;
 }
 
 /**
@@ -45,4 +52,5 @@ export interface IServiceContext {
   redis: Redis;
   repos: IRepositoryContext; // 統一的 Repo 存取點
   currentUser?: CurrentUser; // 當前登入者
+  currentNodeId?: string; // 當前操作的 Node
 }

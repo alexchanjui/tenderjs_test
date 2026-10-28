@@ -29,9 +29,10 @@ export const auditLogMiddleware = (req: Request, res: Response, next: NextFuncti
       const duration = Date.now() - startTime;
       const statusCode = res.statusCode;
 
-      // 取得目前登入者
-      const currentUser = requestContextStorage.getStore();
-      const userId = currentUser?.id ?? null;
+      // 取得目前 Request Context
+      const requestContext = requestContextStorage.getStore();
+      const userId = requestContext?.currentUser.id ?? null;
+      const currentNodeId = requestContext?.currentNodeId ?? null;
 
       // Request Body
       const reqBody = {
@@ -48,6 +49,7 @@ export const auditLogMiddleware = (req: Request, res: Response, next: NextFuncti
       }
 
       const reqData = {
+        currentNodeId,
         params: req.params,
         query: req.query,
         body: reqBody,

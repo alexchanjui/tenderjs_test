@@ -1,9 +1,11 @@
 // src/middlewares/global-permission.middleware.ts
 import type { NextFunction, Request, Response } from "express";
+import { getNodePageIds } from "../caches/nodePage.cache";
 import { findRouteRule } from "../caches/permission.cache";
 import { getRolePageIds } from "../caches/rolePage.cache";
 import { AppError } from "../errors/app.error";
 import { ErrorCode } from "../errors/error.codes";
+import type { RequestContext } from "../types/service.context";
 import { verifyAuthToken } from "../utils/auth.helper";
 import { requestContextStorage } from "../utils/request-context";
 
@@ -38,30 +40,49 @@ export const globalPermissionGuard = async (
     // 4. 驗證 Token 並取得登入者
     const currentUser = await verifyAuthToken(token);
 
-    // 5. 未設定權限規則，只驗證登入身分
+    // 5. 取得目前操作的 Node ID
+    const headerNodeId = req.headers["x-node-id"];
+    const requestedNodeId = Array.isArray(headerNodeId) ? headerNodeId[0] : headerNodeId;
+    const currentNodeId = requestedNodeId || currentUser.nodeId;
+
+    // 6. 業者只能操作自己的 Node
+    if (currentUser.nodeType === "VENDOR" && currentNodeId !== currentUser.nodeId) {
+      throw new AppError(ErrorCode.PERMISSION);
+    }
+
+    // 7. 建立 Request Context
+    const requestContext: RequestContext = {
+      currentUser,
+      currentNodeId,
+    };
+
+    // 8. 未設定權限規則，只驗證登入身分
     if (!rule || rule.pageId === null) {
-      requestContextStorage.run(currentUser, () => {
+      requestContextStorage.run(requestContext, () => {
         next();
       });
 
       return;
     }
 
-    // 6. 沒有角色代表沒有權限
+    // 9. 沒有角色代表沒有權限
     if (!currentUser.roleId) {
       throw new AppError(ErrorCode.PERMISSION);
     }
 
-    // 7. 取得角色擁有的頁面 ID
-    const pageIds = await getRolePageIds(currentUser.roleId);
+    // 10. 取得目前操作環境的頁面權限
+    const pageIds =
+      currentNodeId === currentUser.nodeId
+        ? await getRolePageIds(currentUser.roleId)
+        : await getNodePageIds(currentNodeId);
 
-    // 8. 確認角色是否具有目前 API 所屬頁面的權限
+    // 11. 確認是否具有目前 API 所屬頁面的權限
     if (!pageIds.includes(rule.pageId)) {
       throw new AppError(ErrorCode.PERMISSION);
     }
 
-    // 9. 建立 Request Context
-    requestContextStorage.run(currentUser, () => {
+    // 12. 建立 Request Context
+    requestContextStorage.run(requestContext, () => {
       next();
     });
   } catch (error) {

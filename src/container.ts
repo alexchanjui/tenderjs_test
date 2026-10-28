@@ -44,11 +44,7 @@ import type { IServiceContext } from "./types/service.context";
 import type { IDbContext } from "./types/db.context";
 
 /**
- * 應用程式容器
- *
- * 負責建立共用依賴，並組裝 Service 與 Controller，
- * 最後提供 Controller 清單給 Routes 使用。
- * Tip: 這裡只在 App 啟動時執行一次。
+ * 應用程式 Container
  */
 export class AppContainer {
   public getControllers(): IController[] {
@@ -90,7 +86,10 @@ export class AppContainer {
         faq: faqRepo,
       },
       get currentUser() {
-        return requestContextStorage.getStore();
+        return requestContextStorage.getStore()?.currentUser;
+      },
+      get currentNodeId() {
+        return requestContextStorage.getStore()?.currentNodeId;
       },
     };
 

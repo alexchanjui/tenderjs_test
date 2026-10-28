@@ -1,5 +1,4 @@
 // src/controllers/faq.controller.ts
-
 import { plainToInstance } from "class-transformer";
 import { Request, Response, Router } from "express";
 import {
@@ -49,10 +48,8 @@ export class FaqController implements IController {
   /**
    * 取得問答分類列表
    */
-  private getCategories = async (req: Request, res: Response): Promise<void> => {
-    const nodeId = req.query.nodeId as string | undefined;
-
-    const result = await this.faqService.getCategories(nodeId);
+  private getCategories = async (_req: Request, res: Response): Promise<void> => {
+    const result = await this.faqService.getCategories();
 
     R.success(res, result);
   };
@@ -95,10 +92,9 @@ export class FaqController implements IController {
    * 取得問答列表
    */
   private getQaList = async (req: Request, res: Response): Promise<void> => {
-    const nodeId = req.query.nodeId as string | undefined;
     const categoryId = Number(req.query.categoryId);
 
-    const result = await this.faqService.getQaList(categoryId, nodeId);
+    const result = await this.faqService.getQaList(categoryId);
 
     R.success(res, result);
   };

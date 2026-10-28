@@ -8,7 +8,6 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
-  IsUUID,
   ValidateIf,
   ValidateNested,
 } from "class-validator";
@@ -30,9 +29,6 @@ export class VendorBannerRequestDto {
  * 更新業者資料 Request DTO
  */
 export class UpdateVendorProfileRequestDto {
-  @IsUUID("4", { message: "節點 ID 格式錯誤" })
-  nodeId!: string;
-
   @IsString()
   @IsNotEmpty()
   brandName!: string;

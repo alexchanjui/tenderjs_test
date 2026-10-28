@@ -1,5 +1,7 @@
 // src/services/vendor.service.ts
 import { plainToInstance } from "class-transformer";
+import { invalidateNodePages } from "../caches/nodePage.cache";
+import { invalidateRolePages } from "../caches/rolePage.cache";
 import type { PaginationRequestDto, PaginationResponseDto } from "../dtos/pagination.dto";
 import {
   CreateVendorRequestDto,
@@ -9,7 +11,6 @@ import {
 import { AppError } from "../errors/app.error";
 import { ErrorCode } from "../errors/error.codes";
 import type { IServiceContext } from "../types/service.context";
-import { invalidateRolePages } from "../caches/rolePage.cache";
 
 export class VendorService {
   constructor(private readonly ctx: IServiceContext) {}
@@ -126,6 +127,9 @@ export class VendorService {
         pageId: page.id,
       })),
     );
+
+    // 清除業者頁面權限快取
+    await invalidateNodePages(id);
 
     // 清除業者所有角色的頁面權限快取
     const roles = await this.ctx.repos.role.findByNodeId(id);

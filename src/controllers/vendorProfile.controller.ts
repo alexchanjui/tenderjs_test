@@ -1,5 +1,4 @@
 // src/controllers/vendorProfile.controller.ts
-
 import { plainToInstance } from "class-transformer";
 import { Request, Response, Router } from "express";
 import { UpdateVendorProfileRequestDto } from "../dtos/vendorProfile.dto";
@@ -32,10 +31,8 @@ export class VendorProfileController implements IController {
   /**
    * 取得業者詳細資訊
    */
-  private getVendorProfile = async (req: Request, res: Response): Promise<void> => {
-    const nodeId = req.query.nodeId as string | undefined;
-
-    const result = await this.vendorProfileService.getVendorProfile(nodeId);
+  private getVendorProfile = async (_req: Request, res: Response): Promise<void> => {
+    const result = await this.vendorProfileService.getVendorProfile();
 
     R.success(res, result);
   };

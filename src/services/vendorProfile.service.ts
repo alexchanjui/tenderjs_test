@@ -9,40 +9,25 @@ export class VendorProfileService {
   constructor(private readonly ctx: IServiceContext) {}
 
   /**
-   * 取得目前登入使用者
+   * 取得目前操作的 Node ID
    */
-  private getCurrentUser() {
-    const currentUser = this.ctx.currentUser;
+  private getCurrentNodeId(): string {
+    const currentNodeId = this.ctx.currentNodeId;
 
-    if (!currentUser) {
+    if (!currentNodeId) {
       throw new AppError(ErrorCode.UNAUTH, "使用者未登入");
     }
 
-    return currentUser;
-  }
-
-  /**
-   * 取得實際操作的 Node ID
-   */
-  private getTargetNodeId(nodeId?: string): string {
-    const currentUser = this.getCurrentUser();
-
-    // 業者只能操作自己的資料
-    if (currentUser.nodeType === "VENDOR") {
-      return currentUser.nodeId;
-    }
-
-    // 營運可指定 Node，未指定則操作自己的 Node
-    return nodeId ?? currentUser.nodeId;
+    return currentNodeId;
   }
 
   /**
    * 取得業者詳細資訊
    */
-  public async getVendorProfile(nodeId?: string): Promise<VendorProfileResponseDto | null> {
-    const targetNodeId = this.getTargetNodeId(nodeId);
+  public async getVendorProfile(): Promise<VendorProfileResponseDto | null> {
+    const currentNodeId = this.getCurrentNodeId();
 
-    const profile = await this.ctx.repos.vendorProfile.findByNodeId(targetNodeId);
+    const profile = await this.ctx.repos.vendorProfile.findByNodeId(currentNodeId);
 
     if (!profile) {
       return null;
@@ -57,8 +42,8 @@ export class VendorProfileService {
    * 更新業者詳細資訊
    */
   public async updateVendorProfile(data: UpdateVendorProfileRequestDto): Promise<void> {
-    const targetNodeId = this.getTargetNodeId(data.nodeId);
+    const currentNodeId = this.getCurrentNodeId();
 
-    await this.ctx.repos.vendorProfile.upsert(targetNodeId, data);
+    await this.ctx.repos.vendorProfile.upsert(currentNodeId, data);
   }
 }
