@@ -29,26 +29,24 @@ export class UserService {
   }
 
   /**
-   * 取得實際操作的 Node ID
+   * 取得目前操作的 Node ID
    */
-  private getTargetNodeId(nodeId?: string): string {
-    const currentUser = this.getCurrentUser();
+  private getCurrentNodeId(): string {
+    const currentNodeId = this.ctx.currentNodeId;
 
-    // 業者只能操作自己的資料
-    if (currentUser.nodeType === "VENDOR") {
-      return currentUser.nodeId;
+    if (!currentNodeId) {
+      throw new AppError(ErrorCode.UNAUTH, "使用者未登入");
     }
 
-    // 營運可指定 Node，未指定則操作自己的 Node
-    return nodeId ?? currentUser.nodeId;
+    return currentNodeId;
   }
 
   /**
    * 建立使用者
    */
   public async createUser(data: CreateUserRequestDto): Promise<void> {
-    const { account, username, email, password, nodeId, roleId } = data;
-    const targetNodeId = this.getTargetNodeId(nodeId);
+    const { account, username, email, password, roleId } = data;
+    const currentNodeId = this.getCurrentNodeId();
 
     const user = await this.ctx.repos.user.findByEmail(email);
 
@@ -64,7 +62,7 @@ export class UserService {
         throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
       }
 
-      if (role.nodeId !== targetNodeId) {
+      if (role.nodeId !== currentNodeId) {
         throw new AppError(ErrorCode.REQUEST_DATA, "使用者與角色必須屬於相同節點");
       }
     }
@@ -77,7 +75,7 @@ export class UserService {
       username,
       email,
       password: hashedPassword,
-      nodeId: targetNodeId,
+      nodeId: currentNodeId,
       roleId,
     });
   }
@@ -86,14 +84,10 @@ export class UserService {
    * 取得使用者詳細資訊
    */
   public async getUserById(id: string): Promise<UserResponseDto> {
-    const currentUser = this.getCurrentUser();
+    const currentNodeId = this.getCurrentNodeId();
     const user = await this.ctx.repos.user.findById(id);
 
-    if (!user) {
-      throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);
-    }
-
-    if (currentUser.nodeType === "VENDOR" && user.nodeId !== currentUser.nodeId) {
+    if (!user || user.nodeId !== currentNodeId) {
       throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);
     }
 
@@ -108,14 +102,14 @@ export class UserService {
   public async getUsers(
     dto: PaginationRequestDto,
   ): Promise<PaginationResponseDto<UserResponseDto>> {
-    const { page, limit, nodeId } = dto;
+    const { page, limit } = dto;
     const skip = (page - 1) * limit;
-    const targetNodeId = this.getTargetNodeId(nodeId);
+    const currentNodeId = this.getCurrentNodeId();
 
     const [users, total] = await this.ctx.repos.user.findAndCount({
       skip,
       take: limit,
-      nodeId: targetNodeId,
+      nodeId: currentNodeId,
     });
 
     return {
@@ -135,14 +129,10 @@ export class UserService {
    * 更新使用者
    */
   public async updateUser(id: string, dto: UpdateUserRequestDto): Promise<void> {
-    const currentUser = this.getCurrentUser();
+    const currentNodeId = this.getCurrentNodeId();
     const user = await this.ctx.repos.user.findById(id);
 
-    if (!user) {
-      throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);
-    }
-
-    if (currentUser.nodeType === "VENDOR" && user.nodeId !== currentUser.nodeId) {
+    if (!user || user.nodeId !== currentNodeId) {
       throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);
     }
 
@@ -153,7 +143,6 @@ export class UserService {
         throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
       }
 
-      // 要跟「被編輯的 User」同 Node
       if (role.nodeId !== user.nodeId) {
         throw new AppError(ErrorCode.REQUEST_DATA, "使用者與角色必須屬於相同節點");
       }
@@ -168,6 +157,7 @@ export class UserService {
   public async batchDeleteUser(dto: BatchDeleteStringIdsDto): Promise<void> {
     const { ids } = dto;
     const currentUser = this.getCurrentUser();
+    const currentNodeId = this.getCurrentNodeId();
 
     if (ids.includes(currentUser.id)) {
       throw new AppError(ErrorCode.REQUEST_DATA, "無法刪除自己");
@@ -179,10 +169,7 @@ export class UserService {
       throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);
     }
 
-    if (
-      currentUser.nodeType === "VENDOR" &&
-      users.some((user) => user.nodeId !== currentUser.nodeId)
-    ) {
+    if (users.some((user) => user.nodeId !== currentNodeId)) {
       throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);
     }
 

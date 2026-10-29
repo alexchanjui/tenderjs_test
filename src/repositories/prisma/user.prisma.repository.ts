@@ -10,7 +10,7 @@ export class UserPrismaRepository implements IUserRepository {
   /**
    * 建立使用者
    */
-  public async create(data: CreateUserRequestDto): Promise<User> {
+  public async create(data: CreateUserRequestDto & { nodeId: string }): Promise<User> {
     return this.ctx.prisma.user.create({ data });
   }
 

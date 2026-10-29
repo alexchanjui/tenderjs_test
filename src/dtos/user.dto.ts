@@ -30,9 +30,6 @@ export class CreateUserRequestDto {
   @IsOptional()
   @IsUUID("4", { message: "角色 ID 格式錯誤" })
   roleId?: string;
-
-  @IsUUID("4", { message: "節點 ID 格式錯誤" })
-  nodeId!: string;
 }
 
 /**
