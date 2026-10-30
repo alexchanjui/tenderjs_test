@@ -1,5 +1,5 @@
-# Node.js 22 執行環境
-FROM node:22-alpine
+# Node.js 22.23.4 執行環境
+FROM node:22.23.4-alpine
 
 # 工作目錄
 WORKDIR /app
