@@ -9,13 +9,7 @@
  *     security:
  *       - BearerAuth: []
  *     parameters:
- *       - in: query
- *         name: nodeId
- *         required: false
- *         description: 節點 ID，營運可指定查詢節點；未指定則查詢自己的節點
- *         schema:
- *           type: string
- *           format: uuid
+ *       - $ref: "#/components/parameters/NodeIdHeader"
  *     responses:
  *       200:
  *         description: 成功
@@ -25,6 +19,8 @@
  *     summary: 新增問答分類
  *     security:
  *       - BearerAuth: []
+ *     parameters:
+ *       - $ref: "#/components/parameters/NodeIdHeader"
  *     requestBody:
  *       required: true
  *       content:
@@ -32,14 +28,8 @@
  *           schema:
  *             type: object
  *             required:
- *               - nodeId
  *               - title
  *             properties:
- *               nodeId:
- *                 type: string
- *                 format: uuid
- *                 description: 業者所屬節點 ID
- *                 example: "550e8400-e29b-41d4-a716-446655440000"
  *               title:
  *                 type: string
  *                 example: 問題
@@ -107,13 +97,6 @@
  *       - BearerAuth: []
  *     parameters:
  *       - in: query
- *         name: nodeId
- *         required: false
- *         description: 節點 ID，營運可指定查詢節點；未指定則查詢自己的節點
- *         schema:
- *           type: string
- *           format: uuid
- *       - in: query
  *         name: categoryId
  *         required: true
  *         description: 問答分類 ID
@@ -136,16 +119,10 @@
  *           schema:
  *             type: object
  *             required:
- *               - nodeId
  *               - categoryId
  *               - title
  *               - content
  *             properties:
- *               nodeId:
- *                 type: string
- *                 format: uuid
- *                 description: 業者所屬節點 ID
- *                 example: "550e8400-e29b-41d4-a716-446655440000"
  *               categoryId:
  *                 type: integer
  *                 example: 1

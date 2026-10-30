@@ -81,13 +81,6 @@ export class FaqService {
    * 取得問答列表
    */
   public async getQaList(categoryId: number): Promise<FaqResponseDto[]> {
-    const profile = await this.getVendorProfile();
-    const category = await this.ctx.repos.faq.findCategoryById(categoryId);
-
-    if (!category || category.vendorProfileId !== profile.id) {
-      throw new AppError(ErrorCode.DATA_NOT_FOUND, "問答分類不存在");
-    }
-
     const qaList = await this.ctx.repos.faq.findAllQa(categoryId);
 
     return plainToInstance(FaqResponseDto, qaList, {
@@ -99,10 +92,9 @@ export class FaqService {
    * 新增問答
    */
   public async createQa(data: CreateFaqRequestDto): Promise<void> {
-    const profile = await this.getVendorProfile();
     const category = await this.ctx.repos.faq.findCategoryById(data.categoryId);
 
-    if (!category || category.vendorProfileId !== profile.id) {
+    if (!category) {
       throw new AppError(ErrorCode.DATA_NOT_FOUND, "問答分類不存在");
     }
 

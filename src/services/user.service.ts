@@ -84,10 +84,9 @@ export class UserService {
    * 取得使用者詳細資訊
    */
   public async getUserById(id: string): Promise<UserResponseDto> {
-    const currentNodeId = this.getCurrentNodeId();
     const user = await this.ctx.repos.user.findById(id);
 
-    if (!user || user.nodeId !== currentNodeId) {
+    if (!user) {
       throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);
     }
 
@@ -129,10 +128,9 @@ export class UserService {
    * 更新使用者
    */
   public async updateUser(id: string, dto: UpdateUserRequestDto): Promise<void> {
-    const currentNodeId = this.getCurrentNodeId();
     const user = await this.ctx.repos.user.findById(id);
 
-    if (!user || user.nodeId !== currentNodeId) {
+    if (!user) {
       throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);
     }
 
@@ -157,7 +155,6 @@ export class UserService {
   public async batchDeleteUser(dto: BatchDeleteStringIdsDto): Promise<void> {
     const { ids } = dto;
     const currentUser = this.getCurrentUser();
-    const currentNodeId = this.getCurrentNodeId();
 
     if (ids.includes(currentUser.id)) {
       throw new AppError(ErrorCode.REQUEST_DATA, "無法刪除自己");
@@ -166,10 +163,6 @@ export class UserService {
     const users = await this.ctx.repos.user.findByIds(ids);
 
     if (users.length !== ids.length) {
-      throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);
-    }
-
-    if (users.some((user) => user.nodeId !== currentNodeId)) {
       throw new AppError(ErrorCode.ACCOUNT_NOT_EXIST);
     }
 

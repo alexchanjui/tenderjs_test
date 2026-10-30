@@ -28,6 +28,18 @@ const options: swaggerJsdoc.Options = {
           bearerFormat: "JWT",
         },
       },
+      parameters: {
+        NodeIdHeader: {
+          in: "header",
+          name: "X-Node-Id",
+          required: false,
+          description: "目前操作的組織節點 ID；未提供時使用登入者所屬節點",
+          schema: {
+            type: "string",
+            format: "uuid",
+          },
+        },
+      },
     },
   },
 

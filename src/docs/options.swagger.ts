@@ -9,6 +9,8 @@
  *     summary: 取得角色選項
  *     security:
  *       - BearerAuth: []
+ *     parameters:
+ *       - $ref: "#/components/parameters/NodeIdHeader"
  *     responses:
  *       200:
  *         description: 查詢成功
@@ -51,6 +53,8 @@
  *     summary: 取得問題分類選項
  *     security:
  *       - BearerAuth: []
+ *     parameters:
+ *       - $ref: "#/components/parameters/NodeIdHeader"
  *     responses:
  *       200:
  *         description: 查詢成功

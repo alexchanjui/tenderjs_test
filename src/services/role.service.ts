@@ -88,10 +88,9 @@ export class RoleService {
    * 取得角色詳細資訊
    */
   public async getRoleById(id: string): Promise<RoleResponseDto> {
-    const currentNodeId = this.getCurrentNodeId();
     const role = await this.ctx.repos.role.findById(id);
 
-    if (!role || role.nodeId !== currentNodeId) {
+    if (!role) {
       throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
     }
 
@@ -112,10 +111,9 @@ export class RoleService {
    * 更新角色
    */
   public async updateRole(id: string, data: UpdateRoleRequestDto): Promise<void> {
-    const currentNodeId = this.getCurrentNodeId();
     const role = await this.ctx.repos.role.findById(id);
 
-    if (!role || role.nodeId !== currentNodeId) {
+    if (!role) {
       throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
     }
 
@@ -126,7 +124,7 @@ export class RoleService {
 
     // 檢查同一節點內角色名稱是否重複
     if (data.name && data.name !== role.name) {
-      const existingRole = await this.ctx.repos.role.findByName(data.name, currentNodeId);
+      const existingRole = await this.ctx.repos.role.findByName(data.name, role.nodeId);
 
       if (existingRole) {
         throw new AppError(ErrorCode.DUPLICATE, "角色名稱已存在");
@@ -142,12 +140,11 @@ export class RoleService {
    */
   public async batchDeleteRole(dto: BatchDeleteStringIdsDto): Promise<void> {
     const { ids } = dto;
-    const currentNodeId = this.getCurrentNodeId();
 
     const roles = await this.ctx.repos.role.findByIds(ids);
 
-    // 確認角色皆存在且屬於目前操作節點
-    if (roles.length !== ids.length || roles.some((role) => role.nodeId !== currentNodeId)) {
+    // 確認角色皆存在
+    if (roles.length !== ids.length) {
       throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
     }
 
@@ -173,12 +170,10 @@ export class RoleService {
    * 更新角色頁面權限
    */
   public async updateRolePages(roleId: string, dto: UpdateRolePagesRequestDto): Promise<void> {
-    const currentNodeId = this.getCurrentNodeId();
-
-    // 確認角色存在且屬於目前操作節點
+    // 確認角色存在
     const role = await this.ctx.repos.role.findById(roleId);
 
-    if (!role || role.nodeId !== currentNodeId) {
+    if (!role) {
       throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
     }
 
@@ -203,8 +198,8 @@ export class RoleService {
       throw new AppError(ErrorCode.DATA_NOT_FOUND, "頁面不存在");
     }
 
-    // 角色只能設定目前節點已授權的頁面
-    const node = await this.ctx.repos.vendor.findById(currentNodeId);
+    // 角色只能設定角色所屬節點已授權的頁面
+    const node = await this.ctx.repos.vendor.findById(role.nodeId);
 
     if (!node) {
       throw new AppError(ErrorCode.DATA_NOT_FOUND, "組織節點不存在");

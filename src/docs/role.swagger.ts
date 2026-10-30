@@ -9,6 +9,7 @@
  *     security:
  *       - BearerAuth: []
  *     parameters:
+ *       - $ref: "#/components/parameters/NodeIdHeader"
  *       - in: query
  *         name: page
  *         schema:
@@ -24,13 +25,6 @@
  *           maximum: 100
  *           default: 20
  *         example: 20
- *       - in: query
- *         name: nodeId
- *         required: false
- *         description: 節點 ID，營運可指定查詢節點；未指定則查詢自己的節點
- *         schema:
- *           type: string
- *           format: uuid
  *     responses:
  *       200:
  *         description: 成功
@@ -40,6 +34,8 @@
  *     summary: 建立角色
  *     security:
  *       - BearerAuth: []
+ *     parameters:
+ *       - $ref: "#/components/parameters/NodeIdHeader"
  *     requestBody:
  *       required: true
  *       content:
@@ -48,7 +44,6 @@
  *             type: object
  *             required:
  *               - name
- *               - nodeId
  *             properties:
  *               name:
  *                 type: string
@@ -59,11 +54,6 @@
  *                 type: string
  *                 maxLength: 200
  *                 example: "管理員角色"
- *               nodeId:
- *                 type: string
- *                 format: uuid
- *                 description: 角色所屬節點 ID
- *                 example: "550e8400-e29b-41d4-a716-446655440000"
  *     responses:
  *       200:
  *         description: 成功
