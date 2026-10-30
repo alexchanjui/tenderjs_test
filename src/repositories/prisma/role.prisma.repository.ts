@@ -10,7 +10,7 @@ export class RolePrismaRepository implements IRoleRepository {
   /**
    * 建立新角色
    */
-  public async create(data: CreateRoleRequestDto): Promise<Role> {
+  public async create(data: CreateRoleRequestDto & { nodeId: string }): Promise<Role> {
     return this.ctx.prisma.role.create({ data });
   }
 

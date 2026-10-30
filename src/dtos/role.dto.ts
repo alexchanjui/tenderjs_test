@@ -1,6 +1,6 @@
 // src/dtos/role.dto.ts
 import { Expose } from "class-transformer";
-import { IsArray, IsBoolean, IsInt, IsOptional, IsString, IsUUID, Length } from "class-validator";
+import { IsArray, IsBoolean, IsInt, IsOptional, IsString, Length } from "class-validator";
 
 /**
  * 建立角色 Request DTO
@@ -14,9 +14,6 @@ export class CreateRoleRequestDto {
   @IsString({ message: "角色說明必須為字串" })
   @Length(0, 200, { message: "角色說明長度需介於 0~200 字元" })
   description?: string;
-
-  @IsUUID("4", { message: "節點 ID 格式錯誤" })
-  nodeId!: string;
 }
 
 /**

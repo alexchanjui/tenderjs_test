@@ -1,5 +1,5 @@
 // src/repositories/interface/options.repository.interface.ts
-import type { Node, Page, Role, FaqCategory } from "@prisma/client";
+import type { FaqCategory, Node, Page, Role } from "@prisma/client";
 
 export type NodeWithPages = Node & {
   nodePages: {
@@ -10,8 +10,8 @@ export type NodeWithPages = Node & {
 };
 
 export interface IOptionsRepository {
-  findAllRoles(): Promise<Role[]>;
+  findAllRoles(nodeId: string): Promise<Role[]>;
   findAllPages(): Promise<Page[]>;
   findAllNodes(): Promise<NodeWithPages[]>;
-  findAllFaqCategories(): Promise<FaqCategory[]>;
+  findAllFaqCategories(nodeId: string): Promise<FaqCategory[]>;
 }
