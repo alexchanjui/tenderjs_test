@@ -11,7 +11,6 @@ import { PermissionPrismaRepository } from "./repositories/prisma/permission.pri
 import { PagePrismaRepository } from "./repositories/prisma/page.prisma.repository";
 import { VendorPrismaRepository } from "./repositories/prisma/vendor.prisma.repository";
 import { OptionsPrismaRepository } from "./repositories/prisma/options.prisma.repository";
-import { VendorProfilePrismaRepository } from "./repositories/prisma/vendorProfile.prisma.repository";
 import { FaqPrismaRepository } from "./repositories/prisma/faq.prisma.repository";
 
 // Services
@@ -23,7 +22,6 @@ import { PermissionService } from "./services/permission.service";
 import { PageService } from "./services/page.service";
 import { VendorService } from "./services/vendor.service";
 import { OptionsService } from "./services/options.service";
-import { VendorProfileService } from "./services/vendorProfile.service";
 import { FaqService } from "./services/faq.service";
 
 // Controllers
@@ -36,7 +34,6 @@ import { PermissionController } from "./controllers/permission.controller";
 import { PageController } from "./controllers/page.controller";
 import { VendorController } from "./controllers/vendor.controller";
 import { OptionsController } from "./controllers/options.controller";
-import { VendorProfileController } from "./controllers/vendorProfile.controller";
 import { FaqController } from "./controllers/faq.controller";
 
 // Types
@@ -65,7 +62,6 @@ export class AppContainer {
     const pageRepo = new PagePrismaRepository(dbContext);
     const vendorRepo = new VendorPrismaRepository(dbContext);
     const optionsRepo = new OptionsPrismaRepository(dbContext);
-    const vendorProfileRepo = new VendorProfilePrismaRepository(dbContext);
     const faqRepo = new FaqPrismaRepository(dbContext);
 
     /**
@@ -82,7 +78,6 @@ export class AppContainer {
         page: pageRepo,
         vendor: vendorRepo,
         options: optionsRepo,
-        vendorProfile: vendorProfileRepo,
         faq: faqRepo,
       },
       get currentUser() {
@@ -104,7 +99,6 @@ export class AppContainer {
     const pageService = new PageService(ctx);
     const vendorService = new VendorService(ctx);
     const optionsService = new OptionsService(ctx);
-    const vendorProfileService = new VendorProfileService(ctx);
     const faqService = new FaqService(ctx);
 
     /**
@@ -119,7 +113,6 @@ export class AppContainer {
       new PageController(pageService),
       new VendorController(vendorService),
       new OptionsController(optionsService),
-      new VendorProfileController(vendorProfileService),
       new FaqController(faqService),
     ];
   }

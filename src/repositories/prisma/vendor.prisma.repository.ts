@@ -1,8 +1,16 @@
 import bcrypt from "bcrypt";
 import type { Node } from "@prisma/client";
-import type { CreateVendorRequestDto, UpdateVendorRequestDto } from "../../dtos/vendor.dto";
+import type {
+  CreateVendorRequestDto,
+  UpdateVendorProfileRequestDto,
+  UpdateVendorRequestDto,
+} from "../../dtos/vendor.dto";
 import type { IDbContext } from "../../types/db.context";
-import type { IVendorRepository, VendorWithPages } from "../interface/vendor.repository.interface";
+import type {
+  IVendorRepository,
+  VendorProfileWithBanners,
+  VendorWithPages,
+} from "../interface/vendor.repository.interface";
 
 export class VendorPrismaRepository implements IVendorRepository {
   constructor(private readonly ctx: IDbContext) {}
@@ -20,6 +28,14 @@ export class VendorPrismaRepository implements IVendorRepository {
         data: {
           ...vendorData,
           type: "VENDOR",
+        },
+      });
+
+      // 建立業者品牌資訊
+      await tx.vendorProfile.create({
+        data: {
+          nodeId: vendor.id,
+          brandName: vendor.name,
         },
       });
 
@@ -206,6 +222,74 @@ export class VendorPrismaRepository implements IVendorRepository {
           },
           pageId: {
             notIn: pages.map((page) => page.pageId),
+          },
+        },
+      });
+    });
+  }
+
+  /**
+   * 取得業者品牌資訊
+   */
+  public async findProfileByNodeId(nodeId: string): Promise<VendorProfileWithBanners | null> {
+    return this.ctx.prisma.vendorProfile.findUnique({
+      where: {
+        nodeId,
+      },
+      include: {
+        banners: {
+          orderBy: {
+            sortOrder: "asc",
+          },
+        },
+      },
+    });
+  }
+
+  /**
+   * 更新業者品牌資訊
+   */
+  public async updateProfile(
+    nodeId: string,
+    data: UpdateVendorProfileRequestDto,
+  ): Promise<VendorProfileWithBanners> {
+    const { banners, ...profileData } = data;
+
+    return this.ctx.prisma.$transaction(async (tx) => {
+      // 更新業者品牌資訊
+      const profile = await tx.vendorProfile.update({
+        where: {
+          nodeId,
+        },
+        data: profileData,
+      });
+
+      // 更新主視覺橫幅
+      await tx.vendorBanner.deleteMany({
+        where: {
+          vendorProfileId: profile.id,
+        },
+      });
+
+      if (banners.length > 0) {
+        await tx.vendorBanner.createMany({
+          data: banners.map((banner, index) => ({
+            vendorProfileId: profile.id,
+            imageUrl: banner.imageUrl,
+            sortOrder: banner.sortOrder ?? index + 1,
+          })),
+        });
+      }
+
+      return tx.vendorProfile.findUniqueOrThrow({
+        where: {
+          id: profile.id,
+        },
+        include: {
+          banners: {
+            orderBy: {
+              sortOrder: "asc",
+            },
           },
         },
       });

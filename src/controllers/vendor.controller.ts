@@ -5,8 +5,9 @@ import { BatchDeleteStringIdsDto } from "../dtos/common.dto";
 import { PaginationRequestDto } from "../dtos/pagination.dto";
 import {
   CreateVendorRequestDto,
-  UpdateVendorRequestDto,
   UpdateVendorPagesRequestDto,
+  UpdateVendorProfileRequestDto,
+  UpdateVendorRequestDto,
 } from "../dtos/vendor.dto";
 import { validationMiddleware } from "../middlewares/validation.middleware";
 import { VendorService } from "../services/vendor.service";
@@ -38,6 +39,12 @@ export class VendorController implements IController {
       "/:id/pages",
       validationMiddleware(UpdateVendorPagesRequestDto),
       this.updateVendorPages,
+    );
+    this.router.get("/:id/profile", this.getVendorProfile);
+    this.router.put(
+      "/:id/profile",
+      validationMiddleware(UpdateVendorProfileRequestDto),
+      this.updateVendorProfile,
     );
   }
 
@@ -110,6 +117,33 @@ export class VendorController implements IController {
     const dto = plainToInstance(UpdateVendorPagesRequestDto, req.body);
 
     await this.vendorService.updateVendorPages(id, dto.pageCodes);
+
+    R.success(res);
+  };
+
+  /**
+   * 取得業者品牌資訊
+   */
+  private getVendorProfile = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
+    const { id } = req.params;
+
+    const result = await this.vendorService.getVendorProfile(id);
+
+    R.success(res, result);
+  };
+
+  /**
+   * 更新業者品牌資訊
+   */
+  private updateVendorProfile = async (
+    req: Request<{ id: string }>,
+    res: Response,
+  ): Promise<void> => {
+    const { id } = req.params;
+
+    const dto = plainToInstance(UpdateVendorProfileRequestDto, req.body);
+
+    await this.vendorService.updateVendorProfile(id, dto);
 
     R.success(res);
   };

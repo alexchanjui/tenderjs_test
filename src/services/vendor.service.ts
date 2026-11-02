@@ -5,7 +5,9 @@ import { invalidateRolePages } from "../caches/rolePage.cache";
 import type { PaginationRequestDto, PaginationResponseDto } from "../dtos/pagination.dto";
 import {
   CreateVendorRequestDto,
+  UpdateVendorProfileRequestDto,
   UpdateVendorRequestDto,
+  VendorProfileResponseDto,
   VendorResponseDto,
 } from "../dtos/vendor.dto";
 import { AppError } from "../errors/app.error";
@@ -135,5 +137,33 @@ export class VendorService {
     const roles = await this.ctx.repos.role.findByNodeId(id);
 
     await Promise.all(roles.map((role) => invalidateRolePages(role.id)));
+  }
+
+  /**
+   * 取得業者品牌資訊
+   */
+  public async getVendorProfile(id: string): Promise<VendorProfileResponseDto> {
+    const profile = await this.ctx.repos.vendor.findProfileByNodeId(id);
+
+    if (!profile) {
+      throw new AppError(ErrorCode.DATA_NOT_FOUND, "業者資料不存在");
+    }
+
+    return plainToInstance(VendorProfileResponseDto, profile, {
+      excludeExtraneousValues: true,
+    });
+  }
+
+  /**
+   * 更新業者品牌資訊
+   */
+  public async updateVendorProfile(id: string, data: UpdateVendorProfileRequestDto): Promise<void> {
+    const profile = await this.ctx.repos.vendor.findProfileByNodeId(id);
+
+    if (!profile) {
+      throw new AppError(ErrorCode.DATA_NOT_FOUND, "業者資料不存在");
+    }
+
+    await this.ctx.repos.vendor.updateProfile(id, data);
   }
 }

@@ -101,7 +101,7 @@
  *               pageId:
  *                 type: integer
  *                 nullable: true
- *                 description: 頁面描述
+ *                 description: 頁面 ID
  *                 example: 100
  *               name:
  *                 type: string

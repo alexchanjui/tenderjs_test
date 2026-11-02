@@ -33,7 +33,7 @@ export class FaqService {
    */
   private async getVendorProfile() {
     const currentNodeId = this.getCurrentNodeId();
-    const profile = await this.ctx.repos.vendorProfile.findByNodeId(currentNodeId);
+    const profile = await this.ctx.repos.vendor.findProfileByNodeId(currentNodeId);
 
     if (!profile) {
       throw new AppError(ErrorCode.DATA_NOT_FOUND, "業者資料不存在");
