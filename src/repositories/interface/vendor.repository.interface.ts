@@ -17,7 +17,11 @@ export interface IVendorRepository {
   createWithAdmin(data: CreateVendorRequestDto): Promise<void>;
   findById(id: string): Promise<VendorWithPages | null>;
   findByCode(code: string): Promise<Node | null>;
-  findAndCount(params: { skip?: number; take?: number }): Promise<[VendorWithPages[], number]>;
+  findAndCount(params: {
+    skip?: number;
+    take?: number;
+    keyword?: string;
+  }): Promise<[VendorWithPages[], number]>;
   update(id: string, data: UpdateVendorRequestDto): Promise<void>;
   batchDelete(ids: string[]): Promise<number>;
   updatePages(nodeId: string, pages: { pageId: number }[]): Promise<void>;

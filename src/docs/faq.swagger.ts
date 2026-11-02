@@ -50,7 +50,6 @@
  *     security:
  *       - BearerAuth: []
  *     parameters:
- *       - $ref: "#/components/parameters/NodeIdHeader"
  *       - in: path
  *         name: id
  *         required: true
@@ -83,7 +82,6 @@
  *     security:
  *       - BearerAuth: []
  *     parameters:
- *       - $ref: "#/components/parameters/NodeIdHeader"
  *       - in: path
  *         name: id
  *         required: true
@@ -104,7 +102,6 @@
  *     security:
  *       - BearerAuth: []
  *     parameters:
- *       - $ref: "#/components/parameters/NodeIdHeader"
  *       - in: query
  *         name: categoryId
  *         required: true
@@ -121,8 +118,6 @@
  *     summary: 新增問答
  *     security:
  *       - BearerAuth: []
- *     parameters:
- *       - $ref: "#/components/parameters/NodeIdHeader"
  *     requestBody:
  *       required: true
  *       content:
@@ -163,7 +158,6 @@
  *     security:
  *       - BearerAuth: []
  *     parameters:
- *       - $ref: "#/components/parameters/NodeIdHeader"
  *       - in: path
  *         name: id
  *         required: true
@@ -202,7 +196,6 @@
  *     security:
  *       - BearerAuth: []
  *     parameters:
- *       - $ref: "#/components/parameters/NodeIdHeader"
  *       - in: path
  *         name: id
  *         required: true

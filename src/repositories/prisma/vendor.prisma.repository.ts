@@ -94,11 +94,32 @@ export class VendorPrismaRepository implements IVendorRepository {
   public async findAndCount(params: {
     skip?: number;
     take?: number;
+    keyword?: string;
   }): Promise<[VendorWithPages[], number]> {
+    const { skip, take, keyword } = params;
+
+    const where = keyword
+      ? {
+          OR: [
+            {
+              name: {
+                contains: keyword,
+              },
+            },
+            {
+              code: {
+                contains: keyword,
+              },
+            },
+          ],
+        }
+      : {};
+
     return this.ctx.prisma.$transaction([
       this.ctx.prisma.node.findMany({
-        skip: params.skip,
-        take: params.take,
+        where,
+        skip,
+        take,
         include: {
           nodePages: {
             include: {
@@ -115,7 +136,9 @@ export class VendorPrismaRepository implements IVendorRepository {
         },
       }),
 
-      this.ctx.prisma.node.count(),
+      this.ctx.prisma.node.count({
+        where,
+      }),
     ]);
   }
 

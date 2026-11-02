@@ -34,6 +34,7 @@ export interface IUserRepository {
   findAndCount(params: {
     skip?: number;
     take?: number;
+    keyword?: string;
     nodeId?: string;
   }): Promise<[UserWithRole[], number]>;
   update(id: string, data: UpdateUserRequestDto): Promise<void>;

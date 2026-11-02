@@ -82,17 +82,25 @@ export class RolePrismaRepository implements IRoleRepository {
     skip?: number;
     take?: number;
     nodeId?: string;
+    keyword?: string;
   }): Promise<[RoleWithPages[], number]> {
-    const where = params.nodeId
-      ? {
-          nodeId: params.nodeId,
-        }
-      : undefined;
+    const { skip, take, nodeId, keyword } = params;
+
+    const where = {
+      ...(nodeId && {
+        nodeId,
+      }),
+      ...(keyword && {
+        name: {
+          contains: keyword,
+        },
+      }),
+    };
 
     return this.ctx.prisma.$transaction([
       this.ctx.prisma.role.findMany({
-        skip: params.skip,
-        take: params.take,
+        skip,
+        take,
         orderBy: {
           createdAt: "desc",
         },

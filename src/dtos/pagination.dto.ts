@@ -1,6 +1,6 @@
 // src/dtos/pagination.dto.ts
-import { Type } from "class-transformer";
-import { IsInt, IsOptional, Max, Min } from "class-validator";
+import { Transform, Type } from "class-transformer";
+import { IsInt, IsOptional, IsString, Max, MaxLength, Min } from "class-validator";
 
 /**
  * 分頁資訊
@@ -28,6 +28,12 @@ export class PaginationRequestDto {
   @Min(1, { message: "limit 最小值為 1" })
   @Max(100, { message: "limit 最大值為 100" })
   limit = 20;
+
+  @IsOptional()
+  @Transform(({ value }) => (typeof value === "string" ? value.trim() : value))
+  @IsString({ message: "keyword 必須為字串" })
+  @MaxLength(20, { message: "keyword 最多 20 個字元" })
+  keyword?: string;
 }
 
 /**

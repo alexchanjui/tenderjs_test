@@ -29,13 +29,14 @@ export class PageService {
   public async getPages(
     dto: PaginationRequestDto,
   ): Promise<PaginationResponseDto<PageResponseDto>> {
-    const { page, limit } = dto;
+    const { page, limit, keyword } = dto;
 
     const skip = (page - 1) * limit;
 
     const [pages, total] = await this.ctx.repos.page.findAndCount({
       skip,
       take: limit,
+      keyword,
     });
 
     return {

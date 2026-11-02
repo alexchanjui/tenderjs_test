@@ -26,6 +26,7 @@ export interface IRoleRepository {
     skip?: number;
     take?: number;
     nodeId?: string;
+    keyword?: string;
   }): Promise<[RoleWithPages[], number]>;
   update(id: string, data: UpdateRoleRequestDto): Promise<void>;
   countUsersByRoleIds(ids: string[]): Promise<number>;

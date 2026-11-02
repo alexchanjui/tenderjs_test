@@ -24,6 +24,10 @@
  *           maximum: 100
  *           default: 20
  *         example: 20
+ *       - in: query
+ *         name: keyword
+ *         schema:
+ *           type: string
  *     responses:
  *       200:
  *         description: 成功

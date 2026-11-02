@@ -101,13 +101,14 @@ export class UserService {
   public async getUsers(
     dto: PaginationRequestDto,
   ): Promise<PaginationResponseDto<UserResponseDto>> {
-    const { page, limit } = dto;
+    const { page, limit, keyword } = dto;
     const skip = (page - 1) * limit;
     const currentNodeId = this.getCurrentNodeId();
 
     const [users, total] = await this.ctx.repos.user.findAndCount({
       skip,
       take: limit,
+      keyword,
       nodeId: currentNodeId,
     });
 

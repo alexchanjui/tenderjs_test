@@ -104,7 +104,7 @@
  *       - in: path
  *         name: id
  *         required: true
- *         description: 業者 Node ID
+ *         description: 業者 ID
  *         schema:
  *           type: string
  *           format: uuid
@@ -122,7 +122,7 @@
  *       - in: path
  *         name: id
  *         required: true
- *         description: 業者 Node ID
+ *         description: 業者 ID
  *         schema:
  *           type: string
  *           format: uuid
@@ -194,7 +194,7 @@
  *       - in: path
  *         name: id
  *         required: true
- *         description: 業者 Node ID
+ *         description: 業者 ID
  *         schema:
  *           type: string
  *           format: uuid

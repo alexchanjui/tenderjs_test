@@ -63,16 +63,33 @@ export class PagePrismaRepository implements IPageRepository {
   /**
    * 取得頁面列表（分頁）
    */
-  public async findAndCount(params: { skip?: number; take?: number }): Promise<[Page[], number]> {
+  public async findAndCount(params: {
+    skip?: number;
+    take?: number;
+    keyword?: string;
+  }): Promise<[Page[], number]> {
+    const { skip, take, keyword } = params;
+
+    const where = {
+      ...(keyword && {
+        name: {
+          contains: keyword,
+        },
+      }),
+    };
+
     return this.ctx.prisma.$transaction([
       this.ctx.prisma.page.findMany({
-        skip: params.skip,
-        take: params.take,
+        skip,
+        take,
+        where,
         orderBy: {
           pageCode: "asc",
         },
       }),
-      this.ctx.prisma.page.count(),
+      this.ctx.prisma.page.count({
+        where,
+      }),
     ]);
   }
 

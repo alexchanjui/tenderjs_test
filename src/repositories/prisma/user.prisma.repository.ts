@@ -136,18 +136,35 @@ export class UserPrismaRepository implements IUserRepository {
     skip?: number;
     take?: number;
     nodeId?: string;
+    keyword?: string;
   }): Promise<[UserWithRole[], number]> {
-    const where = params.nodeId
-      ? {
-          nodeId: params.nodeId,
-        }
-      : undefined;
+    const { skip, take, nodeId, keyword } = params;
+
+    const where = {
+      ...(nodeId && {
+        nodeId,
+      }),
+      ...(keyword && {
+        OR: [
+          {
+            account: {
+              contains: keyword,
+            },
+          },
+          {
+            username: {
+              contains: keyword,
+            },
+          },
+        ],
+      }),
+    };
 
     return this.ctx.prisma.$transaction([
       this.ctx.prisma.user.findMany({
         where,
-        skip: params.skip,
-        take: params.take,
+        skip,
+        take,
         orderBy: {
           createdAt: "desc",
         },

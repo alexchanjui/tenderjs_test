@@ -29,6 +29,11 @@ export class VendorController implements IController {
     this.router.get("/:id", this.getVendorById);
     this.router.post("/", validationMiddleware(CreateVendorRequestDto), this.createVendor);
     this.router.put("/:id", validationMiddleware(UpdateVendorRequestDto), this.updateVendor);
+    this.router.put(
+      "/:id/pages",
+      validationMiddleware(UpdateVendorPagesRequestDto),
+      this.updateVendorPages,
+    );
     this.router.delete(
       "/batch",
       validationMiddleware(BatchDeleteStringIdsDto),

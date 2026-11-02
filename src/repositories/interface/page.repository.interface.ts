@@ -8,7 +8,11 @@ export interface IPageRepository {
   findById(id: number): Promise<Page | null>;
   findByCode(pageCode: number): Promise<Page | null>;
   findByCodes(pageCodes: number[]): Promise<Page[]>;
-  findAndCount(params: { skip?: number; take?: number }): Promise<[Page[], number]>;
+  findAndCount(params: {
+    skip?: number;
+    take?: number;
+    keyword?: string;
+  }): Promise<[Page[], number]>;
   update(id: number, data: UpdatePageRequestDto): Promise<void>;
   batchDelete(ids: number[]): Promise<void>;
 }

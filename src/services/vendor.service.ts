@@ -46,12 +46,13 @@ export class VendorService {
   public async getVendors(
     dto: PaginationRequestDto,
   ): Promise<PaginationResponseDto<VendorResponseDto>> {
-    const { page, limit } = dto;
+    const { page, limit, keyword } = dto;
     const skip = (page - 1) * limit;
 
     const [vendors, total] = await this.ctx.repos.vendor.findAndCount({
       skip,
       take: limit,
+      keyword,
     });
 
     return {

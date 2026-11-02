@@ -55,13 +55,14 @@ export class RoleService {
   public async getRoles(
     dto: PaginationRequestDto,
   ): Promise<PaginationResponseDto<RoleResponseDto>> {
-    const { page, limit } = dto;
+    const { page, limit, keyword } = dto;
     const skip = (page - 1) * limit;
     const currentNodeId = this.getCurrentNodeId();
 
     const [roles, total] = await this.ctx.repos.role.findAndCount({
       skip,
       take: limit,
+      keyword,
       nodeId: currentNodeId,
     });
 
