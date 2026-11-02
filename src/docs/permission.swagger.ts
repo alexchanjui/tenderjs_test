@@ -4,7 +4,7 @@
  * @openapi
  * /permissions:
  *   post:
- *     tags: [Permissions]
+ *     tags: ["營運端｜Permissions"]
  *     summary: 建立權限
  *     security:
  *       - BearerAuth: []
@@ -22,7 +22,7 @@
  *               pageId:
  *                 type: integer
  *                 nullable: true
- *                 description: 頁面描述
+ *                 description: 頁面 ID
  *                 example: 100
  *               name:
  *                 type: string
@@ -53,7 +53,7 @@
  * @openapi
  * /permissions/all:
  *   get:
- *     tags: [Permissions]
+ *     tags: ["營運端｜Permissions"]
  *     summary: 取得所有權限
  *     security:
  *       - BearerAuth: []
@@ -66,7 +66,7 @@
  * @openapi
  * /permissions/{id}:
  *   get:
- *     tags: [Permissions]
+ *     tags: ["營運端｜Permissions"]
  *     summary: 取得權限詳細資訊
  *     security:
  *       - BearerAuth: []
@@ -81,7 +81,7 @@
  *         description: 成功
  *
  *   put:
- *     tags: [Permissions]
+ *     tags: ["營運端｜Permissions"]
  *     summary: 更新權限
  *     security:
  *       - BearerAuth: []
@@ -135,7 +135,7 @@
  * @openapi
  * /permissions/batch:
  *   delete:
- *     tags: [Permissions]
+ *     tags: ["營運端｜Permissions"]
  *     summary: 批次刪除權限
  *     security:
  *       - BearerAuth: []

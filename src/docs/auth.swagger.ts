@@ -4,7 +4,7 @@
  * @openapi
  * /auth/login:
  *   post:
- *     tags: [Auth]
+ *     tags: ["共用｜Auth"]
  *     summary: 使用者登入
  *     requestBody:
  *       required: true
@@ -39,7 +39,7 @@
  * @openapi
  * /auth/captcha:
  *   get:
- *     tags: [Auth]
+ *     tags: ["共用｜Auth"]
  *     summary: 取得登入驗證碼
  *     responses:
  *       200:
@@ -50,7 +50,7 @@
  * @openapi
  * /auth/auto-login:
  *   post:
- *     tags: [Auth]
+ *     tags: ["共用｜Auth"]
  *     summary: 自動登入
  *     requestBody:
  *       required: true

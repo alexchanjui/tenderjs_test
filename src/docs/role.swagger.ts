@@ -4,7 +4,7 @@
  * @openapi
  * /roles:
  *   get:
- *     tags: [Roles]
+ *     tags: ["共用｜Roles"]
  *     summary: 取得角色列表
  *     security:
  *       - BearerAuth: []
@@ -30,7 +30,7 @@
  *         description: 成功
  *
  *   post:
- *     tags: [Roles]
+ *     tags: ["共用｜Roles"]
  *     summary: 建立角色
  *     security:
  *       - BearerAuth: []
@@ -63,11 +63,12 @@
  * @openapi
  * /roles/{id}:
  *   get:
- *     tags: [Roles]
+ *     tags: ["共用｜Roles"]
  *     summary: 取得角色詳細資訊
  *     security:
  *       - BearerAuth: []
  *     parameters:
+ *       - $ref: "#/components/parameters/NodeIdHeader"
  *       - in: path
  *         name: id
  *         required: true
@@ -79,11 +80,12 @@
  *         description: 成功
  *
  *   put:
- *     tags: [Roles]
+ *     tags: ["共用｜Roles"]
  *     summary: 更新角色
  *     security:
  *       - BearerAuth: []
  *     parameters:
+ *       - $ref: "#/components/parameters/NodeIdHeader"
  *       - in: path
  *         name: id
  *         required: true
@@ -118,10 +120,12 @@
  * @openapi
  * /roles/batch:
  *   delete:
- *     tags: [Roles]
+ *     tags: ["共用｜Roles"]
  *     summary: 批次刪除角色
  *     security:
  *       - BearerAuth: []
+ *     parameters:
+ *       - $ref: "#/components/parameters/NodeIdHeader"
  *     requestBody:
  *       required: true
  *       content:
@@ -136,6 +140,7 @@
  *                 minItems: 1
  *                 items:
  *                   type: string
+ *                   format: uuid
  *                 example:
  *                   - "550e8400-e29b-41d4-a716-446655440001"
  *                   - "550e8400-e29b-41d4-a716-446655440002"
@@ -148,11 +153,12 @@
  * @openapi
  * /roles/{id}/pages:
  *   put:
- *     tags: [Roles]
+ *     tags: ["共用｜Roles"]
  *     summary: 更新角色頁面權限
  *     security:
  *       - BearerAuth: []
  *     parameters:
+ *       - $ref: "#/components/parameters/NodeIdHeader"
  *       - in: path
  *         name: id
  *         required: true

@@ -10,6 +10,7 @@ import { RolePrismaRepository } from "./repositories/prisma/role.prisma.reposito
 import { PermissionPrismaRepository } from "./repositories/prisma/permission.prisma.repository";
 import { PagePrismaRepository } from "./repositories/prisma/page.prisma.repository";
 import { VendorPrismaRepository } from "./repositories/prisma/vendor.prisma.repository";
+import { VendorProfilePrismaRepository } from "./repositories/prisma/vendor-profile.prisma.repository";
 import { OptionsPrismaRepository } from "./repositories/prisma/options.prisma.repository";
 import { FaqPrismaRepository } from "./repositories/prisma/faq.prisma.repository";
 
@@ -21,6 +22,7 @@ import { RoleService } from "./services/role.service";
 import { PermissionService } from "./services/permission.service";
 import { PageService } from "./services/page.service";
 import { VendorService } from "./services/vendor.service";
+import { VendorProfileService } from "./services/vendor-profile.service";
 import { OptionsService } from "./services/options.service";
 import { FaqService } from "./services/faq.service";
 
@@ -33,6 +35,7 @@ import { RoleController } from "./controllers/role.controller";
 import { PermissionController } from "./controllers/permission.controller";
 import { PageController } from "./controllers/page.controller";
 import { VendorController } from "./controllers/vendor.controller";
+import { VendorProfileController } from "./controllers/vendor-profile.controller";
 import { OptionsController } from "./controllers/options.controller";
 import { FaqController } from "./controllers/faq.controller";
 
@@ -61,6 +64,7 @@ export class AppContainer {
     const permissionRepo = new PermissionPrismaRepository(dbContext);
     const pageRepo = new PagePrismaRepository(dbContext);
     const vendorRepo = new VendorPrismaRepository(dbContext);
+    const vendorProfileRepo = new VendorProfilePrismaRepository(dbContext);
     const optionsRepo = new OptionsPrismaRepository(dbContext);
     const faqRepo = new FaqPrismaRepository(dbContext);
 
@@ -77,6 +81,7 @@ export class AppContainer {
         permission: permissionRepo,
         page: pageRepo,
         vendor: vendorRepo,
+        vendorProfile: vendorProfileRepo,
         options: optionsRepo,
         faq: faqRepo,
       },
@@ -98,6 +103,7 @@ export class AppContainer {
     const permissionService = new PermissionService(ctx);
     const pageService = new PageService(ctx);
     const vendorService = new VendorService(ctx);
+    const vendorProfileService = new VendorProfileService(ctx);
     const optionsService = new OptionsService(ctx);
     const faqService = new FaqService(ctx);
 
@@ -112,6 +118,7 @@ export class AppContainer {
       new PermissionController(permissionService),
       new PageController(pageService),
       new VendorController(vendorService),
+      new VendorProfileController(vendorProfileService),
       new OptionsController(optionsService),
       new FaqController(faqService),
     ];

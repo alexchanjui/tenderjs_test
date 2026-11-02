@@ -4,7 +4,7 @@
  * @openapi
  * /vendors:
  *   get:
- *     tags: [Vendors]
+ *     tags: ["營運端｜Vendors"]
  *     summary: 取得業者列表
  *     security:
  *       - BearerAuth: []
@@ -29,7 +29,7 @@
  *         description: 成功
  *
  *   post:
- *     tags: [Vendors]
+ *     tags: ["營運端｜Vendors"]
  *     summary: 建立業者
  *     description: 建立業者時，同時建立業者最高管理員角色與首位管理員帳號
  *     security:
@@ -96,7 +96,7 @@
  * @openapi
  * /vendors/{id}:
  *   get:
- *     tags: [Vendors]
+ *     tags: ["營運端｜Vendors"]
  *     summary: 取得業者詳細資訊
  *     security:
  *       - BearerAuth: []
@@ -104,6 +104,7 @@
  *       - in: path
  *         name: id
  *         required: true
+ *         description: 業者 Node ID
  *         schema:
  *           type: string
  *           format: uuid
@@ -113,7 +114,7 @@
  *         description: 成功
  *
  *   put:
- *     tags: [Vendors]
+ *     tags: ["營運端｜Vendors"]
  *     summary: 更新業者
  *     security:
  *       - BearerAuth: []
@@ -121,6 +122,7 @@
  *       - in: path
  *         name: id
  *         required: true
+ *         description: 業者 Node ID
  *         schema:
  *           type: string
  *           format: uuid
@@ -139,6 +141,7 @@
  *                 example: 測試業者
  *               description:
  *                 type: string
+ *                 maxLength: 200
  *                 example: 更新後的業者說明
  *               isActive:
  *                 type: boolean
@@ -152,7 +155,7 @@
  * @openapi
  * /vendors/batch:
  *   delete:
- *     tags: [Vendors]
+ *     tags: ["營運端｜Vendors"]
  *     summary: 批次刪除業者
  *     security:
  *       - BearerAuth: []
@@ -183,8 +186,7 @@
  * @openapi
  * /vendors/{id}/pages:
  *   put:
- *     tags:
- *       - Vendors
+ *     tags: ["營運端｜Vendors"]
  *     summary: 更新業者頁面權限
  *     security:
  *       - BearerAuth: []
@@ -192,10 +194,10 @@
  *       - in: path
  *         name: id
  *         required: true
+ *         description: 業者 Node ID
  *         schema:
  *           type: string
  *           format: uuid
- *         description: 業者 ID
  *     requestBody:
  *       required: true
  *       content:
@@ -213,85 +215,4 @@
  *     responses:
  *       200:
  *         description: 更新成功
- */
-
-/**
- * @openapi
- * /vendors/{id}/profile:
- *   get:
- *     tags: [Vendors]
- *     summary: 取得業者品牌資訊
- *     security:
- *       - BearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         description: 業者 Node ID
- *         schema:
- *           type: string
- *           format: uuid
- *     responses:
- *       200:
- *         description: 成功
- *
- *   put:
- *     tags: [Vendors]
- *     summary: 更新業者品牌資訊
- *     security:
- *       - BearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         description: 業者 Node ID
- *         schema:
- *           type: string
- *           format: uuid
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - brandName
- *               - banners
- *             properties:
- *               brandName:
- *                 type: string
- *                 example: 測試品牌
- *               description:
- *                 type: string
- *                 example: 品牌介紹
- *               brandImage:
- *                 type: string
- *                 example: /res/images/vendor/brand.png
- *               phone:
- *                 type: string
- *                 example: "02-12345678"
- *               email:
- *                 type: string
- *                 format: email
- *                 example: vendor@example.com
- *               address:
- *                 type: string
- *                 example: 台北市信義區
- *               banners:
- *                 type: array
- *                 maxItems: 5
- *                 items:
- *                   type: object
- *                   required:
- *                     - imageUrl
- *                   properties:
- *                     imageUrl:
- *                       type: string
- *                       example: /res/images/vendor/banner.png
- *                     sortOrder:
- *                       type: integer
- *                       example: 1
- *     responses:
- *       200:
- *         description: 成功
  */

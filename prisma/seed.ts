@@ -43,12 +43,10 @@ const pagesData = [
   },
   {
     pageCode: 500,
-    name: "vendor-profile",
-    apiPath: "/api/vendor-profile",
-    actionType: 0,
-    isRequired: true,
+    name: "業者品牌管理",
+    description: "管理業者品牌資訊",
+    routePath: "/vendor-profile",
     isActive: true,
-    description: "查詢業者詳細資訊",
   },
 ];
 
@@ -312,10 +310,12 @@ const permissionsData = [
     isActive: true,
     description: "更新業者頁面權限",
   },
+
+  // 500 - 業者品牌管理
   {
     pageCode: 500,
     name: "vendor-profile:detail",
-    apiPath: "/api/vendors/:id/profile",
+    apiPath: "/api/vendor-profile",
     actionType: 0, // GET
     isRequired: true,
     isActive: true,
@@ -324,7 +324,7 @@ const permissionsData = [
   {
     pageCode: 500,
     name: "vendor-profile:update",
-    apiPath: "/api/vendors/:id/profile",
+    apiPath: "/api/vendor-profile",
     actionType: 2, // PUT
     isRequired: true,
     isActive: true,

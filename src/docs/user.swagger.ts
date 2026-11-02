@@ -4,7 +4,7 @@
  * @openapi
  * /users:
  *   get:
- *     tags: [Users]
+ *     tags: ["共用｜Users"]
  *     summary: 取得使用者列表
  *     security:
  *       - BearerAuth: []
@@ -30,7 +30,7 @@
  *         description: 成功
  *
  *   post:
- *     tags: [Users]
+ *     tags: ["共用｜Users"]
  *     summary: 建立使用者
  *     security:
  *       - BearerAuth: []
@@ -80,11 +80,12 @@
  * @openapi
  * /users/{id}:
  *   get:
- *     tags: [Users]
+ *     tags: ["共用｜Users"]
  *     summary: 取得使用者詳細資訊
  *     security:
  *       - BearerAuth: []
  *     parameters:
+ *       - $ref: "#/components/parameters/NodeIdHeader"
  *       - in: path
  *         name: id
  *         required: true
@@ -94,30 +95,14 @@
  *     responses:
  *       200:
  *         description: 成功
- */
-
-/**
- * @openapi
- * /users/me:
- *   get:
- *     tags: [Users]
- *     summary: 取得當前使用者詳細資訊
- *     security:
- *       - BearerAuth: []
- *     responses:
- *       200:
- *         description: 成功
- */
-
-/**
- * @openapi
- * /users/{id}:
+ *
  *   put:
- *     tags: [Users]
+ *     tags: ["共用｜Users"]
  *     summary: 更新使用者
  *     security:
  *       - BearerAuth: []
  *     parameters:
+ *       - $ref: "#/components/parameters/NodeIdHeader"
  *       - in: path
  *         name: id
  *         required: true
@@ -159,12 +144,27 @@
 
 /**
  * @openapi
+ * /users/me:
+ *   get:
+ *     tags: ["共用｜Users"]
+ *     summary: 取得當前使用者詳細資訊
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: 成功
+ */
+
+/**
+ * @openapi
  * /users/batch:
  *   delete:
- *     tags: [Users]
+ *     tags: ["共用｜Users"]
  *     summary: 批次刪除使用者
  *     security:
  *       - BearerAuth: []
+ *     parameters:
+ *       - $ref: "#/components/parameters/NodeIdHeader"
  *     requestBody:
  *       required: true
  *       content:
@@ -179,6 +179,7 @@
  *                 minItems: 1
  *                 items:
  *                   type: string
+ *                   format: uuid
  *                 example:
  *                   - "550e8400-e29b-41d4-a716-446655440001"
  *                   - "550e8400-e29b-41d4-a716-446655440002"

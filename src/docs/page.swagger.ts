@@ -4,7 +4,7 @@
  * @openapi
  * /pages:
  *   get:
- *     tags: [Pages]
+ *     tags: ["營運端｜Pages"]
  *     summary: 取得頁面列表
  *     security:
  *       - BearerAuth: []
@@ -29,7 +29,7 @@
  *         description: 成功
  *
  *   post:
- *     tags: [Pages]
+ *     tags: ["營運端｜Pages"]
  *     summary: 建立頁面
  *     security:
  *       - BearerAuth: []
@@ -70,7 +70,7 @@
  * @openapi
  * /pages/{id}:
  *   get:
- *     tags: [Pages]
+ *     tags: ["營運端｜Pages"]
  *     summary: 取得頁面詳細資訊
  *     security:
  *       - BearerAuth: []
@@ -86,7 +86,7 @@
  *         description: 成功
  *
  *   put:
- *     tags: [Pages]
+ *     tags: ["營運端｜Pages"]
  *     summary: 更新頁面
  *     security:
  *       - BearerAuth: []
@@ -127,7 +127,7 @@
  * @openapi
  * /pages/batch:
  *   delete:
- *     tags: [Pages]
+ *     tags: ["營運端｜Pages"]
  *     summary: 批次刪除頁面
  *     security:
  *       - BearerAuth: []

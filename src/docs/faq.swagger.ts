@@ -4,7 +4,7 @@
  * @openapi
  * /faq-categories:
  *   get:
- *     tags: [FAQ]
+ *     tags: ["共用｜FAQ"]
  *     summary: 取得問答分類列表
  *     security:
  *       - BearerAuth: []
@@ -15,7 +15,7 @@
  *         description: 成功
  *
  *   post:
- *     tags: [FAQ]
+ *     tags: ["共用｜FAQ"]
  *     summary: 新增問答分類
  *     security:
  *       - BearerAuth: []
@@ -39,14 +39,18 @@
  *     responses:
  *       200:
  *         description: 新增成功
- *
+ */
+
+/**
+ * @openapi
  * /faq-categories/{id}:
  *   put:
- *     tags: [FAQ]
+ *     tags: ["共用｜FAQ"]
  *     summary: 更新問答分類
  *     security:
  *       - BearerAuth: []
  *     parameters:
+ *       - $ref: "#/components/parameters/NodeIdHeader"
  *       - in: path
  *         name: id
  *         required: true
@@ -74,11 +78,12 @@
  *         description: 更新成功
  *
  *   delete:
- *     tags: [FAQ]
+ *     tags: ["共用｜FAQ"]
  *     summary: 刪除問答分類
  *     security:
  *       - BearerAuth: []
  *     parameters:
+ *       - $ref: "#/components/parameters/NodeIdHeader"
  *       - in: path
  *         name: id
  *         required: true
@@ -88,14 +93,18 @@
  *     responses:
  *       200:
  *         description: 刪除成功
- *
+ */
+
+/**
+ * @openapi
  * /faqs:
  *   get:
- *     tags: [FAQ]
+ *     tags: ["共用｜FAQ"]
  *     summary: 取得問答列表
  *     security:
  *       - BearerAuth: []
  *     parameters:
+ *       - $ref: "#/components/parameters/NodeIdHeader"
  *       - in: query
  *         name: categoryId
  *         required: true
@@ -108,10 +117,12 @@
  *         description: 成功
  *
  *   post:
- *     tags: [FAQ]
+ *     tags: ["共用｜FAQ"]
  *     summary: 新增問答
  *     security:
  *       - BearerAuth: []
+ *     parameters:
+ *       - $ref: "#/components/parameters/NodeIdHeader"
  *     requestBody:
  *       required: true
  *       content:
@@ -141,14 +152,18 @@
  *     responses:
  *       200:
  *         description: 新增成功
- *
+ */
+
+/**
+ * @openapi
  * /faqs/{id}:
  *   put:
- *     tags: [FAQ]
+ *     tags: ["共用｜FAQ"]
  *     summary: 更新問答
  *     security:
  *       - BearerAuth: []
  *     parameters:
+ *       - $ref: "#/components/parameters/NodeIdHeader"
  *       - in: path
  *         name: id
  *         required: true
@@ -182,11 +197,12 @@
  *         description: 更新成功
  *
  *   delete:
- *     tags: [FAQ]
+ *     tags: ["共用｜FAQ"]
  *     summary: 刪除問答
  *     security:
  *       - BearerAuth: []
  *     parameters:
+ *       - $ref: "#/components/parameters/NodeIdHeader"
  *       - in: path
  *         name: id
  *         required: true
