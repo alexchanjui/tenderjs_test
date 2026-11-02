@@ -89,7 +89,6 @@
  *     security:
  *       - BearerAuth: []
  *     parameters:
- *       - $ref: "#/components/parameters/NodeIdHeader"
  *       - in: path
  *         name: id
  *         required: true
@@ -106,7 +105,6 @@
  *     security:
  *       - BearerAuth: []
  *     parameters:
- *       - $ref: "#/components/parameters/NodeIdHeader"
  *       - in: path
  *         name: id
  *         required: true
@@ -167,8 +165,6 @@
  *     summary: 批次刪除使用者
  *     security:
  *       - BearerAuth: []
- *     parameters:
- *       - $ref: "#/components/parameters/NodeIdHeader"
  *     requestBody:
  *       required: true
  *       content:
