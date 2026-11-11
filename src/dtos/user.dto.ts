@@ -3,6 +3,20 @@ import { Expose, Type } from "class-transformer";
 import { IsBoolean, IsEmail, IsOptional, IsString, IsUUID, Length } from "class-validator";
 
 /**
+ * 節點資訊 DTO
+ */
+export class UserNodeResponseDto {
+  @Expose()
+  name!: string;
+
+  @Expose()
+  code!: string;
+
+  @Expose()
+  type!: string;
+}
+
+/**
  * 建立使用者 Request DTO
  */
 export class CreateUserRequestDto {
@@ -75,17 +89,34 @@ class UserRoleDto {
 }
 
 /**
- * 節點資訊 DTO
+ * 更新個人資料 Request DTO
  */
-export class UserNodeResponseDto {
-  @Expose()
-  name!: string;
+export class UpdatePersonalProfileRequestDto {
+  @IsString({ message: "暱稱必須為字串" })
+  @Length(2, 20, {
+    message: "暱稱長度需介於 2~20 字元",
+  })
+  username!: string;
 
-  @Expose()
-  code!: string;
+  @IsEmail({}, { message: "Email 格式錯誤" })
+  email!: string;
+}
 
-  @Expose()
-  type!: string;
+/**
+ * 修改個人密碼 Request DTO
+ */
+export class UpdatePersonalPasswordRequestDto {
+  @IsString({ message: "舊密碼必須為字串" })
+  @Length(8, 16, {
+    message: "舊密碼長度需介於 8~16 字元",
+  })
+  oldPassword!: string;
+
+  @IsString({ message: "新密碼必須為字串" })
+  @Length(8, 16, {
+    message: "新密碼長度需介於 8~16 字元",
+  })
+  newPassword!: string;
 }
 
 /**

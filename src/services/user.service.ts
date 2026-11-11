@@ -4,6 +4,8 @@ import { plainToInstance } from "class-transformer";
 import type { BatchDeleteStringIdsDto } from "../dtos/common.dto";
 import type { PaginationRequestDto, PaginationResponseDto } from "../dtos/pagination.dto";
 import {
+  UpdatePersonalPasswordRequestDto,
+  UpdatePersonalProfileRequestDto,
   UserResponseDto,
   type CreateUserRequestDto,
   type UpdateUserRequestDto,
@@ -175,9 +177,9 @@ export class UserService {
   }
 
   /**
-   * 取得當前使用者詳細資訊
+   * 取得個人資料
    */
-  public async getMyUserInfo(): Promise<UserResponseDto> {
+  public async getMyProfile(): Promise<UserResponseDto> {
     const currentUser = this.getCurrentUser();
 
     const user = await this.ctx.repos.user.findById(currentUser.id);
@@ -201,5 +203,49 @@ export class UserService {
         excludeExtraneousValues: true,
       },
     );
+  }
+
+  /**
+   * 更新個人密碼
+   */
+  public async updatePersonalPassword(data: UpdatePersonalPasswordRequestDto): Promise<void> {
+    const currentUser = this.getCurrentUser();
+
+    const user = await this.ctx.repos.user.findById(currentUser.id);
+
+    if (!user) {
+      throw new AppError(ErrorCode.DATA_NOT_FOUND);
+    }
+
+    const isPasswordValid = await bcrypt.compare(data.oldPassword, user.password);
+
+    if (!isPasswordValid) {
+      throw new AppError(ErrorCode.PASSWORD_ERROR, "舊密碼錯誤");
+    }
+
+    const isSamePassword = await bcrypt.compare(data.newPassword, user.password);
+
+    if (isSamePassword) {
+      throw new AppError(ErrorCode.PASSWORD_ERROR, "新密碼不可與目前密碼相同");
+    }
+
+    const hashedPassword = await bcrypt.hash(data.newPassword, 10);
+
+    await this.ctx.repos.user.updatePersonalPassword(currentUser.id, hashedPassword);
+  }
+
+  /**
+   * 更新個人資料
+   */
+  public async updatePersonalProfile(data: UpdatePersonalProfileRequestDto): Promise<void> {
+    const currentUser = this.getCurrentUser();
+
+    const user = await this.ctx.repos.user.findById(currentUser.id);
+
+    if (!user) {
+      throw new AppError(ErrorCode.DATA_NOT_FOUND);
+    }
+
+    await this.ctx.repos.user.updatePersonalProfile(currentUser.id, data);
   }
 }

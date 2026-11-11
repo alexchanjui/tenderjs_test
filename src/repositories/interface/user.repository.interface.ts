@@ -1,5 +1,9 @@
 import type { Role, RolePage, User } from "@prisma/client";
-import type { CreateUserRequestDto, UpdateUserRequestDto } from "../../dtos/user.dto";
+import type {
+  CreateUserRequestDto,
+  UpdateUserRequestDto,
+  UpdatePersonalProfileRequestDto,
+} from "../../dtos/user.dto";
 
 /**
  * 包含角色的使用者資料
@@ -38,5 +42,7 @@ export interface IUserRepository {
     nodeId?: string;
   }): Promise<[UserWithRole[], number]>;
   update(id: string, data: UpdateUserRequestDto): Promise<void>;
+  updatePersonalProfile(id: string, data: UpdatePersonalProfileRequestDto): Promise<void>;
+  updatePersonalPassword(id: string, password: string): Promise<void>;
   batchDelete(ids: string[]): Promise<number>;
 }

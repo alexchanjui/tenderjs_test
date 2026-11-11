@@ -3,7 +3,11 @@ import { Router } from "express";
 import type { Request, Response } from "express";
 import { plainToInstance } from "class-transformer";
 import type { UserService } from "../services/user.service";
-import { UpdateUserRequestDto } from "../dtos/user.dto";
+import {
+  UpdateUserRequestDto,
+  UpdatePersonalPasswordRequestDto,
+  UpdatePersonalProfileRequestDto,
+} from "../dtos/user.dto";
 import type { IController } from "./interface/controller.interface";
 import { validationMiddleware } from "../middlewares/validation.middleware";
 import { CreateUserRequestDto } from "../dtos/user.dto";
@@ -24,7 +28,17 @@ export class UserController implements IController {
    */
   private initializeRoutes(): void {
     this.router.post("/", validationMiddleware(CreateUserRequestDto), this.createUser);
-    this.router.get("/me", this.getMyUserInfo);
+    this.router.get("/me", this.getMyProfile);
+    this.router.put(
+      "/me",
+      validationMiddleware(UpdatePersonalProfileRequestDto),
+      this.updatePersonalProfile,
+    );
+    this.router.put(
+      "/me/password",
+      validationMiddleware(UpdatePersonalPasswordRequestDto),
+      this.updatePersonalPassword,
+    );
     this.router.get("/", validationMiddleware(PaginationRequestDto, "query"), this.getUsers);
     this.router.get("/:id", this.getUserById);
     this.router.put("/:id", validationMiddleware(UpdateUserRequestDto), this.updateUser);
@@ -92,11 +106,33 @@ export class UserController implements IController {
   };
 
   /**
-   * 取得當前使用者詳細資訊
+   * 取得個人資料
    */
-  private getMyUserInfo = async (_req: Request, res: Response): Promise<void> => {
-    const result = await this.userService.getMyUserInfo();
+  private getMyProfile = async (_req: Request, res: Response): Promise<void> => {
+    const result = await this.userService.getMyProfile();
 
     R.success(res, result);
+  };
+
+  /**
+   * 更新個人資料
+   */
+  private updatePersonalProfile = async (req: Request, res: Response): Promise<void> => {
+    const dto = plainToInstance(UpdatePersonalProfileRequestDto, req.body);
+
+    await this.userService.updatePersonalProfile(dto);
+
+    R.success(res);
+  };
+
+  /**
+   * 更新個人密碼
+   */
+  private updatePersonalPassword = async (req: Request, res: Response): Promise<void> => {
+    const dto = plainToInstance(UpdatePersonalPasswordRequestDto, req.body);
+
+    await this.userService.updatePersonalPassword(dto);
+
+    R.success(res);
   };
 }

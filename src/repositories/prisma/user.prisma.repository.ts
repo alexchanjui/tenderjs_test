@@ -1,6 +1,10 @@
 // src/repositories/prisma/user.prisma.repository.ts
 import type { User } from "@prisma/client";
-import type { CreateUserRequestDto, UpdateUserRequestDto } from "../../dtos/user.dto";
+import type {
+  CreateUserRequestDto,
+  UpdateUserRequestDto,
+  UpdatePersonalProfileRequestDto,
+} from "../../dtos/user.dto";
 import type { IDbContext } from "../../types/db.context";
 import type { IUserRepository, UserWithRole } from "../interface/user.repository.interface";
 
@@ -223,5 +227,30 @@ export class UserPrismaRepository implements IUserRepository {
     });
 
     return result.count;
+  }
+
+  /**
+   * 更新個人資料
+   */
+  public async updatePersonalProfile(
+    id: string,
+    data: UpdatePersonalProfileRequestDto,
+  ): Promise<void> {
+    await this.ctx.prisma.user.update({
+      where: { id },
+      data,
+    });
+  }
+
+  /**
+   * 更新個人密碼
+   */
+  public async updatePersonalPassword(id: string, password: string): Promise<void> {
+    await this.ctx.prisma.user.update({
+      where: { id },
+      data: {
+        password,
+      },
+    });
   }
 }

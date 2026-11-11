@@ -146,19 +146,6 @@
 
 /**
  * @openapi
- * /users/me:
- *   get:
- *     tags: ["共用｜Users"]
- *     summary: 取得當前使用者詳細資訊
- *     security:
- *       - BearerAuth: []
- *     responses:
- *       200:
- *         description: 成功
- */
-
-/**
- * @openapi
  * /users/batch:
  *   delete:
  *     tags: ["共用｜Users"]
@@ -183,6 +170,72 @@
  *                 example:
  *                   - "550e8400-e29b-41d4-a716-446655440001"
  *                   - "550e8400-e29b-41d4-a716-446655440002"
+ *     responses:
+ *       200:
+ *         description: 成功
+ */
+
+/**
+ * @openapi
+ * /users/me:
+ *   get:
+ *     tags: ["共用｜Users"]
+ *     summary: 取得個人資料
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: 成功
+ *
+ *   put:
+ *     tags: ["共用｜Users"]
+ *     summary: 更新個人資料
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 minLength: 2
+ *                 maxLength: 20
+ *                 example: "測試人員"
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: test@example.com
+ *     responses:
+ *       200:
+ *         description: 成功
+ *
+ * /users/me/password:
+ *   put:
+ *     tags: ["共用｜Users"]
+ *     summary: 更新個人密碼
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - oldPassword
+ *               - newPassword
+ *             properties:
+ *               oldPassword:
+ *                 type: string
+ *                 minLength: 6
+ *                 example: oldpassword123
+ *               newPassword:
+ *                 type: string
+ *                 minLength: 6
+ *                 example: newpassword123
  *     responses:
  *       200:
  *         description: 成功
