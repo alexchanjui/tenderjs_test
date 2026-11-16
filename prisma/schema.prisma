@@ -469,3 +469,17 @@ model OperatingTerm {
   @@index([vendorProfileId])
   @@map("operating_term")
 }
+
+// ==========================================
+// 商品相關
+// ==========================================
+model ProductCategory {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique @db.NVarChar(20)
+  description String?  @db.NVarChar(250)
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("create_time")
+  updatedAt   DateTime @updatedAt @map("update_time")
+
+  @@map("product_category")
+}

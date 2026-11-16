@@ -4,11 +4,12 @@ import type Redis from "ioredis";
 import type { IFaqRepository } from "../repositories/interface/faq.repository.interface";
 import type { IOptionsRepository } from "../repositories/interface/options.repository.interface";
 import type { IPageRepository } from "../repositories/interface/page.repository.interface";
-import { IPermissionRepository } from "../repositories/interface/permission.repository.interface";
-import { IRoleRepository } from "../repositories/interface/role.repository.interface";
-import { IUserRepository } from "../repositories/interface/user.repository.interface";
+import type { IPermissionRepository } from "../repositories/interface/permission.repository.interface";
+import type { IRoleRepository } from "../repositories/interface/role.repository.interface";
+import type { IUserRepository } from "../repositories/interface/user.repository.interface";
 import type { IVendorProfileRepository } from "../repositories/interface/vendor-profile.repository.interface";
 import type { IVendorRepository } from "../repositories/interface/vendor.repository.interface";
+import type { IProductCategoryRepository } from "../repositories/interface/product-category.repository.interface";
 import type { LoggerService } from "../utils/logger";
 
 /**
@@ -41,6 +42,7 @@ export interface IRepositoryContext {
   options: IOptionsRepository;
   faq: IFaqRepository;
   vendorProfile: IVendorProfileRepository;
+  productCategory: IProductCategoryRepository;
 }
 
 /**

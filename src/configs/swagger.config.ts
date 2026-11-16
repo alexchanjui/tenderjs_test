@@ -76,6 +76,10 @@ const options: swaggerJsdoc.Options = {
         name: "營運端｜Vendors",
         description: "僅供營運端使用的業者管理 API",
       },
+      {
+        name: "營運端｜Product Category",
+        description: "僅供營運端使用的商品分類管理 API",
+      },
     ],
   },
 

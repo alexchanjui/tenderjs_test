@@ -13,6 +13,7 @@ import { VendorPrismaRepository } from "./repositories/prisma/vendor.prisma.repo
 import { VendorProfilePrismaRepository } from "./repositories/prisma/vendor-profile.prisma.repository";
 import { OptionsPrismaRepository } from "./repositories/prisma/options.prisma.repository";
 import { FaqPrismaRepository } from "./repositories/prisma/faq.prisma.repository";
+import { ProductCategoryPrismaRepository } from "./repositories/prisma/product-category.prisma.repository";
 
 // Services
 import { HealthService } from "./services/health.service";
@@ -25,6 +26,7 @@ import { VendorService } from "./services/vendor.service";
 import { VendorProfileService } from "./services/vendor-profile.service";
 import { OptionsService } from "./services/options.service";
 import { FaqService } from "./services/faq.service";
+import { ProductCategoryService } from "./services/product-category.service";
 
 // Controllers
 import type { IController } from "./controllers/interface/controller.interface";
@@ -38,6 +40,7 @@ import { VendorController } from "./controllers/vendor.controller";
 import { VendorProfileController } from "./controllers/vendor-profile.controller";
 import { OptionsController } from "./controllers/options.controller";
 import { FaqController } from "./controllers/faq.controller";
+import { ProductCategoryController } from "./controllers/product-category.controller";
 
 // Types
 import type { IServiceContext } from "./types/service.context";
@@ -67,6 +70,7 @@ export class AppContainer {
     const vendorProfileRepo = new VendorProfilePrismaRepository(dbContext);
     const optionsRepo = new OptionsPrismaRepository(dbContext);
     const faqRepo = new FaqPrismaRepository(dbContext);
+    const productCategoryRepo = new ProductCategoryPrismaRepository(dbContext);
 
     /**
      * 建立 Service 共用依賴
@@ -84,6 +88,7 @@ export class AppContainer {
         vendorProfile: vendorProfileRepo,
         options: optionsRepo,
         faq: faqRepo,
+        productCategory: productCategoryRepo,
       },
       get currentUser() {
         return requestContextStorage.getStore()?.currentUser;
@@ -106,6 +111,7 @@ export class AppContainer {
     const vendorProfileService = new VendorProfileService(ctx);
     const optionsService = new OptionsService(ctx);
     const faqService = new FaqService(ctx);
+    const productCategoryService = new ProductCategoryService(ctx);
 
     /**
      * 組裝 Controllers
@@ -121,6 +127,7 @@ export class AppContainer {
       new VendorProfileController(vendorProfileService),
       new OptionsController(optionsService),
       new FaqController(faqService),
+      new ProductCategoryController(productCategoryService),
     ];
   }
 }

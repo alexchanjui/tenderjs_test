@@ -56,13 +56,13 @@ export class PageService {
    * 取得頁面詳細資訊
    */
   public async getPageById(id: number): Promise<PageResponseDto> {
-    const page = await this.ctx.repos.page.findById(id);
+    const data = await this.ctx.repos.page.findById(id);
 
-    if (!page) {
-      throw new AppError(ErrorCode.DATA_NOT_FOUND, "頁面不存在");
+    if (!data) {
+      throw new AppError(ErrorCode.DATA_NOT_FOUND);
     }
 
-    return plainToInstance(PageResponseDto, page, {
+    return plainToInstance(PageResponseDto, data, {
       excludeExtraneousValues: true,
     });
   }
