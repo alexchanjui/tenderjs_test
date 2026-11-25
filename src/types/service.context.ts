@@ -10,6 +10,7 @@ import type { IUserRepository } from "../repositories/interface/user.repository.
 import type { IVendorProfileRepository } from "../repositories/interface/vendor-profile.repository.interface";
 import type { IVendorRepository } from "../repositories/interface/vendor.repository.interface";
 import type { IProductCategoryRepository } from "../repositories/interface/product-category.repository.interface";
+import type { IProductTagRepository } from "../repositories/interface/product-tag.interface";
 import type { LoggerService } from "../utils/logger";
 
 /**
@@ -43,6 +44,7 @@ export interface IRepositoryContext {
   faq: IFaqRepository;
   vendorProfile: IVendorProfileRepository;
   productCategory: IProductCategoryRepository;
+  productTag: IProductTagRepository;
 }
 
 /**

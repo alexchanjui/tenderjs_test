@@ -473,6 +473,8 @@ model OperatingTerm {
 // ==========================================
 // 商品相關
 // ==========================================
+
+/// 商品分類
 model ProductCategory {
   id          Int      @id @default(autoincrement())
   name        String   @unique @db.NVarChar(20)
@@ -482,4 +484,16 @@ model ProductCategory {
   updatedAt   DateTime @updatedAt @map("update_time")
 
   @@map("product_category")
+}
+
+/// 商品標籤
+model ProductTag {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique @db.NVarChar(20)
+  description String?  @db.NVarChar(250)
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("create_time")
+  updatedAt   DateTime @updatedAt @map("update_time")
+
+  @@map("product_tag")
 }

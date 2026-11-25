@@ -30,7 +30,7 @@ export class ProductCategoryController implements IController {
     this.router.get("/:id", this.getProductCategoryById);
     this.router.post(
       "/",
-      validationMiddleware(UpdateProductCategoryRequestDto, "body"),
+      validationMiddleware(CreateProductCategoryRequestDto, "body"),
       this.createProductCategory,
     );
     this.router.put(
