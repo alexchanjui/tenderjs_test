@@ -3,16 +3,15 @@ import type { Page } from "@prisma/client";
 import type { CreatePageRequestDto, UpdatePageRequestDto } from "../../dtos/page.dto";
 
 export interface IPageRepository {
-  create(data: CreatePageRequestDto): Promise<Page>;
-  findAll(): Promise<Page[]>;
-  findById(id: number): Promise<Page | null>;
-  findByCode(pageCode: number): Promise<Page | null>;
-  findByCodes(pageCodes: number[]): Promise<Page[]>;
   findAndCount(params: {
     skip?: number;
     take?: number;
     keyword?: string;
   }): Promise<[Page[], number]>;
+  findById(id: number): Promise<Page | null>;
+  findByCode(pageCode: number): Promise<Page | null>;
+  findByCodes(pageCodes: number[]): Promise<Page[]>;
+  create(data: CreatePageRequestDto): Promise<void>;
   update(id: number, data: UpdatePageRequestDto): Promise<void>;
-  batchDelete(ids: number[]): Promise<void>;
+  delete(id: number): Promise<void>;
 }

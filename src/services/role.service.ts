@@ -178,7 +178,7 @@ export class RoleService {
       throw new AppError(ErrorCode.DATA_NOT_FOUND, "角色不存在");
     }
 
-    // 最高管理員權限由 NodePage 自動同步
+    // 最高管理員的頁面權限不開放手動修改
     if (role.name === "superAdmin" || role.isVendorAdmin) {
       throw new AppError(ErrorCode.FAIL, "最高管理員權限不可手動修改");
     }
@@ -188,14 +188,11 @@ export class RoleService {
       throw new AppError(ErrorCode.REQUEST_DATA, "頁面不可重複設定");
     }
 
-    // 取得所有頁面
-    const pages = await this.ctx.repos.page.findAll();
-    const pageIdByCode = new Map(pages.map((page) => [page.pageCode, page.id]));
+    // 只查詢本次設定的頁面
+    const pages = await this.ctx.repos.page.findByCodes(dto.pageCodes);
 
-    // 檢查頁面是否存在
-    const invalidPageCode = dto.pageCodes.find((pageCode) => !pageIdByCode.has(pageCode));
-
-    if (invalidPageCode !== undefined) {
+    // 查到的筆數不足，代表有頁面代碼不存在
+    if (pages.length !== dto.pageCodes.length) {
       throw new AppError(ErrorCode.DATA_NOT_FOUND, "頁面不存在");
     }
 
@@ -214,9 +211,9 @@ export class RoleService {
       throw new AppError(ErrorCode.FAIL, "角色頁面權限不可超出組織授權範圍");
     }
 
-    // 轉換為 RolePage
-    const rolePages = dto.pageCodes.map((pageCode) => ({
-      pageId: pageIdByCode.get(pageCode)!,
+    // 使用查到的頁面 ID 建立角色頁面關聯
+    const rolePages = pages.map((page) => ({
+      pageId: page.id,
     }));
 
     // 更新角色頁面權限

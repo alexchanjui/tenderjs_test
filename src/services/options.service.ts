@@ -33,19 +33,6 @@ export class OptionsService {
   }
 
   /**
-   * 取得頁面選項
-   */
-  public async getPageOptions() {
-    const pages = await this.ctx.repos.options.findAllPages();
-
-    return pages.map((page) => ({
-      label: page.name,
-      value: page.id,
-      pageCode: page.pageCode,
-    }));
-  }
-
-  /**
    * 取得組織節點選項
    */
   public async getNodeOptions() {

@@ -15,7 +15,7 @@
  *           type: integer
  *           minimum: 1
  *           default: 1
- *         example: 1
+ *         description: 頁碼
  *       - in: query
  *         name: limit
  *         schema:
@@ -23,11 +23,13 @@
  *           minimum: 1
  *           maximum: 100
  *           default: 20
- *         example: 20
+ *         description: 每頁筆數
  *       - in: query
  *         name: keyword
  *         schema:
  *           type: string
+ *           maxLength: 20
+ *         description: 關鍵字
  *     responses:
  *       200:
  *         description: 成功
@@ -43,52 +45,31 @@
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - pageCode
- *               - name
- *               - routePath
+ *             required: [pageCode, name, routePath]
  *             properties:
  *               pageCode:
  *                 type: integer
- *                 example: 500
+ *                 description: 頁面代碼，建立後不可修改
+ *                 example: 100
  *               name:
  *                 type: string
  *                 minLength: 2
  *                 maxLength: 50
- *                 example: 報表管理
+ *                 example: 使用者管理
  *               description:
  *                 type: string
- *                 example: 報表相關頁面
+ *                 example: 管理使用者資料
  *               routePath:
  *                 type: string
- *                 example: /reports
+ *                 example: /users
  *               isActive:
  *                 type: boolean
- *                 example: true
- *     responses:
- *       200:
- *         description: 成功
- */
-
-/**
- * @openapi
- * /pages/{id}:
- *   get:
- *     tags: ["營運端｜Pages"]
- *     summary: 取得頁面詳細資訊
- *     security:
- *       - BearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         example: 100
+ *                 default: true
  *     responses:
  *       200:
  *         description: 成功
  *
+ * /pages/{id}:
  *   put:
  *     tags: ["營運端｜Pages"]
  *     summary: 更新頁面
@@ -100,7 +81,8 @@
  *         required: true
  *         schema:
  *           type: integer
- *         example: 100
+ *           minimum: 1
+ *         description: 頁面 ID
  *     requestBody:
  *       required: true
  *       content:
@@ -115,7 +97,7 @@
  *                 example: 使用者管理
  *               description:
  *                 type: string
- *                 example: 使用者管理相關頁面
+ *                 example: 管理使用者資料
  *               routePath:
  *                 type: string
  *                 example: /users
@@ -125,31 +107,20 @@
  *     responses:
  *       200:
  *         description: 成功
- */
-
-/**
- * @openapi
- * /pages/batch:
+ *
  *   delete:
  *     tags: ["營運端｜Pages"]
- *     summary: 批次刪除頁面
+ *     summary: 刪除頁面
  *     security:
  *       - BearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - ids
- *             properties:
- *               ids:
- *                 type: array
- *                 minItems: 1
- *                 items:
- *                   type: integer
- *                 example: [300, 400]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *         description: 頁面 ID
  *     responses:
  *       200:
  *         description: 成功

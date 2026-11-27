@@ -18,7 +18,6 @@ export class OptionsController implements IController {
    */
   private initializeRoutes(): void {
     this.router.get("/roles", this.getRoleOptions);
-    this.router.get("/pages", this.getPageOptions);
     this.router.get("/nodes", this.getNodeOptions);
     this.router.get("/faq-categories", this.getFaqCategoryOptions);
   }
@@ -28,15 +27,6 @@ export class OptionsController implements IController {
    */
   private getRoleOptions = async (_req: Request, res: Response): Promise<void> => {
     const result = await this.optionsService.getRoleOptions();
-
-    R.success(res, result);
-  };
-
-  /**
-   * 取得頁面選項
-   */
-  private getPageOptions = async (_req: Request, res: Response): Promise<void> => {
-    const result = await this.optionsService.getPageOptions();
 
     R.success(res, result);
   };
