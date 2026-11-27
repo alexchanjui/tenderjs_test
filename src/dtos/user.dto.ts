@@ -86,6 +86,9 @@ class UserRoleDto {
 
   @Expose()
   description!: string;
+
+  @Expose()
+  isVendorAdmin!: boolean;
 }
 
 /**

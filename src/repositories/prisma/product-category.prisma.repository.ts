@@ -10,12 +10,6 @@ import type { IProductCategoryRepository } from "../interface/product-category.r
 export class ProductCategoryPrismaRepository implements IProductCategoryRepository {
   constructor(private readonly ctx: IDbContext) {}
 
-  public findAll(): Promise<ProductCategory[]> {
-    return this.ctx.prisma.productCategory.findMany({
-      orderBy: { name: "asc" },
-    });
-  }
-
   public async findAndCount(params: {
     skip?: number;
     take?: number;
@@ -46,12 +40,6 @@ export class ProductCategoryPrismaRepository implements IProductCategoryReposito
     ]);
   }
 
-  public async findById(id: number): Promise<ProductCategory | null> {
-    return this.ctx.prisma.productCategory.findUnique({
-      where: { id },
-    });
-  }
-
   public async create(data: CreateProductCategoryRequestDto): Promise<void> {
     await this.ctx.prisma.productCategory.create({
       data: {
@@ -69,11 +57,9 @@ export class ProductCategoryPrismaRepository implements IProductCategoryReposito
     });
   }
 
-  public async batchDelete(ids: number[]): Promise<void> {
-    await this.ctx.prisma.productCategory.deleteMany({
-      where: {
-        id: { in: ids },
-      },
+  public async delete(id: number): Promise<void> {
+    await this.ctx.prisma.productCategory.delete({
+      where: { id },
     });
   }
 }

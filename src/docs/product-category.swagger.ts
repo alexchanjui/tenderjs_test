@@ -2,9 +2,9 @@
 
 /**
  * @openapi
- * /product-category:
+ * /product-categories:
  *   get:
- *     tags: ["營運端｜Product Category"]
+ *     tags: ["營運端｜Product Categories"]
  *     summary: 取得商品分類列表
  *     security:
  *       - BearerAuth: []
@@ -15,7 +15,7 @@
  *           type: integer
  *           minimum: 1
  *           default: 1
- *         example: 1
+ *         description: 頁碼
  *       - in: query
  *         name: limit
  *         schema:
@@ -23,18 +23,19 @@
  *           minimum: 1
  *           maximum: 100
  *           default: 20
- *         example: 20
+ *         description: 每頁筆數
  *       - in: query
  *         name: keyword
  *         schema:
  *           type: string
- *         example: 定期票
+ *           maxLength: 20
+ *         description: 關鍵字
  *     responses:
  *       200:
  *         description: 成功
  *
  *   post:
- *     tags: ["營運端｜Product Category"]
+ *     tags: ["營運端｜Product Categories"]
  *     summary: 建立商品分類
  *     security:
  *       - BearerAuth: []
@@ -50,40 +51,22 @@
  *                 type: string
  *                 minLength: 2
  *                 maxLength: 20
- *                 example: 水上活動
+ *                 example: 戶外活動
  *               description:
  *                 type: string
- *                 maxLength: 250
- *                 example: 商品分類描述
+ *                 nullable: true
+ *                 maxLength: 500
+ *                 example: 戶外探索與自然體驗相關活動
  *               isActive:
  *                 type: boolean
- *                 example: true
- *     responses:
- *       200:
- *         description: 成功
- */
-
-/**
- * @openapi
- * /product-category/{id}:
- *   get:
- *     tags: ["營運端｜Product Category"]
- *     summary: 取得商品分類詳細資訊
- *     security:
- *       - BearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         example: 1
+ *                 default: true
  *     responses:
  *       200:
  *         description: 成功
  *
+ * /product-categories/{id}:
  *   put:
- *     tags: ["營運端｜Product Category"]
+ *     tags: ["營運端｜Product Categories"]
  *     summary: 更新商品分類
  *     security:
  *       - BearerAuth: []
@@ -93,7 +76,8 @@
  *         required: true
  *         schema:
  *           type: integer
- *         example: 1
+ *           minimum: 1
+ *         description: 商品分類 ID
  *     requestBody:
  *       required: true
  *       content:
@@ -105,42 +89,32 @@
  *                 type: string
  *                 minLength: 2
  *                 maxLength: 20
- *                 example: 水上活動
+ *                 example: 戶外活動
  *               description:
  *                 type: string
- *                 maxLength: 250
- *                 example: 商品分類描述
+ *                 nullable: true
+ *                 maxLength: 500
+ *                 example: 戶外探索與自然體驗相關活動
  *               isActive:
  *                 type: boolean
  *                 example: true
  *     responses:
  *       200:
  *         description: 成功
- */
-
-/**
- * @openapi
- * /product-category/batch:
+ *
  *   delete:
- *     tags: ["營運端｜Product Category"]
- *     summary: 批次刪除商品分類
+ *     tags: ["營運端｜Product Categories"]
+ *     summary: 刪除商品分類
  *     security:
  *       - BearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - ids
- *             properties:
- *               ids:
- *                 type: array
- *                 minItems: 1
- *                 items:
- *                   type: integer
- *                 example: [1, 2]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *         description: 商品分類 ID
  *     responses:
  *       200:
  *         description: 成功

@@ -1,20 +1,18 @@
 // src/controllers/product-category.controller.ts
-import type { Request, Response } from "express";
+import { Router, type Request, type Response } from "express";
 import { plainToInstance } from "class-transformer";
 import { validationMiddleware } from "../middlewares/validation.middleware";
 import { PaginationRequestDto } from "../dtos/pagination.dto";
 import {
-  UpdateProductCategoryRequestDto,
   CreateProductCategoryRequestDto,
+  UpdateProductCategoryRequestDto,
 } from "../dtos/product-category.dto";
 import { ProductCategoryService } from "../services/product-category.service";
-import { BatchDeleteNumberIdsDto } from "../dtos/common.dto";
 import type { IController } from "./interface/controller.interface";
-import { Router } from "express";
 import * as R from "../utils/response";
 
 export class ProductCategoryController implements IController {
-  public path = "/product-category";
+  public path = "/product-categories";
   public router = Router();
 
   constructor(private readonly productCategoryService: ProductCategoryService) {
@@ -25,9 +23,8 @@ export class ProductCategoryController implements IController {
     this.router.get(
       "/",
       validationMiddleware(PaginationRequestDto, "query"),
-      this.getProductCategoryList,
+      this.getProductCategories,
     );
-    this.router.get("/:id", this.getProductCategoryById);
     this.router.post(
       "/",
       validationMiddleware(CreateProductCategoryRequestDto, "body"),
@@ -38,17 +35,13 @@ export class ProductCategoryController implements IController {
       validationMiddleware(UpdateProductCategoryRequestDto, "body"),
       this.updateProductCategory,
     );
-    this.router.delete(
-      "/batch",
-      validationMiddleware(BatchDeleteNumberIdsDto),
-      this.batchDeleteProductCategory,
-    );
+    this.router.delete("/:id", this.deleteProductCategory);
   }
 
-  private getProductCategoryList = async (req: Request, res: Response): Promise<void> => {
+  private getProductCategories = async (req: Request, res: Response): Promise<void> => {
     const dto = plainToInstance(PaginationRequestDto, req.query);
 
-    const result = await this.productCategoryService.getProductCategoryList(dto);
+    const result = await this.productCategoryService.getProductCategories(dto);
 
     R.success(res, result);
   };
@@ -56,35 +49,27 @@ export class ProductCategoryController implements IController {
   private createProductCategory = async (req: Request, res: Response): Promise<void> => {
     const dto = plainToInstance(CreateProductCategoryRequestDto, req.body);
 
-    const result = await this.productCategoryService.createProductCategory(dto);
+    await this.productCategoryService.createProductCategory(dto);
 
-    R.success(res, result);
-  };
-
-  private getProductCategoryById = async (req: Request, res: Response): Promise<void> => {
-    const { id } = req.params;
-
-    const result = await this.productCategoryService.getProductCategoryById(Number(id));
-
-    R.success(res, result);
+    R.success(res);
   };
 
   private updateProductCategory = async (
     req: Request<{ id: string }>,
     res: Response,
   ): Promise<void> => {
-    const { id } = req.params;
     const dto = plainToInstance(UpdateProductCategoryRequestDto, req.body);
 
-    await this.productCategoryService.updateProductCategory(Number(id), dto);
+    await this.productCategoryService.updateProductCategory(Number(req.params.id), dto);
 
     R.success(res);
   };
 
-  private batchDeleteProductCategory = async (req: Request, res: Response): Promise<void> => {
-    const dto = plainToInstance(BatchDeleteNumberIdsDto, req.body);
-
-    await this.productCategoryService.batchDeleteProductCategory(dto.ids);
+  private deleteProductCategory = async (
+    req: Request<{ id: string }>,
+    res: Response,
+  ): Promise<void> => {
+    await this.productCategoryService.deleteProductCategory(Number(req.params.id));
 
     R.success(res);
   };

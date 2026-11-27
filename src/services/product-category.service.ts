@@ -8,23 +8,14 @@ import { PageResponseDto } from "../dtos/page.dto";
 import { PaginationRequestDto } from "../dtos/pagination.dto";
 import { PaginationResponseDto } from "../dtos/pagination.dto";
 import { plainToInstance } from "class-transformer";
-import { AppError } from "../errors/app.error";
-import { ErrorCode } from "../errors/error.codes";
 
 export class ProductCategoryService {
   constructor(private readonly ctx: IServiceContext) {}
 
   /**
-   * 建立商品分類
-   */
-  public async createProductCategory(data: CreateProductCategoryRequestDto): Promise<void> {
-    await this.ctx.repos.productCategory.create(data);
-  }
-
-  /**
    * 取得商品分類列表 (分頁)
    */
-  public async getProductCategoryList(
+  public async getProductCategories(
     dto: PaginationRequestDto,
   ): Promise<PaginationResponseDto<PageResponseDto>> {
     const { page, limit, keyword } = dto;
@@ -51,18 +42,10 @@ export class ProductCategoryService {
   }
 
   /**
-   * 取得商品分類詳細資訊
+   * 建立商品分類
    */
-  public async getProductCategoryById(id: number): Promise<PageResponseDto> {
-    const data = await this.ctx.repos.productCategory.findById(id);
-
-    if (!data) {
-      throw new AppError(ErrorCode.DATA_NOT_FOUND);
-    }
-
-    return plainToInstance(PageResponseDto, data, {
-      excludeExtraneousValues: true,
-    });
+  public async createProductCategory(data: CreateProductCategoryRequestDto): Promise<void> {
+    await this.ctx.repos.productCategory.create(data);
   }
 
   /**
@@ -76,9 +59,9 @@ export class ProductCategoryService {
   }
 
   /**
-   * 批次刪除商品分類
+   * 刪除商品分類
    */
-  public async batchDeleteProductCategory(ids: number[]): Promise<void> {
-    await this.ctx.repos.productCategory.batchDelete(ids);
+  public async deleteProductCategory(id: number): Promise<void> {
+    await this.ctx.repos.productCategory.delete(id);
   }
 }
